@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Monitoring PKL SMK</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 min-h-screen font-sans text-slate-800">
+
+  <!-- CONTAINER UTAMA BERGAYA MOBILE APP -->
+  <div class="max-w-md mx-auto bg-white min-h-screen shadow-xl flex flex-col justify-between relative">
+    
+    <!-- HEADER -->
+    <header class="bg-indigo-600 text-white p-4 shadow-md sticky top-0 z-10">
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-lg font-bold tracking-wide">E-PKL SMK</h1>
+          <p id="headerSubtitle" class="text-xs text-indigo-200">Sistem Presensi & Jurnal Harian</p>
+        </div>
+        <button id="btnLogout" onclick="logout()" class="hidden text-xs bg-indigo-800 hover:bg-indigo-900 px-3 py-1.5 rounded-lg">Keluar</button>
+      </div>
+    </header>
+
+    <!-- HALAMAN LOGIN -->
+    <main id="loginView" class="p-6 flex-1 flex flex-col justify-center">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-3 font-bold text-2xl">PKL</div>
+        <h2 class="text-xl font-bold">Login Peserta PKL</h2>
+        <p class="text-xs text-slate-500 mt-1">Gunakan NIS & PIN dari Pokja PKL (Coba: NIS 1001, PIN 1234)</p>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nomor Induk Siswa (NIS)</label>
+          <input type="text" id="inputNis" placeholder="Contoh: 1001" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">PIN Akses</label>
+          <input type="password" id="inputPin" placeholder="••••" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <button onclick="prosesLogin()" id="btnLogin" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl shadow transition">Masuk Aplikasi</button>
+      </div>
+    </main>
+
+    <!-- HALAMAN UTAMA APLIKASI (SETELAH LOGIN) -->
+    <main id="appView" class="hidden flex-1 pb-20">
+      
+      <!-- KARTU INFO SISWA & DUDI -->
+      <div class="bg-indigo-50 p-4 m-4 rounded-xl border border-indigo-100">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 id="txtNamaSiswa" class="font-bold text-slate-800">-</h3>
+            <p id="txtKelasSiswa" class="text-xs text-slate-500">-</p>
+          </div>
+          <span class="bg-indigo-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">AKTIF PKL</span>
+        </div>
+        <div class="mt-3 pt-3 border-t border-indigo-200/60 text-xs">
+          <p class="font-semibold text-indigo-950">Lokasi DUDI: <span id="txtNamaDudi" class="font-normal">-</span></p>
+          <p class="text-slate-600 mt-0.5">Jarak GPS Saat Ini: <span id="txtJarakGps" class="font-bold text-amber-600">Mendeteksi GPS...</span></p>
+        </div>
+      </div>
+
+      <!-- TAB 1: MENU ABSENSI -->
+      <section id="tabAbsen" class="px-4 space-y-4">
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+          <label class="block text-xs font-bold text-slate-700 mb-2">1. Kamera Bukti Kehadiran (Live Selfie)</label>
+          <div class="relative rounded-lg overflow-hidden bg-black aspect-video flex items-center justify-center">
+            <video id="videoCam" autoplay playsinline class="w-full h-full object-cover"></video>
+            <canvas id="canvasCam" class="hidden"></canvas>
+            <img id="previewFoto" class="hidden w-full h-full object-cover" />
+          </div>
+          <div class="flex gap-2 mt-2">
+            <button onclick="ambilFoto()" id="btnCapture" class="flex-1 bg-slate-800 text-white text-xs py-2.5 rounded-lg font-medium">Ambil Foto</button>
+            <button onclick="ulangFoto()" id="btnRetake" class="hidden flex-1 bg-slate-300 text-slate-800 text-xs py-2.5 rounded-lg font-medium">Foto Ulang</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Sesi Presensi</label>
+            <select id="selJenisAbsen" class="w-full p-2.5 text-sm rounded-xl border border-slate-300 bg-white">
+              <option value="Masuk">Absen Masuk</option>
+              <option value="Pulang">Absen Pulang</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Status Lokasi</label>
+            <select id="selStatusHadir" class="w-full p-2.5 text-sm rounded-xl border border-slate-300 bg-white">
+              <option value="Hadir di DUDI">Hadir di Studio/DUDI</option>
+              <option value="Dinas Luar / Liputan">Liputan / Shooting Luar</option>
+              <option value="Izin / Sakit">Izin / Sakit</option>
+            </select>
+          </div>
+        </div>
+
+        <button onclick="kirimAbsensi()" id="btnSubmitAbsen" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow">Kirim Presensi Sekarang</button>
+      </section>
+
+      <!-- TAB 2: MENU JURNAL HARIAN -->
+      <section id="tabJurnal" class="hidden px-4 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Bidang Kompetensi Pekerjaan</label>
+          <select id="selKompetensi" class="w-full p-3 text-sm rounded-xl border border-slate-300 bg-white">
+            <option value="Pra-Produksi (Riset/Konsep/Storyboard)">Pra-Produksi (Riset / Konsep / Storyboard)</option>
+            <option value="Produksi (Videografi/Fotografi/Lighting)">Produksi (Videografi / Fotografi / Lighting)</option>
+            <option value="Pasca-Produksi (Video Editing/Coloring/VFX)">Pasca-Produksi (Video Editing / Coloring)</option>
+            <option value="Desain Grafis & Media Cetak">Desain Grafis & Media Cetak</option>
+            <option value="Manajemen Proyek & Klien">Manajemen Proyek / Pelayanan Klien</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Uraian Kegiatan & Alat yang Digunakan</label>
+          <textarea id="txtUraianJurnal" rows="4" placeholder="Ceritakan detail pekerjaan hari ini, software/alat yang dipakai, serta hasilnya..." class="w-full p-3 text-sm rounded-xl border border-slate-300"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Link Portofolio / Hasil Karya (Opsional)</label>
+          <input type="url" id="txtLinkKarya" placeholder="https://drive.google.com/..." class="w-full p-3 text-sm rounded-xl border border-slate-300">
+        </div>
+
+        <button onclick="kirimJurnal()" id="btnSubmitJurnal" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow">Simpan Jurnal Harian</button>
+      </section>
+
+      <!-- TAB 3: RIWAYAT -->
+      <section id="tabRiwayat" class="hidden px-4 space-y-4">
+        <h4 class="font-bold text-sm text-slate-700">5 Presensi Terakhir</h4>
+        <div id="listRiwayatAbsen" class="space-y-2 text-xs">Memuat data...</div>
+        <h4 class="font-bold text-sm text-slate-700 pt-2">5 Jurnal Terakhir</h4>
+        <div id="listRiwayatJurnal" class="space-y-2 text-xs">Memuat data...</div>
+      </section>
+
+    </main>
+
+    <!-- NAVIGASI BAWAH -->
+    <nav id="bottomNav" class="hidden fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 flex justify-around py-2.5 text-xs font-semibold text-slate-500">
+      <button onclick="gantiTab('Absen')" id="navAbsen" class="text-indigo-600 flex flex-col items-center">
+        <span>📸 Presensi</span>
+      </button>
+      <button onclick="gantiTab('Jurnal')" id="navJurnal" class="flex flex-col items-center">
+        <span>📝 Isi Jurnal</span>
+      </button>
+      <button onclick="gantiTab('Riwayat')" id="navRiwayat" class="flex flex-col items-center">
+        <span>📊 Riwayat</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <script>
+    // =========================================================================
+    // TEMPELKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI BAWAH INI:
+    const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwi7JawplrCbbPJSaWfWsBcH_FfmPV4un5lruxssQqiePZ372172qepYIw163X4PKM-aQ/exec';
+    // =========================================================================
+
+    let currentUser = null;
+    let currentCoords = { lat: 0, lng: 0, jarak: 9999 };
+    let capturedImageBase64 = '';
+    let videoStream = null;
+
+    async function callAPI(payload) {
+      const res = await fetch(GAS_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+      return await res.json();
+    }
+
+    async function prosesLogin() {
+      const nis = document.getElementById('inputNis').value.trim();
+      const pin = document.getElementById('inputPin').value.trim();
+      if (!nis || !pin) return alert('Masukkan NIS dan PIN terlebih dahulu!');
+
+      const btn = document.getElementById('btnLogin');
+      btn.innerText = 'Memverifikasi...';
+      btn.disabled = true;
+
+      try {
+        const result = await callAPI({ action: 'login', nis, pin });
+        if (result.status === 'success') {
+          currentUser = result.user;
+          document.getElementById('loginView').classList.add('hidden');
+          document.getElementById('appView').classList.remove('hidden');
+          document.getElementById('bottomNav').classList.remove('hidden');
+          document.getElementById('btnLogout').classList.remove('hidden');
+
+          document.getElementById('txtNamaSiswa').innerText = currentUser.nama;
+          document.getElementById('txtKelasSiswa').innerText = `${currentUser.kelas} • NIS: ${currentUser.nis}`;
+          document.getElementById('txtNamaDudi').innerText = currentUser.dudi.nama;
+
+          mulaiKamera();
+          deteksiGPS();
+        } else {
+          alert(result.message);
+        }
+      } catch (e) {
+        alert('Gagal terhubung ke server. Pastikan GAS_API_URL sudah benar.');
+      } finally {
+        btn.innerText = 'Masuk Aplikasi';
+        btn.disabled = false;
+      }
+    }
+
+    function mulaiKamera() {
+      const video = document.getElementById('videoCam');
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
+        .then(stream => {
+          videoStream = stream;
+          video.srcObject = stream;
+        })
+        .catch(() => alert('Izinkan akses kamera di browser HP Anda untuk melakukan presensi.'));
+    }
+
+    function ambilFoto() {
+      const video = document.getElementById('videoCam');
+      const canvas = document.getElementById('canvasCam');
+      const preview = document.getElementById('previewFoto');
+
+      // Kompresi ukuran foto ke lebar 480px agar cepat diunggah
+      const scale = 480 / video.videoWidth;
+      canvas.width = 480;
+      canvas.height = video.videoHeight * scale;
+      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      capturedImageBase64 = canvas.toDataURL('image/jpeg', 0.7);
+      preview.src = capturedImageBase64;
+      video.classList.add('hidden');
+      preview.classList.remove('hidden');
+      document.getElementById('btnCapture').classList.add('hidden');
+      document.getElementById('btnRetake').classList.remove('hidden');
+    }
+
+    function ulangFoto() {
+      capturedImageBase64 = '';
+      document.getElementById('videoCam').classList.remove('hidden');
+      document.getElementById('previewFoto').classList.add('hidden');
+      document.getElementById('btnCapture').classList.remove('hidden');
+      document.getElementById('btnRetake').classList.add('hidden');
+    }
+
+    function deteksiGPS() {
+      if (!navigator.geolocation) return;
+      navigator.geolocation.watchPosition(pos => {
+        currentCoords.lat = pos.coords.latitude;
+        currentCoords.lng = pos.coords.longitude;
+        currentCoords.jarak = hitungJarak(currentCoords.lat, currentCoords.lng, currentUser.dudi.lat, currentUser.dudi.lng);
+        
+        const elJarak = document.getElementById('txtJarakGps');
+        elJarak.innerText = `${currentCoords.jarak} Meter dari DUDI`;
+        elJarak.className = currentCoords.jarak <= currentUser.dudi.radius ? 'font-bold text-emerald-600' : 'font-bold text-rose-600';
+      }, () => {
+        document.getElementById('txtJarakGps').innerText = 'GPS tidak aktif';
+      }, { enableHighAccuracy: true });
+    }
+
+    function hitungJarak(lat1, lon1, lat2, lon2) {
+      const R = 6371e3;
+      const rad = Math.PI / 180;
+      const dLat = (lat2 - lat1) * rad;
+      const dLon = (lon2 - lon1) * rad;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*rad) * Math.cos(lat2*rad) * Math.sin(dLon/2) * Math.sin(dLon/2);
+      return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+    }
+
+    async function kirimAbsensi() {
+      if (!capturedImageBase64) return alert('Silakan ambil foto selfie terlebih dahulu!');
+      const btn = document.getElementById('btnSubmitAbsen');
+      btn.innerText = 'Mengunggah Presensi...';
+      btn.disabled = true;
+
+      try {
+        const res = await callAPI({
+          action: 'submitAbsen',
+          nis: currentUser.nis,
+          nama: currentUser.nama,
+          jenisAbsen: document.getElementById('selJenisAbsen').value,
+          statusKehadiran: document.getElementById('selStatusHadir').value,
+          jarak: currentCoords.jarak,
+          koordinat: `${currentCoords.lat},${currentCoords.lng}`,
+          imageBase64: capturedImageBase64
+        });
+        alert(res.message);
+        ulangFoto();
+      } catch (e) {
+        alert('Gagal mengirim presensi.');
+      } finally {
+        btn.innerText = 'Kirim Presensi Sekarang';
+        btn.disabled = false;
+      }
+    }
+
+    async function kirimJurnal() {
+      const uraian = document.getElementById('txtUraianJurnal').value.trim();
+      if (!uraian) return alert('Uraian kegiatan wajib diisi!');
+
+      const btn = document.getElementById('btnSubmitJurnal');
+      btn.innerText = 'Menyimpan Jurnal...';
+      btn.disabled = true;
+
+      try {
+        const res = await callAPI({
+          action: 'submitJurnal',
+          nis: currentUser.nis,
+          nama: currentUser.nama,
+          idDudi: currentUser.dudi.id,
+          kompetensi: document.getElementById('selKompetensi').value,
+          uraian: uraian,
+          linkKarya: document.getElementById('txtLinkKarya').value.trim()
+        });
+        alert(res.message);
+        document.getElementById('txtUraianJurnal').value = '';
+        document.getElementById('txtLinkKarya').value = '';
+      } catch (e) {
+        alert('Gagal menyimpan jurnal.');
+      } finally {
+        btn.innerText = 'Simpan Jurnal Harian';
+        btn.disabled = false;
+      }
+    }
+
+    async function muatRiwayat() {
+      const res = await callAPI({ action: 'getRiwayat', nis: currentUser.nis });
+      if (res.status === 'success') {
+        document.getElementById('listRiwayatAbsen').innerHTML = res.absen.map(a => 
+          `<div class="p-3 bg-slate-50 rounded-lg border flex justify-between">
+            <span><b>${a.jenis}</b> (${a.status})</span>
+            <span class="text-slate-500">${a.tanggal}</span>
+          </div>`
+        ).join('') || '<p class="text-slate-400">Belum ada riwayat presensi.</p>';
+
+        document.getElementById('listRiwayatJurnal').innerHTML = res.jurnal.map(j => 
+          `<div class="p-3 bg-slate-50 rounded-lg border space-y-1">
+            <div class="flex justify-between font-bold"><span>${j.kompetensi}</span><span class="text-indigo-600">${j.tanggal}</span></div>
+            <p class="text-slate-600">${j.uraian}</p>
+          </div>`
+        ).join('') || '<p class="text-slate-400">Belum ada jurnal harian.</p>';
+      }
+    }
+
+    function gantiTab(tab) {
+      ['Absen', 'Jurnal', 'Riwayat'].forEach(t => {
+        document.getElementById('tab' + t).classList.add('hidden');
+        document.getElementById('nav' + t).classList.remove('text-indigo-600');
+      });
+      document.getElementById('tab' + tab).classList.remove('hidden');
+      document.getElementById('nav' + tab).classList.add('text-indigo-600');
+      if (tab === 'Riwayat') muatRiwayat();
+    }
+
+    function logout() {
+      location.reload();
+    }
+  </script>
+</body>
+</html>
