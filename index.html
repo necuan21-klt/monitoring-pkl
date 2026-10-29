@@ -44,7 +44,6 @@
         </div>
         <button onclick="prosesLogin()" id="btnLogin" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-200 transition">Masuk Portal PKL</button>
         
-        <!-- TEKS COPYRIGHT SESUAI PERMINTAAN -->
         <div class="text-center pt-2">
           <p class="text-[11px] text-slate-400 font-medium">© copyright_DKV_SMKN 1 Klaten</p>
         </div>
@@ -138,7 +137,7 @@
     </main>
 
     <!-- =================================================================== -->
-    <!-- TAMPILAN 2: DASHBOARD MONITORING GURU PEMBIMBING                    -->
+    <!-- TAMPILAN 2: DASHBOARD MONITORING GURU PEMBIMBING + CETAK PDF        -->
     <!-- =================================================================== -->
     <main id="guruView" class="hidden flex-1 pb-20">
       <div class="bg-slate-800 text-white p-4 m-4 rounded-2xl shadow">
@@ -195,6 +194,15 @@
           <p class="text-center text-slate-400 py-6">Memuat jurnal siswa...</p>
         </div>
       </section>
+
+      <!-- TAB GURU 3: CETAK LAPORAN PDF -->
+      <section id="tabGuruCetak" class="hidden px-4 space-y-4">
+        <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-2xl space-y-3">
+          <h4 class="font-bold text-sm text-indigo-900">🖨️ Cetak Rekapitulasi PKL</h4>
+          <p class="text-xs text-slate-600">Fitur ini akan membuka jendela cetak browser. Anda dapat langsung menyimpan laporan ke format PDF atau mencetaknya ke printer.</p>
+          <button onclick="cetakLaporanPDF()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-xs shadow">Cetak / Unduh PDF Laporan</button>
+        </div>
+      </section>
     </main>
 
     <!-- NAVIGASI BAWAH SISWA -->
@@ -205,9 +213,10 @@
     </nav>
 
     <!-- NAVIGASI BAWAH GURU -->
-    <nav id="bottomNavGuru" class="hidden fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 flex justify-around py-2.5 text-xs font-semibold text-slate-500 z-20">
-      <button onclick="gantiTabGuru('Absen')" id="navGuruAbsen" class="text-indigo-600 flex flex-col items-center"><span>📋 Rekap Harian</span></button>
-      <button onclick="gantiTabGuru('Jurnal')" id="navGuruJurnal" class="flex flex-col items-center"><span>✅ Validasi Jurnal</span></button>
+    <nav id="bottomNavGuru" class="hidden fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 flex justify-around py-2 text-xs font-semibold text-slate-500 z-20">
+      <button onclick="gantiTabGuru('Absen')" id="navGuruAbsen" class="text-indigo-600 flex flex-col items-center"><span>📋 Rekap</span></button>
+      <button onclick="gantiTabGuru('Jurnal')" id="navGuruJurnal" class="flex flex-col items-center"><span>✅ Jurnal</span></button>
+      <button onclick="gantiTabGuru('Cetak')" id="navGuruCetak" class="flex flex-col items-center"><span>🖨️ Cetak PDF</span></button>
     </nav>
 
   </div>
@@ -233,6 +242,7 @@
     let currentCoords = { lat: 0, lng: 0, jarak: 9999 };
     let capturedImageBase64 = '';
     let dataRekapCache = [];
+    let dataJurnalCache = [];
 
     async function callAPI(payload) {
       const res = await fetch(GAS_API_URL, {
@@ -297,6 +307,8 @@
         const res = await callAPI({ action: 'getMonitoringGuru', tanggal });
         if (res.status === 'success') {
           dataRekapCache = res.rekapSiswa;
+          dataJurnalCache = res.listJurnal;
+          
           const total = dataRekapCache.length;
           const hadir = dataRekapCache.filter(s => s.sudahAbsen).length;
           const belum = total - hadir;
@@ -306,7 +318,7 @@
           document.getElementById('statBelumAbsen').innerText = belum;
 
           renderDaftarAbsenGuru(dataRekapCache);
-          renderDaftarJurnalGuru(res.listJurnal);
+          renderDaftarJurnalGuru(dataJurnalCache);
         }
       } catch (e) {
         alert('Gagal memuat data monitoring.');
@@ -393,8 +405,102 @@
       muatDataMonitoringGuru();
     }
 
+    function cetakLaporanPDF() {
+      const tanggal = document.getElementById('filterTanggalGuru').value;
+      let printWindow = window.open('', '_blank');
+      
+      let htmlContent = `
+        <html>
+        <head>
+          <title>Rekap Laporan PKL - ${SCHOOL_CONFIG.namaSekolah}</title>
+          <style>
+            body { font-family: sans-serif; padding: 20px; color: #333; }
+            h2, h3 { text-align: center; margin: 2px 0; }
+            .header { border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
+            th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h2>${SCHOOL_CONFIG.namaSekolah}</h2>
+            <h3>${SCHOOL_CONFIG.jurusan}</h3>
+            <p style="text-align: center; font-size: 13px; margin-top: 5px;">REKAPITULASI MONITORING PKL TANGGAL: ${tanggal}</p>
+          </div>
+          
+          <h4>A. Rekapitulasi Kehadiran Siswa</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>NIS</th>
+                <th>Nama Siswa</th>
+                <th>Kelas</th>
+                <th>Tempat DUDI</th>
+                <th>Status</th>
+                <th>Jam Masuk</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${dataRekapCache.map((s, i) => `
+                <tr>
+                  <td>${i + 1}</td>
+                  <td>${s.nis}</td>
+                  <td>${s.nama}</td>
+                  <td>${s.kelas}</td>
+                  <td>${s.dudi}</td>
+                  <td>${s.sudahAbsen ? 'Hadir (' + s.status + ')' : 'Belum Absen'}</td>
+                  <td>${s.jamMasuk}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+
+          <h4 style="margin-top: 30px;">B. Jurnal Harian Siswa</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>Tanggal</th>
+                <th>Nama Siswa</th>
+                <th>DUDI</th>
+                <th>Kompetensi</th>
+                <th>Uraian Kegiatan</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${dataJurnalCache.map(j => `
+                <tr>
+                  <td>${j.tanggal}</td>
+                  <td>${j.nama}</td>
+                  <td>${j.dudi}</td>
+                  <td>${j.kompetensi}</td>
+                  <td>${j.uraian}</td>
+                  <td>${j.statusValidasi}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+
+          <div style="margin-top: 40px; float: right; text-align: center;">
+            <p>Klaten, ${new Date().toLocaleDateString('id-ID')}</p>
+            <p>Guru Pembimbing PKL,</p>
+            <br><br>
+            <p><b><u>${currentUser.nama}</u></b></p>
+          </div>
+        </body>
+        </html>
+      `;
+
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => { printWindow.print(); }, 500);
+    }
+
     function gantiTabGuru(tab) {
-      ['Absen', 'Jurnal'].forEach(t => {
+      ['Absen', 'Jurnal', 'Cetak'].forEach(t => {
         document.getElementById('tabGuru' + t).classList.add('hidden');
         document.getElementById('navGuru' + t).classList.remove('text-indigo-600');
       });
@@ -535,7 +641,7 @@
       });
       document.getElementById('tab' + tab).classList.remove('hidden');
       document.getElementById('nav' + tab).classList.add('text-indigo-600');
-      if (tab === 'Riwayat') muatRiwayat();
+      if (tab === 'Riwayat') muitRiwayat();
     }
 
     function logout() { location.reload(); }
