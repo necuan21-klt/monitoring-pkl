@@ -20,7 +20,7 @@
             <p id="txtSubJudulHeader" class="text-[11px] text-indigo-100">Portal Monitoring PKL & Jurnal</p>
           </div>
         </div>
-        <button id="btnLogout" onclick="logout()" class="hidden text-xs bg-white/20 hover:bg-white/30 backdrop-blur px-3 py-1.5 rounded-lg font-semibold transition">Keluar</button>
+        <button id="btnLogout" onclick="logout()" class="hidden text-xs bg-white/25 hover:bg-white/35 backdrop-blur px-3 py-1.5 rounded-lg font-semibold transition">Keluar</button>
       </div>
     </header>
 
@@ -70,8 +70,20 @@
 
       <!-- TAB ABSENSI SISWA -->
       <section id="tabAbsen" class="px-4 space-y-4">
+        
+        <!-- INFORMASI STATUS ABSEN HARI INI (CEGAH DOUBLE ABSEN) -->
+        <div id="bannerStatusAbsen" class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-xs flex items-center justify-between">
+          <span id="txtStatusAbsenHariIni" class="text-amber-800 font-semibold">Memeriksa status absen hari ini...</span>
+          <span id="badgeStatusAbsen" class="px-2 py-1 bg-amber-200 text-amber-900 rounded font-bold text-[10px]">CEK</span>
+        </div>
+
         <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
-          <label class="block text-xs font-bold text-slate-700 mb-2">📸 Kamera Bukti Kehadiran (Live Selfie)</label>
+          <div class="flex justify-between items-center mb-2">
+            <label class="text-xs font-bold text-slate-700">📸 Kamera Bukti Kehadiran (Live Selfie)</label>
+            <!-- TOMBOL SWITCH KAMERA (DEPAN/BELAKANG) -->
+            <button onclick="switchKamera()" class="text-[11px] bg-slate-200 hover:bg-slate-300 text-slate-700 px-2.5 py-1 rounded-lg font-semibold transition">🔄 Putar Kamera</button>
+          </div>
+
           <div class="relative rounded-xl overflow-hidden bg-black aspect-video flex items-center justify-center">
             <video id="videoCam" autoplay playsinline class="w-full h-full object-cover"></video>
             <canvas id="canvasCam" class="hidden"></canvas>
@@ -91,8 +103,8 @@
           <div>
             <label class="block text-xs font-semibold text-slate-600 mb-1">Sesi Presensi</label>
             <select id="selJenisAbsen" class="w-full p-2.5 text-sm rounded-xl border border-slate-300 bg-white">
-              <option value="Masuk">Absen Masuk</option>
-              <option value="Pulang">Absen Pulang</option>
+              <option value="Masuk">Absen Masuk (Pagi)</option>
+              <option value="Pulang">Absen Pulang (Sore)</option>
             </select>
           </div>
           <div>
@@ -105,7 +117,14 @@
           </div>
         </div>
 
-        <button onclick="kirimAbsensi()" id="btnSubmitAbsen" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl shadow-md transition opacity-50 cursor-not-allowed" disabled>Kirim Presensi Sekarang</button>
+        <!-- TOMBOL KIRIM DENGAN ANIMASI LOADING -->
+        <button onclick="kirimAbsensi()" id="btnSubmitAbsen" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl shadow-md transition opacity-50 cursor-not-allowed flex items-center justify-center gap-2" disabled>
+          <span id="txtBtnAbsen">Kirim Presensi Sekarang</span>
+          <svg id="loadingSpinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </button>
       </section>
 
       <!-- TAB JURNAL SISWA -->
@@ -246,6 +265,9 @@
     let currentCoords = { lat: 0, lng: 0, jarak: 9999 };
     let capturedImageBase64 = '';
     let isPhotoConfirmed = false;
+    let useFrontCamera = true; // Status kamera (true = depan, false = belakang)
+    let videoStream = null;
+    let statusAbsenHariIni = { masuk: false, pulang: false };
     let dataRekapCache = [];
     let dataJurnalCache = [];
 
@@ -314,6 +336,251 @@
 
         mulaiKamera();
         deteksiGPS();
+        cekStatusAbsenHariIni();
+      }
+    }
+
+    // ================= FUNGSI KAMERA & SWITCH KAMERA =================
+    function mulaiKamera() {
+      if (videoStream) {
+        videoStream.getTracks().forEach(track => track.stop());
+      }
+      
+      const video = document.getElementById('videoCam');
+      const constraints = {
+        video: { facingMode: useFrontCamera ? 'user' : 'environment' },
+        audio: false
+      };
+
+      navigator.mediaDevices.getUserMedia(constraints)
+        .then(stream => {
+          videoStream = stream;
+          video.srcObject = stream;
+        })
+        .catch(() => alert('Gagal mengakses kamera. Pastikan izin kamera diaktifkan pada browser HP Anda.'));
+    }
+
+    function switchKamera() {
+      useFrontCamera = !useFrontCamera;
+      mulaiKamera();
+    }
+
+    function ambilFoto() {
+      const video = document.getElementById('videoCam');
+      const canvas = document.getElementById('canvasCam');
+      const preview = document.getElementById('previewFoto');
+      const scale = 480 / video.videoWidth;
+      canvas.width = 480;
+      canvas.height = video.videoHeight * scale;
+      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      capturedImageBase64 = canvas.toDataURL('image/jpeg', 0.7);
+      preview.src = capturedImageBase64;
+      
+      video.classList.add('hidden');
+      preview.classList.remove('hidden');
+      document.getElementById('btnCapture').classList.add('hidden');
+      document.getElementById('konfirmasiFotoDiv').classList.remove('hidden');
+    }
+
+    function konfirmasiFoto() {
+      isPhotoConfirmed = true;
+      document.getElementById('konfirmasiFotoDiv').classList.add('hidden');
+      cekValidasiAbsen();
+    }
+
+    function ulangFoto() {
+      capturedImageBase64 = '';
+      isPhotoConfirmed = false;
+      document.getElementById('videoCam').classList.remove('hidden');
+      document.getElementById('previewFoto').classList.add('hidden');
+      document.getElementById('btnCapture').classList.remove('hidden');
+      document.getElementById('konfirmasiFotoDiv').classList.add('hidden');
+      cekValidasiAbsen();
+    }
+
+    // ================= CEK STATUS ABSEN HARI INI =================
+    async function cekStatusAbsenHariIni() {
+      try {
+        const res = await callAPI({ action: 'getRiwayat', nis: currentUser.user.nis });
+        if (res.status === 'success' && res.absen) {
+          const todayStr = new Date().toLocaleDateString('id-ID'); // Format dd/MM/yyyy dari fungsi format di server atau sesuaikan
+          // Cek apakah ada record absen masuk / pulang hari ini
+          const absenHariIni = res.absen.filter(a => a.tanggal.includes(new Date().toLocaleDateString()));
+          
+          statusAbsenHariIni.masuk = absenHariIni.some(a => a.jenis === 'Masuk');
+          statusAbsenHariIni.pulang = absenHariIni.some(a => a.jenis === 'Pulang');
+
+          updateBannerStatusAbsen();
+        }
+      } catch (e) {
+        console.error('Gagal mengecek status absen harian');
+      }
+    }
+
+    function updateBannerStatusAbsen() {
+      const txtStatus = document.getElementById('txtStatusAbsenHariIni');
+      const badge = document.getElementById('badgeStatusAbsen');
+      const jenisAbsen = document.getElementById('selJenisAbsen').value;
+
+      let sudahAbsenSesiIni = (jenisAbsen === 'Masuk' && statusAbsenHariIni.masuk) || 
+                             (jenisAbsen === 'Pulang' && statusAbsenHariIni.pulang);
+
+      if (sudahAbsenSesiIni) {
+        txtStatus.innerText = `Anda sudah melakukan Absen ${jenisAbsen} hari ini!`;
+        badge.innerText = 'SUDAH ABSEN';
+        badge.className = 'px-2 py-1 bg-rose-200 text-rose-900 rounded font-bold text-[10px]';
+      } else {
+        txtStatus.innerText = `Belum melakukan Absen ${jenisAbsen} hari ini.`;
+        badge.innerText = 'BELUM';
+        badge.className = 'px-2 py-1 bg-emerald-200 text-emerald-900 rounded font-bold text-[10px]';
+      }
+      cekValidasiAbsen();
+    }
+
+    document.getElementById('selJenisAbsen').addEventListener('change', updateBannerStatusAbsen);
+
+    function deteksiGPS() {
+      if (!navigator.geolocation) return;
+      navigator.geolocation.watchPosition(pos => {
+        currentCoords.lat = pos.coords.latitude;
+        currentCoords.lng = pos.coords.longitude;
+        currentCoords.jarak = hitungJarak(currentCoords.lat, currentCoords.lng, currentUser.user.dudi.lat, currentUser.user.dudi.lng);
+        
+        const elJarak = document.getElementById('txtJarakGps');
+        elJarak.innerText = `${currentCoords.jarak} Meter dari DUDI`;
+        
+        const maxRadius = currentUser.user.dudi.radius || 100;
+        elJarak.className = currentCoords.jarak <= maxRadius ? 'font-bold text-emerald-600' : 'font-bold text-rose-600';
+        cekValidasiAbsen();
+      }, () => {
+        document.getElementById('txtJarakGps').innerText = 'GPS tidak aktif';
+      }, { enableHighAccuracy: true });
+    }
+
+    function hitungJarak(lat1, lon1, lat2, lon2) {
+      const R = 6371e3, rad = Math.PI / 180;
+      const dLat = (lat2 - lat1) * rad, dLon = (lon2 - lon1) * rad;
+      const a = Math.sin(dLat/2)**2 + Math.cos(lat1*rad) * Math.cos(lat2*rad) * Math.sin(dLon/2)**2;
+      return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+    }
+
+    function cekValidasiAbsen() {
+      const statusPresensi = document.getElementById('selStatusHadir').value;
+      const jenisAbsen = document.getElementById('selJenisAbsen').value;
+      const maxRadius = currentUser.user.dudi.radius || 100;
+      const isRadiusValid = currentCoords.jarak <= maxRadius;
+      const isIjinSakit = statusPresensi === 'Ijin' || statusPresensi === 'Sakit';
+      
+      let sudahAbsenSesiIni = (jenisAbsen === 'Masuk' && statusAbsenHariIni.masuk) || 
+                             (jenisAbsen === 'Pulang' && statusAbsenHariIni.pulang);
+
+      const btnSubmit = document.getElementById('btnSubmitAbsen');
+
+      if (isPhotoConfirmed && (isRadiusValid || isIjinSakit) && !sudahAbsenSesiIni) {
+        btnSubmit.disabled = false;
+        btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed');
+      } else {
+        btnSubmit.disabled = true;
+        btnSubmit.classList.add('opacity-50', 'cursor-not-allowed');
+      }
+    }
+
+    document.getElementById('selStatusHadir').addEventListener('change', cekValidasiAbsen);
+
+    // ================= KIRIM ABSEN DENGAN ANIMASI LOADING =================
+    async function kirimAbsensi() {
+      const statusPresensi = document.getElementById('selStatusHadir').value;
+      const jenisAbsen = document.getElementById('selJenisAbsen').value;
+      const maxRadius = currentUser.user.dudi.radius || 100;
+      
+      if (!isPhotoConfirmed) return alert('Silakan ambil dan konfirmasi foto selfie terlebih dahulu!');
+      if (currentCoords.jarak > maxRadius && statusPresensi === 'Hadir') {
+        return alert(`Gagal! Jarak Anda (${currentCoords.jarak}m) melebihi batas radius DUDI (${maxRadius}m).`);
+      }
+
+      // Aktifkan Animasi Loading
+      const btn = document.getElementById('btnSubmitAbsen');
+      const txtBtn = document.getElementById('txtBtnAbsen');
+      const spinner = document.getElementById('loadingSpinner');
+      
+      btn.disabled = true;
+      txtBtn.innerText = 'Mengirim Presensi...';
+      spinner.classList.remove('hidden');
+
+      try {
+        const res = await callAPI({
+          action: 'submitAbsen',
+          nis: currentUser.user.nis,
+          nama: currentUser.user.nama,
+          jenisAbsen: jenisAbsen,
+          statusKehadiran: statusPresensi,
+          jarak: currentCoords.jarak,
+          koordinat: `${currentCoords.lat},${currentCoords.lng}`,
+          imageBase64: capturedImageBase64
+        });
+        alert(res.message);
+        
+        // Perbarui status absen harian lokal
+        if (jenisAbsen === 'Masuk') statusAbsenHariIni.masuk = true;
+        if (jenisAbsen === 'Pulang') statusAbsenHariIni.pulang = true;
+        updateBannerStatusAbsen();
+        ulangFoto();
+      } catch (e) {
+        alert('Gagal mengirim presensi. Terjadi kesalahan jaringan.');
+      } finally {
+        // Matikan Animasi Loading
+        btn.disabled = false;
+        txtBtn.innerText = 'Kirim Presensi Sekarang';
+        spinner.classList.add('hidden');
+        cekValidasiAbsen();
+      }
+    }
+
+    async function kirimJurnal() {
+      const uraian = document.getElementById('txtUraianJurnal').value.trim();
+      if (!uraian) return alert('Uraian kegiatan wajib diisi!');
+      const btn = document.getElementById('btnSubmitJurnal');
+      btn.innerText = 'Menyimpan Jurnal...';
+      btn.disabled = true;
+      try {
+        const res = await callAPI({
+          action: 'submitJurnal',
+          nis: currentUser.user.nis,
+          nama: currentUser.user.nama,
+          idDudi: currentUser.user.dudi.id,
+          kompetensi: document.getElementById('selKompetensi').value,
+          uraian: uraian,
+          linkKarya: document.getElementById('txtLinkKarya').value.trim()
+        });
+        alert(res.message);
+        document.getElementById('txtUraianJurnal').value = '';
+        document.getElementById('txtLinkKarya').value = '';
+      } catch (e) {
+        alert('Gagal menyimpan jurnal.');
+      } finally {
+        btn.innerText = 'Simpan Jurnal Harian';
+        btn.disabled = false;
+      }
+    }
+
+    async function muatRiwayat() {
+      const res = await callAPI({ action: 'getRiwayat', nis: currentUser.user.nis });
+      if (res.status === 'success') {
+        document.getElementById('listRiwayatAbsen').innerHTML = res.absen.map(a => 
+          `<div class="p-3 bg-slate-50 rounded-lg border flex justify-between">
+            <span><b>${a.jenis}</b> (${a.status})</span>
+            <span class="text-slate-500">${a.tanggal}</span>
+          </div>`
+        ).join('') || '<p class="text-slate-400">Belum ada riwayat presensi.</p>';
+
+        document.getElementById('listRiwayatJurnal').innerHTML = res.jurnal.map(j => 
+          `<div class="p-3 bg-slate-50 rounded-lg border space-y-1">
+            <div class="flex justify-between font-bold"><span>${j.kompetensi}</span><span class="text-indigo-600">${j.tanggal}</span></div>
+            <p class="text-slate-600">${j.uraian}</p>
+            <span class="inline-block text-[10px] font-bold px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded">${j.validasi}</span>
+          </div>`
+        ).join('') || '<p class="text-slate-400">Belum ada jurnal harian.</p>';
       }
     }
 
@@ -522,185 +789,6 @@
       setTimeout(() => { printWindow.print(); }, 500);
     }
 
-    function gantiTabGuru(tab) {
-      ['Absen', 'Jurnal', 'Cetak'].forEach(t => {
-        document.getElementById('tabGuru' + t).classList.add('hidden');
-        document.getElementById('navGuru' + t).classList.remove('text-indigo-600');
-      });
-      document.getElementById('tabGuru' + tab).classList.remove('hidden');
-      document.getElementById('navGuru' + tab).classList.add('text-indigo-600');
-    }
-
-    function mulaiKamera() {
-      const video = document.getElementById('videoCam');
-      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
-        .then(stream => { video.srcObject = stream; })
-        .catch(() => alert('Izinkan akses kamera di browser HP Anda.'));
-    }
-
-    function ambilFoto() {
-      const video = document.getElementById('videoCam');
-      const canvas = document.getElementById('canvasCam');
-      const preview = document.getElementById('previewFoto');
-      const scale = 480 / video.videoWidth;
-      canvas.width = 480;
-      canvas.height = video.videoHeight * scale;
-      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-
-      capturedImageBase64 = canvas.toDataURL('image/jpeg', 0.7);
-      preview.src = capturedImageBase64;
-      
-      video.classList.add('hidden');
-      preview.classList.remove('hidden');
-      document.getElementById('btnCapture').classList.add('hidden');
-      document.getElementById('konfirmasiFotoDiv').classList.remove('hidden');
-    }
-
-    function konfirmasiFoto() {
-      isPhotoConfirmed = true;
-      document.getElementById('konfirmasiFotoDiv').classList.add('hidden');
-      cekValidasiAbsen();
-    }
-
-    function ulangFoto() {
-      capturedImageBase64 = '';
-      isPhotoConfirmed = false;
-      document.getElementById('videoCam').classList.remove('hidden');
-      document.getElementById('previewFoto').classList.add('hidden');
-      document.getElementById('btnCapture').classList.remove('hidden');
-      document.getElementById('konfirmasiFotoDiv').classList.add('hidden');
-      cekValidasiAbsen();
-    }
-
-    function deteksiGPS() {
-      if (!navigator.geolocation) return;
-      navigator.geolocation.watchPosition(pos => {
-        currentCoords.lat = pos.coords.latitude;
-        currentCoords.lng = pos.coords.longitude;
-        currentCoords.jarak = hitungJarak(currentCoords.lat, currentCoords.lng, currentUser.user.dudi.lat, currentUser.user.dudi.lng);
-        
-        const elJarak = document.getElementById('txtJarakGps');
-        elJarak.innerText = `${currentCoords.jarak} Meter dari DUDI`;
-        
-        const maxRadius = currentUser.user.dudi.radius || 100;
-        if (currentCoords.jarak <= maxRadius) {
-          elJarak.className = 'font-bold text-emerald-600';
-        } else {
-          elJarak.className = 'font-bold text-rose-600';
-        }
-        cekValidasiAbsen();
-      }, () => {
-        document.getElementById('txtJarakGps').innerText = 'GPS tidak aktif';
-      }, { enableHighAccuracy: true });
-    }
-
-    function hitungJarak(lat1, lon1, lat2, lon2) {
-      const R = 6371e3, rad = Math.PI / 180;
-      const dLat = (lat2 - lat1) * rad, dLon = (lon2 - lon1) * rad;
-      const a = Math.sin(dLat/2)**2 + Math.cos(lat1*rad) * Math.cos(lat2*rad) * Math.sin(dLon/2)**2;
-      return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
-    }
-
-    function cekValidasiAbsen() {
-      const statusPresensi = document.getElementById('selStatusHadir').value;
-      const maxRadius = currentUser.user.dudi.radius || 100;
-      const isRadiusValid = currentCoords.jarak <= maxRadius;
-      const isIjinSakit = statusPresensi === 'Ijin' || statusPresensi === 'Sakit';
-
-      const btnSubmit = document.getElementById('btnSubmitAbsen');
-
-      if (isPhotoConfirmed && (isRadiusValid || isIjinSakit)) {
-        btnSubmit.disabled = false;
-        btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed');
-      } else {
-        btnSubmit.disabled = true;
-        btnSubmit.classList.add('opacity-50', 'cursor-not-allowed');
-      }
-    }
-
-    document.getElementById('selStatusHadir').addEventListener('change', cekValidasiAbsen);
-
-    async function kirimAbsensi() {
-      const statusPresensi = document.getElementById('selStatusHadir').value;
-      const maxRadius = currentUser.user.dudi.radius || 100;
-      
-      if (!isPhotoConfirmed) return alert('Silakan ambil dan konfirmasi foto selfie terlebih dahulu!');
-      if (currentCoords.jarak > maxRadius && statusPresensi === 'Hadir') {
-        return alert(`Gagal! Jarak Anda (${currentCoords.jarak}m) melebihi batas radius DUDI (${maxRadius}m). Anda tidak dapat melakukan presensi Hadir.`);
-      }
-
-      const btn = document.getElementById('btnSubmitAbsen');
-      btn.innerText = 'Mengunggah Presensi...';
-      btn.disabled = true;
-
-      try {
-        const res = await callAPI({
-          action: 'submitAbsen',
-          nis: currentUser.user.nis,
-          nama: currentUser.user.nama,
-          jenisAbsen: document.getElementById('selJenisAbsen').value,
-          statusKehadiran: statusPresensi,
-          jarak: currentCoords.jarak,
-          koordinat: `${currentCoords.lat},${currentCoords.lng}`,
-          imageBase64: capturedImageBase64
-        });
-        alert(res.message);
-        ulangFoto();
-      } catch (e) {
-        alert('Gagal mengirim presensi.');
-      } finally {
-        btn.innerText = 'Kirim Presensi Sekarang';
-        btn.disabled = false;
-      }
-    }
-
-    async function kirimJurnal() {
-      const uraian = document.getElementById('txtUraianJurnal').value.trim();
-      if (!uraian) return alert('Uraian kegiatan wajib diisi!');
-      const btn = document.getElementById('btnSubmitJurnal');
-      btn.innerText = 'Menyimpan Jurnal...';
-      btn.disabled = true;
-      try {
-        const res = await callAPI({
-          action: 'submitJurnal',
-          nis: currentUser.user.nis,
-          nama: currentUser.user.nama,
-          idDudi: currentUser.user.dudi.id,
-          kompetensi: document.getElementById('selKompetensi').value,
-          uraian: uraian,
-          linkKarya: document.getElementById('txtLinkKarya').value.trim()
-        });
-        alert(res.message);
-        document.getElementById('txtUraianJurnal').value = '';
-        document.getElementById('txtLinkKarya').value = '';
-      } catch (e) {
-        alert('Gagal menyimpan jurnal.');
-      } finally {
-        btn.innerText = 'Simpan Jurnal Harian';
-        btn.disabled = false;
-      }
-    }
-
-    async function muatRiwayat() {
-      const res = await callAPI({ action: 'getRiwayat', nis: currentUser.user.nis });
-      if (res.status === 'success') {
-        document.getElementById('listRiwayatAbsen').innerHTML = res.absen.map(a => 
-          `<div class="p-3 bg-slate-50 rounded-lg border flex justify-between">
-            <span><b>${a.jenis}</b> (${a.status})</span>
-            <span class="text-slate-500">${a.tanggal}</span>
-          </div>`
-        ).join('') || '<p class="text-slate-400">Belum ada riwayat presensi.</p>';
-
-        document.getElementById('listRiwayatJurnal').innerHTML = res.jurnal.map(j => 
-          `<div class="p-3 bg-slate-50 rounded-lg border space-y-1">
-            <div class="flex justify-between font-bold"><span>${j.kompetensi}</span><span class="text-indigo-600">${j.tanggal}</span></div>
-            <p class="text-slate-600">${j.uraian}</p>
-            <span class="inline-block text-[10px] font-bold px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded">${j.validasi}</span>
-          </div>`
-        ).join('') || '<p class="text-slate-400">Belum ada jurnal harian.</p>';
-      }
-    }
-
     function gantiTabSiswa(tab) {
       ['Absen', 'Jurnal', 'Riwayat'].forEach(t => {
         document.getElementById('tab' + t).classList.add('hidden');
@@ -709,6 +797,16 @@
       document.getElementById('tab' + tab).classList.remove('hidden');
       document.getElementById('nav' + tab).classList.add('text-indigo-600');
       if (tab === 'Riwayat') muatRiwayat();
+    }
+
+    function gantiTabGuru(tab) {
+      ['Absen', 'Jurnal', 'Cetak'].forEach(t => {
+        document.getElementById('tabGuru' + t).classList.add('hidden');
+        document.getElementById('navGuru' + t).classList.remove('text-indigo-600');
+      });
+      document.getElementById('tabGuru' + tab).classList.add('hidden'); // reset
+      document.getElementById('tabGuru' + tab).classList.remove('hidden');
+      document.getElementById('navGuru' + tab).classList.add('text-indigo-600');
     }
 
     function logout() { 
