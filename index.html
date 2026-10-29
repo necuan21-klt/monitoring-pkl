@@ -78,7 +78,6 @@
             <img id="previewFoto" class="hidden w-full h-full object-cover" />
           </div>
           
-          <!-- TOMBOL KAMERA & KONFIRMASI -->
           <div class="mt-2.5">
             <button onclick="ambilFoto()" id="btnCapture" class="w-full bg-slate-800 text-white text-xs py-2.5 rounded-xl font-semibold">Ambil Foto</button>
             <div id="konfirmasiFotoDiv" class="hidden flex gap-2">
@@ -148,7 +147,7 @@
       <div class="bg-slate-800 text-white p-4 m-4 rounded-2xl shadow">
         <div class="flex justify-between items-center">
           <div>
-            <p class="text-[10px] uppercase tracking-wider text-indigo-300 font-semibold">Dashboard Monitoring</p>
+            <p class="text-[10px] uppercase tracking-wider text-indigo-300 font-semibold">Dashboard Monitoring Binaan</p>
             <h3 id="txtNamaGuru" class="font-bold text-base">-</h3>
             <p id="txtJabatanGuru" class="text-xs text-slate-300">-</p>
           </div>
@@ -165,7 +164,7 @@
 
         <div class="grid grid-cols-3 gap-2 text-center">
           <div class="bg-blue-50 border border-blue-200 p-2.5 rounded-xl">
-            <p class="text-[10px] text-blue-700 font-bold uppercase">Total Siswa</p>
+            <p class="text-[10px] text-blue-700 font-bold uppercase">Siswa Binaan</p>
             <p id="statTotalSiswa" class="text-xl font-extrabold text-blue-900">0</p>
           </div>
           <div class="bg-emerald-50 border border-emerald-200 p-2.5 rounded-xl">
@@ -185,14 +184,14 @@
         </div>
 
         <div id="listRekapGuru" class="space-y-2.5 text-xs">
-          <p class="text-center text-slate-400 py-6">Memuat rekap kehadiran siswa...</p>
+          <p class="text-center text-slate-400 py-6">Memuat rekap kehadiran siswa binaan...</p>
         </div>
       </section>
 
       <!-- TAB GURU 2: VALIDASI JURNAL SISWA -->
       <section id="tabGuruJurnal" class="hidden px-4 space-y-3">
         <div class="flex justify-between items-center">
-          <h4 class="font-bold text-sm text-slate-700">Jurnal Masuk Terbaru</h4>
+          <h4 class="font-bold text-sm text-slate-700">Jurnal Siswa Binaan Terbaru</h4>
           <button onclick="muatDataMonitoringGuru()" class="text-xs text-indigo-600 font-semibold">🔄 Segarkan</button>
         </div>
         <div id="listValidasiJurnal" class="space-y-3 text-xs">
@@ -203,8 +202,8 @@
       <!-- TAB GURU 3: CETAK LAPORAN PDF -->
       <section id="tabGuruCetak" class="hidden px-4 space-y-4">
         <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-2xl space-y-3">
-          <h4 class="font-bold text-sm text-indigo-900">🖨️ Cetak Rekapitulasi PKL</h4>
-          <p class="text-xs text-slate-600">Fitur ini akan membuka jendela cetak browser. Anda dapat langsung menyimpan laporan ke format PDF atau mencetaknya ke printer.</p>
+          <h4 class="font-bold text-sm text-indigo-900">🖨️ Cetak Rekapitulasi PKL Binaan</h4>
+          <p class="text-xs text-slate-600">Fitur ini akan membuka jendela cetak browser untuk menyimpan laporan kelompok bimbingan Anda ke format PDF.</p>
           <button onclick="cetakLaporanPDF()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-xs shadow">Cetak / Unduh PDF Laporan</button>
         </div>
       </section>
@@ -250,7 +249,6 @@
     let dataRekapCache = [];
     let dataJurnalCache = [];
 
-    // Cek Sesi Tersimpan saat halaman dimuat (agar tidak kembali ke login saat refresh)
     window.addEventListener('DOMContentLoaded', () => {
       const savedUser = localStorage.getItem('pkl_user');
       if (savedUser) {
@@ -280,7 +278,7 @@
       try {
         const result = await callAPI({ action: 'login', nis, pin });
         if (result.status === 'success') {
-          currentUser = result; // Simpan role & user
+          currentUser = result;
           localStorage.setItem('pkl_user', JSON.stringify(currentUser));
           inisialisasiUIUser();
         } else {
@@ -324,7 +322,12 @@
       document.getElementById('listRekapGuru').innerHTML = '<p class="text-center text-slate-400 py-6">Mengambil data terbaru...</p>';
       
       try {
-        const res = await callAPI({ action: 'getMonitoringGuru', tanggal });
+        const res = await callAPI({ 
+          action: 'getMonitoringGuru', 
+          idGuru: currentUser.user.id, 
+          tanggal: tanggal 
+        });
+        
         if (res.status === 'success') {
           dataRekapCache = res.rekapSiswa;
           dataJurnalCache = res.listJurnal;
@@ -358,7 +361,7 @@
     function renderDaftarAbsenGuru(list) {
       const container = document.getElementById('listRekapGuru');
       if (list.length === 0) {
-        container.innerHTML = '<p class="text-center text-slate-400 py-6">Tidak ada data siswa pada filter ini.</p>';
+        container.innerHTML = '<p class="text-center text-slate-400 py-6">Tidak ada siswa binaan pada filter ini.</p>';
         return;
       }
 
@@ -389,7 +392,7 @@
     function renderDaftarJurnalGuru(list) {
       const container = document.getElementById('listValidasiJurnal');
       if (list.length === 0) {
-        container.innerHTML = '<p class="text-center text-slate-400 py-6">Belum ada jurnal yang dikirim siswa.</p>';
+        container.innerHTML = '<p class="text-center text-slate-400 py-6">Belum ada jurnal dari siswa binaan.</p>';
         return;
       }
 
@@ -446,10 +449,10 @@
           <div class="header">
             <h2>${SCHOOL_CONFIG.namaSekolah}</h2>
             <h3>${SCHOOL_CONFIG.jurusan}</h3>
-            <p style="text-align: center; font-size: 13px; margin-top: 5px;">REKAPITULASI MONITORING PKL TANGGAL: ${tanggal}</p>
+            <p style="text-align: center; font-size: 13px; margin-top: 5px;">REKAPITULASI KELOMPOK BINAAN • TANGGAL: ${tanggal}</p>
           </div>
           
-          <h4>A. Rekapitulasi Kehadiran Siswa</h4>
+          <h4>A. Rekapitulasi Kehadiran Siswa Binaan</h4>
           <table>
             <thead>
               <tr>
@@ -477,7 +480,7 @@
             </tbody>
           </table>
 
-          <h4 style="margin-top: 30px;">B. Jurnal Harian Siswa</h4>
+          <h4 style="margin-top: 30px;">B. Jurnal Harian Siswa Binaan</h4>
           <table>
             <thead>
               <tr>
@@ -528,7 +531,6 @@
       document.getElementById('navGuru' + tab).classList.add('text-indigo-600');
     }
 
-    // ================= FUNGSI SISWA =================
     function mulaiKamera() {
       const video = document.getElementById('videoCam');
       navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
@@ -584,7 +586,7 @@
         if (currentCoords.jarak <= maxRadius) {
           elJarak.className = 'font-bold text-emerald-600';
         } else {
-          elJarak.className = 'font-bold text-rose-600 (Di Luar Radius)';
+          elJarak.className = 'font-bold text-rose-600';
         }
         cekValidasiAbsen();
       }, () => {
@@ -599,7 +601,6 @@
       return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
     }
 
-    // Validasi Mutlak: Tombol Absen hanya aktif jika foto sudah dikonfirmasi DAN (jarak masuk radius ATAU status Ijin/Sakit)
     function cekValidasiAbsen() {
       const statusPresensi = document.getElementById('selStatusHadir').value;
       const maxRadius = currentUser.user.dudi.radius || 100;
@@ -617,7 +618,6 @@
       }
     }
 
-    // Event Listener perubahan status presensi
     document.getElementById('selStatusHadir').addEventListener('change', cekValidasiAbsen);
 
     async function kirimAbsensi() {
