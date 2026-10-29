@@ -96,20 +96,21 @@
           </div>
         </div>
 
+        <!-- LAYOUT DIPERBARUI: STATUS PRESENSI DI KIRI, SESI PRESENSI DI KANAN -->
         <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Status Presensi</label>
+            <select id="selStatusHadir" onchange="handleStatusChange()" class="w-full p-2.5 text-sm rounded-xl border border-slate-300 bg-white">
+              <option value="Hadir">Hadir</option>
+              <option value="Ijin">Ijin</option>
+              <option value="Sakit">Sakit</option>
+            </select>
+          </div>
           <div>
             <label class="block text-xs font-semibold text-slate-600 mb-1">Sesi Presensi</label>
             <select id="selJenisAbsen" class="w-full p-2.5 text-sm rounded-xl border border-slate-300 bg-white">
               <option value="Masuk">Absen Masuk (Pagi)</option>
               <option value="Pulang">Absen Pulang (Sore)</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">Status Presensi</label>
-            <select id="selStatusHadir" class="w-full p-2.5 text-sm rounded-xl border border-slate-300 bg-white">
-              <option value="Hadir">Hadir</option>
-              <option value="Ijin">Ijin</option>
-              <option value="Sakit">Sakit</option>
             </select>
           </div>
         </div>
@@ -154,7 +155,6 @@
             <input type="month" id="filterBulanSiswa" onchange="muatRekapAbsenSiswa()" class="text-xs p-1.5 rounded-lg border border-indigo-300 bg-white">
           </div>
           
-          <!-- RINGKASAN STATISTIK BULANAN -->
           <div class="grid grid-cols-3 gap-2 text-center pt-1">
             <div class="bg-emerald-100 p-2 rounded-xl border border-emerald-200">
               <p class="text-[10px] font-bold text-emerald-800 uppercase">Hadir</p>
@@ -250,7 +250,7 @@
       </section>
     </main>
 
-    <!-- NAVIGASI BAWAH SISWA (DIPERBARUI KE MENU REKAP) -->
+    <!-- NAVIGASI BAWAH SISWA -->
     <nav id="bottomNavSiswa" class="hidden fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 flex justify-around py-2.5 text-xs font-semibold text-slate-500 z-20">
       <button onclick="gantiTabSiswa('Absen')" id="navAbsen" class="text-indigo-600 flex flex-col items-center"><span>📸 Presensi</span></button>
       <button onclick="gantiTabSiswa('Jurnal')" id="navJurnal" class="flex flex-col items-center"><span>📝 Isi Jurnal</span></button>
@@ -359,7 +359,28 @@
         mulaiKamera();
         deteksiGPS();
         cekStatusAbsenHariIni();
+        handleStatusChange(); // Inisialisasi awal pilihan sesi
       }
+    }
+
+    // ================= FUNGSI KONTROL SESI & STATUS =================
+    function handleStatusChange() {
+      const statusPresensi = document.getElementById('selStatusHadir').value;
+      const selJenisAbsen = document.getElementById('selJenisAbsen');
+
+      if (statusPresensi === 'Ijin' || statusPresensi === 'Sakit') {
+        selJenisAbsen.innerHTML = '<option value="-">-</option>';
+        selJenisAbsen.disabled = true;
+        selJenisAbsen.classList.add('bg-slate-100', 'text-slate-400');
+      } else {
+        selJenisAbsen.innerHTML = `
+          <option value="Masuk">Absen Masuk (Pagi)</option>
+          <option value="Pulang">Absen Pulang (Sore)</option>
+        `;
+        selJenisAbsen.disabled = false;
+        selJenisAbsen.classList.remove('bg-slate-100', 'text-slate-400');
+      }
+      updateBannerStatusAbsen();
     }
 
     // ================= FUNGSI KAMERA =================
@@ -441,18 +462,22 @@
     function updateBannerStatusAbsen() {
       const txtStatus = document.getElementById('txtStatusAbsenHariIni');
       const badge = document.getElementById('badgeStatusAbsen');
+      const statusPresensi = document.getElementById('selStatusHadir').value;
       const jenisAbsen = document.getElementById('selJenisAbsen').value;
 
-      let sudahAbsenSesiIni = (jenisAbsen === 'Masuk' && statusAbsenHariIni.masuk) || 
-                             (jenisAbsen === 'Pulang' && statusAbsenHariIni.pulang);
+      let sudahAbsenSesiIni = false;
+      if (statusPresensi === 'Hadir') {
+        sudahAbsenSesiIni = (jenisAbsen === 'Masuk' && statusAbsenHariIni.masuk) || 
+                           (jenisAbsen === 'Pulang' && statusAbsenHariIni.pulang);
+      }
 
       if (sudahAbsenSesiIni) {
         txtStatus.innerText = `Anda sudah melakukan Absen ${jenisAbsen} hari ini!`;
         badge.innerText = 'SUDAH ABSEN';
         badge.className = 'px-2 py-1 bg-rose-200 text-rose-900 rounded font-bold text-[10px]';
       } else {
-        txtStatus.innerText = `Belum melakukan Absen ${jenisAbsen} hari ini.`;
-        badge.innerText = 'BELUM';
+        txtStatus.innerText = `Siap melakukan presensi ${statusPresensi}.`;
+        badge.innerText = 'SIAP';
         badge.className = 'px-2 py-1 bg-emerald-200 text-emerald-900 rounded font-bold text-[10px]';
       }
       cekValidasiAbsen();
@@ -492,8 +517,11 @@
       const isRadiusValid = currentCoords.jarak <= maxRadius;
       const isIjinSakit = statusPresensi === 'Ijin' || statusPresensi === 'Sakit';
       
-      let sudahAbsenSesiIni = (jenisAbsen === 'Masuk' && statusAbsenHariIni.masuk) || 
-                             (jenisAbsen === 'Pulang' && statusAbsenHariIni.pulang);
+      let sudahAbsenSesiIni = false;
+      if (statusPresensi === 'Hadir') {
+        sudahAbsenSesiIni = (jenisAbsen === 'Masuk' && statusAbsenHariIni.masuk) || 
+                           (jenisAbsen === 'Pulang' && statusAbsenHariIni.pulang);
+      }
 
       const btnSubmit = document.getElementById('btnSubmitAbsen');
 
@@ -505,8 +533,6 @@
         btnSubmit.classList.add('opacity-50', 'cursor-not-allowed');
       }
     }
-
-    document.getElementById('selStatusHadir').addEventListener('change', cekValidasiAbsen);
 
     async function kirimAbsensi() {
       const statusPresensi = document.getElementById('selStatusHadir').value;
@@ -539,8 +565,10 @@
         });
         alert(res.message);
         
-        if (jenisAbsen === 'Masuk') statusAbsenHariIni.masuk = true;
-        if (jenisAbsen === 'Pulang') statusAbsenHariIni.pulang = true;
+        if (statusPresensi === 'Hadir') {
+          if (jenisAbsen === 'Masuk') statusAbsenHariIni.masuk = true;
+          if (jenisAbsen === 'Pulang') statusAbsenHariIni.pulang = true;
+        }
         updateBannerStatusAbsen();
         ulangFoto();
       } catch (e) {
@@ -580,22 +608,19 @@
       }
     }
 
-    // ================= REKAP BULANAN SISWA =================
     async function muatRekapAbsenSiswa() {
-      const bulanFilter = document.getElementById('filterBulanSiswa').value; // Format: YYYY-MM
+      const bulanFilter = document.getElementById('filterBulanSiswa').value;
       const container = document.getElementById('listRekapAbsenSiswa');
       container.innerHTML = '<p class="text-center text-slate-400 py-4">Memuat data rekap...</p>';
 
       try {
         const res = await callAPI({ action: 'getRiwayat', nis: currentUser.user.nis });
         if (res.status === 'success') {
-          // Kelompokkan data absen per tanggal
           let absenList = res.absen || [];
           if (bulanFilter) {
             absenList = absenList.filter(a => a.rawTanggal && a.rawTanggal.startsWith(bulanFilter));
           }
 
-          // Agregat per tanggal (Gabungkan Masuk & Pulang)
           const rekapPerTanggal = {};
           absenList.forEach(a => {
             let tglKey = a.rawTanggal ? a.rawTanggal.substring(0, 10) : a.tanggal;
@@ -605,9 +630,13 @@
             if (a.jenis === 'Masuk') {
               rekapPerTanggal[tglKey].masuk = a.jam || a.tanggal;
               rekapPerTanggal[tglKey].status = a.status;
-            }
-            if (a.jenis === 'Pulang') {
+            } else if (a.jenis === 'Pulang') {
               rekapPerTanggal[tglKey].pulang = a.jam || a.tanggal;
+            } else {
+              // Untuk Ijin / Sakit yang sesinya bernilai '-'
+              rekapPerTanggal[tglKey].status = a.status;
+              rekapPerTanggal[tglKey].masuk = '-';
+              rekapPerTanggal[tglKey].pulang = '-';
             }
           });
 
@@ -642,7 +671,6 @@
           document.getElementById('statIjinBulan').innerText = totalIjin;
           document.getElementById('statSakitBulan').innerText = totalSakit;
 
-          // Render Jurnal di Tab Rekap juga
           document.getElementById('listRiwayatJurnal').innerHTML = res.jurnal.map(j => 
             `<div class="p-3 bg-slate-50 rounded-lg border space-y-1">
               <div class="flex justify-between font-bold"><span>${j.kompetensi}</span><span class="text-indigo-600">${j.tanggal}</span></div>
@@ -664,7 +692,6 @@
       document.getElementById('nav' + tab).classList.add('text-indigo-600');
       
       if (tab === 'Rekap') {
-        // Set default bulan sekarang pada input month
         const now = new Date().toISOString().substring(0, 7);
         const filterBulan = document.getElementById('filterBulanSiswa');
         if (!filterBulan.value) filterBulan.value = now;
