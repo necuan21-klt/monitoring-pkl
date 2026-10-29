@@ -70,8 +70,6 @@
 
       <!-- TAB ABSENSI SISWA -->
       <section id="tabAbsen" class="px-4 space-y-4">
-        
-        <!-- INFORMASI STATUS ABSEN HARI INI (CEGAH DOUBLE ABSEN) -->
         <div id="bannerStatusAbsen" class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-xs flex items-center justify-between">
           <span id="txtStatusAbsenHariIni" class="text-amber-800 font-semibold">Memeriksa status absen hari ini...</span>
           <span id="badgeStatusAbsen" class="px-2 py-1 bg-amber-200 text-amber-900 rounded font-bold text-[10px]">CEK</span>
@@ -80,7 +78,6 @@
         <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
           <div class="flex justify-between items-center mb-2">
             <label class="text-xs font-bold text-slate-700">📸 Kamera Bukti Kehadiran (Live Selfie)</label>
-            <!-- TOMBOL SWITCH KAMERA (DEPAN/BELAKANG) -->
             <button onclick="switchKamera()" class="text-[11px] bg-slate-200 hover:bg-slate-300 text-slate-700 px-2.5 py-1 rounded-lg font-semibold transition">🔄 Putar Kamera</button>
           </div>
 
@@ -117,7 +114,6 @@
           </div>
         </div>
 
-        <!-- TOMBOL KIRIM DENGAN ANIMASI LOADING -->
         <button onclick="kirimAbsensi()" id="btnSubmitAbsen" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl shadow-md transition opacity-50 cursor-not-allowed flex items-center justify-center gap-2" disabled>
           <span id="txtBtnAbsen">Kirim Presensi Sekarang</span>
           <svg id="loadingSpinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -150,12 +146,38 @@
         <button onclick="kirimJurnal()" id="btnSubmitJurnal" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-md">Simpan Jurnal Harian</button>
       </section>
 
-      <!-- TAB RIWAYAT SISWA -->
-      <section id="tabRiwayat" class="hidden px-4 space-y-4">
-        <h4 class="font-bold text-sm text-slate-700">5 Presensi Terakhir</h4>
-        <div id="listRiwayatAbsen" class="space-y-2 text-xs">Memuat data...</div>
-        <h4 class="font-bold text-sm text-slate-700 pt-2">5 Jurnal Terakhir</h4>
-        <div id="listRiwayatJurnal" class="space-y-2 text-xs">Memuat data...</div>
+      <!-- TAB REKAP ABSEN & JURNAL SISWA (BULANAN) -->
+      <section id="tabRekap" class="hidden px-4 space-y-4">
+        <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-2xl space-y-3">
+          <div class="flex justify-between items-center">
+            <h4 class="font-bold text-sm text-indigo-950">📅 Rekap Presensi Bulanan</h4>
+            <input type="month" id="filterBulanSiswa" onchange="muatRekapAbsenSiswa()" class="text-xs p-1.5 rounded-lg border border-indigo-300 bg-white">
+          </div>
+          
+          <!-- RINGKASAN STATISTIK BULANAN -->
+          <div class="grid grid-cols-3 gap-2 text-center pt-1">
+            <div class="bg-emerald-100 p-2 rounded-xl border border-emerald-200">
+              <p class="text-[10px] font-bold text-emerald-800 uppercase">Hadir</p>
+              <p id="statHadirBulan" class="text-lg font-extrabold text-emerald-900">0</p>
+            </div>
+            <div class="bg-amber-100 p-2 rounded-xl border border-amber-200">
+              <p class="text-[10px] font-bold text-amber-800 uppercase">Ijin</p>
+              <p id="statIjinBulan" class="text-lg font-extrabold text-amber-900">0</p>
+            </div>
+            <div class="bg-rose-100 p-2 rounded-xl border border-rose-200">
+              <p class="text-[10px] font-bold text-rose-800 uppercase">Sakit</p>
+              <p id="statSakitBulan" class="text-lg font-extrabold text-rose-900">0</p>
+            </div>
+          </div>
+        </div>
+
+        <h4 class="font-bold text-sm text-slate-700 pt-1">Rincian Kehadiran Harian</h4>
+        <div id="listRekapAbsenSiswa" class="space-y-2.5 text-xs">
+          <p class="text-center text-slate-400 py-6">Memuat rekap bulanan...</p>
+        </div>
+
+        <h4 class="font-bold text-sm text-slate-700 pt-3">Riwayat Jurnal Terbaru</h4>
+        <div id="listRiwayatJurnal" class="space-y-2 text-xs">Memuat jurnal...</div>
       </section>
     </main>
 
@@ -228,11 +250,11 @@
       </section>
     </main>
 
-    <!-- NAVIGASI BAWAH SISWA -->
+    <!-- NAVIGASI BAWAH SISWA (DIPERBARUI KE MENU REKAP) -->
     <nav id="bottomNavSiswa" class="hidden fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 flex justify-around py-2.5 text-xs font-semibold text-slate-500 z-20">
       <button onclick="gantiTabSiswa('Absen')" id="navAbsen" class="text-indigo-600 flex flex-col items-center"><span>📸 Presensi</span></button>
       <button onclick="gantiTabSiswa('Jurnal')" id="navJurnal" class="flex flex-col items-center"><span>📝 Isi Jurnal</span></button>
-      <button onclick="gantiTabSiswa('Riwayat')" id="navRiwayat" class="flex flex-col items-center"><span>📊 Riwayat</span></button>
+      <button onclick="gantiTabSiswa('Rekap')" id="navRekap" class="flex flex-col items-center"><span>📊 Rekap Absen</span></button>
     </nav>
 
     <!-- NAVIGASI BAWAH GURU -->
@@ -265,7 +287,7 @@
     let currentCoords = { lat: 0, lng: 0, jarak: 9999 };
     let capturedImageBase64 = '';
     let isPhotoConfirmed = false;
-    let useFrontCamera = true; // Status kamera (true = depan, false = belakang)
+    let useFrontCamera = true;
     let videoStream = null;
     let statusAbsenHariIni = { masuk: false, pulang: false };
     let dataRekapCache = [];
@@ -340,7 +362,7 @@
       }
     }
 
-    // ================= FUNGSI KAMERA & SWITCH KAMERA =================
+    // ================= FUNGSI KAMERA =================
     function mulaiKamera() {
       if (videoStream) {
         videoStream.getTracks().forEach(track => track.stop());
@@ -357,7 +379,7 @@
           videoStream = stream;
           video.srcObject = stream;
         })
-        .catch(() => alert('Gagal mengakses kamera. Pastikan izin kamera diaktifkan pada browser HP Anda.'));
+        .catch(() => alert('Gagal mengakses kamera. Pastikan izin kamera diaktifkan.'));
     }
 
     function switchKamera() {
@@ -399,14 +421,12 @@
       cekValidasiAbsen();
     }
 
-    // ================= CEK STATUS ABSEN HARI INI =================
     async function cekStatusAbsenHariIni() {
       try {
         const res = await callAPI({ action: 'getRiwayat', nis: currentUser.user.nis });
         if (res.status === 'success' && res.absen) {
-          const todayStr = new Date().toLocaleDateString('id-ID'); // Format dd/MM/yyyy dari fungsi format di server atau sesuaikan
-          // Cek apakah ada record absen masuk / pulang hari ini
-          const absenHariIni = res.absen.filter(a => a.tanggal.includes(new Date().toLocaleDateString()));
+          const todayStr = new Date().toISOString().substring(0, 10);
+          const absenHariIni = res.absen.filter(a => a.rawTanggal && a.rawTanggal.startsWith(todayStr));
           
           statusAbsenHariIni.masuk = absenHariIni.some(a => a.jenis === 'Masuk');
           statusAbsenHariIni.pulang = absenHariIni.some(a => a.jenis === 'Pulang');
@@ -423,396 +443,4 @@
       const badge = document.getElementById('badgeStatusAbsen');
       const jenisAbsen = document.getElementById('selJenisAbsen').value;
 
-      let sudahAbsenSesiIni = (jenisAbsen === 'Masuk' && statusAbsenHariIni.masuk) || 
-                             (jenisAbsen === 'Pulang' && statusAbsenHariIni.pulang);
-
-      if (sudahAbsenSesiIni) {
-        txtStatus.innerText = `Anda sudah melakukan Absen ${jenisAbsen} hari ini!`;
-        badge.innerText = 'SUDAH ABSEN';
-        badge.className = 'px-2 py-1 bg-rose-200 text-rose-900 rounded font-bold text-[10px]';
-      } else {
-        txtStatus.innerText = `Belum melakukan Absen ${jenisAbsen} hari ini.`;
-        badge.innerText = 'BELUM';
-        badge.className = 'px-2 py-1 bg-emerald-200 text-emerald-900 rounded font-bold text-[10px]';
-      }
-      cekValidasiAbsen();
-    }
-
-    document.getElementById('selJenisAbsen').addEventListener('change', updateBannerStatusAbsen);
-
-    function deteksiGPS() {
-      if (!navigator.geolocation) return;
-      navigator.geolocation.watchPosition(pos => {
-        currentCoords.lat = pos.coords.latitude;
-        currentCoords.lng = pos.coords.longitude;
-        currentCoords.jarak = hitungJarak(currentCoords.lat, currentCoords.lng, currentUser.user.dudi.lat, currentUser.user.dudi.lng);
-        
-        const elJarak = document.getElementById('txtJarakGps');
-        elJarak.innerText = `${currentCoords.jarak} Meter dari DUDI`;
-        
-        const maxRadius = currentUser.user.dudi.radius || 100;
-        elJarak.className = currentCoords.jarak <= maxRadius ? 'font-bold text-emerald-600' : 'font-bold text-rose-600';
-        cekValidasiAbsen();
-      }, () => {
-        document.getElementById('txtJarakGps').innerText = 'GPS tidak aktif';
-      }, { enableHighAccuracy: true });
-    }
-
-    function hitungJarak(lat1, lon1, lat2, lon2) {
-      const R = 6371e3, rad = Math.PI / 180;
-      const dLat = (lat2 - lat1) * rad, dLon = (lon2 - lon1) * rad;
-      const a = Math.sin(dLat/2)**2 + Math.cos(lat1*rad) * Math.cos(lat2*rad) * Math.sin(dLon/2)**2;
-      return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
-    }
-
-    function cekValidasiAbsen() {
-      const statusPresensi = document.getElementById('selStatusHadir').value;
-      const jenisAbsen = document.getElementById('selJenisAbsen').value;
-      const maxRadius = currentUser.user.dudi.radius || 100;
-      const isRadiusValid = currentCoords.jarak <= maxRadius;
-      const isIjinSakit = statusPresensi === 'Ijin' || statusPresensi === 'Sakit';
-      
-      let sudahAbsenSesiIni = (jenisAbsen === 'Masuk' && statusAbsenHariIni.masuk) || 
-                             (jenisAbsen === 'Pulang' && statusAbsenHariIni.pulang);
-
-      const btnSubmit = document.getElementById('btnSubmitAbsen');
-
-      if (isPhotoConfirmed && (isRadiusValid || isIjinSakit) && !sudahAbsenSesiIni) {
-        btnSubmit.disabled = false;
-        btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed');
-      } else {
-        btnSubmit.disabled = true;
-        btnSubmit.classList.add('opacity-50', 'cursor-not-allowed');
-      }
-    }
-
-    document.getElementById('selStatusHadir').addEventListener('change', cekValidasiAbsen);
-
-    // ================= KIRIM ABSEN DENGAN ANIMASI LOADING =================
-    async function kirimAbsensi() {
-      const statusPresensi = document.getElementById('selStatusHadir').value;
-      const jenisAbsen = document.getElementById('selJenisAbsen').value;
-      const maxRadius = currentUser.user.dudi.radius || 100;
-      
-      if (!isPhotoConfirmed) return alert('Silakan ambil dan konfirmasi foto selfie terlebih dahulu!');
-      if (currentCoords.jarak > maxRadius && statusPresensi === 'Hadir') {
-        return alert(`Gagal! Jarak Anda (${currentCoords.jarak}m) melebihi batas radius DUDI (${maxRadius}m).`);
-      }
-
-      // Aktifkan Animasi Loading
-      const btn = document.getElementById('btnSubmitAbsen');
-      const txtBtn = document.getElementById('txtBtnAbsen');
-      const spinner = document.getElementById('loadingSpinner');
-      
-      btn.disabled = true;
-      txtBtn.innerText = 'Mengirim Presensi...';
-      spinner.classList.remove('hidden');
-
-      try {
-        const res = await callAPI({
-          action: 'submitAbsen',
-          nis: currentUser.user.nis,
-          nama: currentUser.user.nama,
-          jenisAbsen: jenisAbsen,
-          statusKehadiran: statusPresensi,
-          jarak: currentCoords.jarak,
-          koordinat: `${currentCoords.lat},${currentCoords.lng}`,
-          imageBase64: capturedImageBase64
-        });
-        alert(res.message);
-        
-        // Perbarui status absen harian lokal
-        if (jenisAbsen === 'Masuk') statusAbsenHariIni.masuk = true;
-        if (jenisAbsen === 'Pulang') statusAbsenHariIni.pulang = true;
-        updateBannerStatusAbsen();
-        ulangFoto();
-      } catch (e) {
-        alert('Gagal mengirim presensi. Terjadi kesalahan jaringan.');
-      } finally {
-        // Matikan Animasi Loading
-        btn.disabled = false;
-        txtBtn.innerText = 'Kirim Presensi Sekarang';
-        spinner.classList.add('hidden');
-        cekValidasiAbsen();
-      }
-    }
-
-    async function kirimJurnal() {
-      const uraian = document.getElementById('txtUraianJurnal').value.trim();
-      if (!uraian) return alert('Uraian kegiatan wajib diisi!');
-      const btn = document.getElementById('btnSubmitJurnal');
-      btn.innerText = 'Menyimpan Jurnal...';
-      btn.disabled = true;
-      try {
-        const res = await callAPI({
-          action: 'submitJurnal',
-          nis: currentUser.user.nis,
-          nama: currentUser.user.nama,
-          idDudi: currentUser.user.dudi.id,
-          kompetensi: document.getElementById('selKompetensi').value,
-          uraian: uraian,
-          linkKarya: document.getElementById('txtLinkKarya').value.trim()
-        });
-        alert(res.message);
-        document.getElementById('txtUraianJurnal').value = '';
-        document.getElementById('txtLinkKarya').value = '';
-      } catch (e) {
-        alert('Gagal menyimpan jurnal.');
-      } finally {
-        btn.innerText = 'Simpan Jurnal Harian';
-        btn.disabled = false;
-      }
-    }
-
-    async function muatRiwayat() {
-      const res = await callAPI({ action: 'getRiwayat', nis: currentUser.user.nis });
-      if (res.status === 'success') {
-        document.getElementById('listRiwayatAbsen').innerHTML = res.absen.map(a => 
-          `<div class="p-3 bg-slate-50 rounded-lg border flex justify-between">
-            <span><b>${a.jenis}</b> (${a.status})</span>
-            <span class="text-slate-500">${a.tanggal}</span>
-          </div>`
-        ).join('') || '<p class="text-slate-400">Belum ada riwayat presensi.</p>';
-
-        document.getElementById('listRiwayatJurnal').innerHTML = res.jurnal.map(j => 
-          `<div class="p-3 bg-slate-50 rounded-lg border space-y-1">
-            <div class="flex justify-between font-bold"><span>${j.kompetensi}</span><span class="text-indigo-600">${j.tanggal}</span></div>
-            <p class="text-slate-600">${j.uraian}</p>
-            <span class="inline-block text-[10px] font-bold px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded">${j.validasi}</span>
-          </div>`
-        ).join('') || '<p class="text-slate-400">Belum ada jurnal harian.</p>';
-      }
-    }
-
-    async function muatDataMonitoringGuru() {
-      const tanggal = document.getElementById('filterTanggalGuru').value;
-      document.getElementById('listRekapGuru').innerHTML = '<p class="text-center text-slate-400 py-6">Mengambil data terbaru...</p>';
-      
-      try {
-        const res = await callAPI({ 
-          action: 'getMonitoringGuru', 
-          idGuru: currentUser.user.id, 
-          tanggal: tanggal 
-        });
-        
-        if (res.status === 'success') {
-          dataRekapCache = res.rekapSiswa;
-          dataJurnalCache = res.listJurnal;
-          
-          const total = dataRekapCache.length;
-          const hadir = dataRekapCache.filter(s => s.sudahAbsen).length;
-          const belum = total - hadir;
-
-          document.getElementById('statTotalSiswa').innerText = total;
-          document.getElementById('statSudahAbsen').innerText = hadir;
-          document.getElementById('statBelumAbsen').innerText = belum;
-
-          renderDaftarAbsenGuru(dataRekapCache);
-          renderDaftarJurnalGuru(dataJurnalCache);
-        }
-      } catch (e) {
-        alert('Gagal memuat data monitoring.');
-      }
-    }
-
-    function filterDaftarAbsen(kategori) {
-      if (kategori === 'HADIR') {
-        renderDaftarAbsenGuru(dataRekapCache.filter(s => s.sudahAbsen));
-      } else if (kategori === 'BELUM') {
-        renderDaftarAbsenGuru(dataRekapCache.filter(s => !s.sudahAbsen));
-      } else {
-        renderDaftarAbsenGuru(dataRekapCache);
-      }
-    }
-
-    function renderDaftarAbsenGuru(list) {
-      const container = document.getElementById('listRekapGuru');
-      if (list.length === 0) {
-        container.innerHTML = '<p class="text-center text-slate-400 py-6">Tidak ada siswa binaan pada filter ini.</p>';
-        return;
-      }
-
-      container.innerHTML = list.map(s => {
-        const badgeClass = s.sudahAbsen ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-rose-100 text-rose-800 border-rose-300';
-        const badgeText = s.sudahAbsen ? `Hadir (${s.jamMasuk})` : 'Belum Absen';
-
-        return `
-          <div class="p-3.5 bg-white rounded-xl border border-slate-200 shadow-sm space-y-2">
-            <div class="flex justify-between items-start">
-              <div>
-                <h5 class="font-bold text-slate-800 text-sm">${s.nama}</h5>
-                <p class="text-[11px] text-slate-500">${s.kelas} • ${s.dudi}</p>
-              </div>
-              <span class="px-2.5 py-1 rounded-full text-[10px] font-bold border ${badgeClass}">${badgeText}</span>
-            </div>
-            ${s.sudahAbsen ? `
-              <div class="pt-2 border-t border-slate-100 flex justify-between items-center text-[11px] text-slate-600">
-                <span>📍 Jarak: <b>${s.jarak}m</b> (${s.status})</span>
-                ${s.fotoUrl ? `<a href="${s.fotoUrl}" target="_blank" class="text-indigo-600 font-bold hover:underline">🖼️ Lihat Foto</a>` : ''}
-              </div>
-            ` : ''}
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderDaftarJurnalGuru(list) {
-      const container = document.getElementById('listValidasiJurnal');
-      if (list.length === 0) {
-        container.innerHTML = '<p class="text-center text-slate-400 py-6">Belum ada jurnal dari siswa binaan.</p>';
-        return;
-      }
-
-      container.innerHTML = list.map(j => {
-        const isApproved = j.statusValidasi.includes('Disetujui');
-        return `
-          <div class="p-3.5 bg-white rounded-xl border border-slate-200 shadow-sm space-y-2">
-            <div class="flex justify-between items-start">
-              <div>
-                <span class="text-[10px] font-bold text-indigo-600 uppercase">${j.tanggal}</span>
-                <h5 class="font-bold text-slate-800 text-sm">${j.nama}</h5>
-                <p class="text-[11px] text-slate-500">${j.dudi} • <b>${j.kompetensi}</b></p>
-              </div>
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isApproved ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${j.statusValidasi}</span>
-            </div>
-            <p class="text-slate-700 bg-slate-50 p-2.5 rounded-lg border border-slate-100">${j.uraian}</p>
-            <div class="flex justify-between items-center pt-1">
-              ${j.linkKarya && j.linkKarya !== '-' ? `<a href="${j.linkKarya}" target="_blank" class="text-indigo-600 font-bold underline">🔗 Buka Karya</a>` : '<span></span>'}
-              ${!isApproved ? `<button onclick="setujuiJurnal('${j.idJurnal}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg font-bold text-[11px]">✅ Setujui Jurnal</button>` : ''}
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    async function setujuiJurnal(idJurnal) {
-      const res = await callAPI({
-        action: 'validasiJurnal',
-        idJurnal: idJurnal,
-        statusBaru: 'Disetujui Guru Pembimbing'
-      });
-      alert(res.message);
-      muatDataMonitoringGuru();
-    }
-
-    function cetakLaporanPDF() {
-      const tanggal = document.getElementById('filterTanggalGuru').value;
-      let printWindow = window.open('', '_blank');
-      
-      let htmlContent = `
-        <html>
-        <head>
-          <title>Rekap Laporan PKL - ${SCHOOL_CONFIG.namaSekolah}</title>
-          <style>
-            body { font-family: sans-serif; padding: 20px; color: #333; }
-            h2, h3 { text-align: center; margin: 2px 0; }
-            .header { border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
-            table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
-            th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-            th { background-color: #f2f2f2; }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <h2>${SCHOOL_CONFIG.namaSekolah}</h2>
-            <h3>${SCHOOL_CONFIG.jurusan}</h3>
-            <p style="text-align: center; font-size: 13px; margin-top: 5px;">REKAPITULASI KELOMPOK BINAAN • TANGGAL: ${tanggal}</p>
-          </div>
-          
-          <h4>A. Rekapitulasi Kehadiran Siswa Binaan</h4>
-          <table>
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>NIS</th>
-                <th>Nama Siswa</th>
-                <th>Kelas</th>
-                <th>Tempat DUDI</th>
-                <th>Status</th>
-                <th>Jam Masuk</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${dataRekapCache.map((s, i) => `
-                <tr>
-                  <td>${i + 1}</td>
-                  <td>${s.nis}</td>
-                  <td>${s.nama}</td>
-                  <td>${s.kelas}</td>
-                  <td>${s.dudi}</td>
-                  <td>${s.sudahAbsen ? 'Hadir (' + s.status + ')' : 'Belum Absen'}</td>
-                  <td>${s.jamMasuk}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-
-          <h4 style="margin-top: 30px;">B. Jurnal Harian Siswa Binaan</h4>
-          <table>
-            <thead>
-              <tr>
-                <th>Tanggal</th>
-                <th>Nama Siswa</th>
-                <th>DUDI</th>
-                <th>Kompetensi</th>
-                <th>Uraian Kegiatan</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${dataJurnalCache.map(j => `
-                <tr>
-                  <td>${j.tanggal}</td>
-                  <td>${j.nama}</td>
-                  <td>${j.dudi}</td>
-                  <td>${j.kompetensi}</td>
-                  <td>${j.uraian}</td>
-                  <td>${j.statusValidasi}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-
-          <div style="margin-top: 40px; float: right; text-align: center;">
-            <p>Klaten, ${new Date().toLocaleDateString('id-ID')}</p>
-            <p>Guru Pembimbing PKL,</p>
-            <br><br>
-            <p><b><u>${currentUser.user.nama}</u></b></p>
-          </div>
-        </body>
-        </html>
-      `;
-
-      printWindow.document.write(htmlContent);
-      printWindow.document.close();
-      printWindow.focus();
-      setTimeout(() => { printWindow.print(); }, 500);
-    }
-
-    function gantiTabSiswa(tab) {
-      ['Absen', 'Jurnal', 'Riwayat'].forEach(t => {
-        document.getElementById('tab' + t).classList.add('hidden');
-        document.getElementById('nav' + t).classList.remove('text-indigo-600');
-      });
-      document.getElementById('tab' + tab).classList.remove('hidden');
-      document.getElementById('nav' + tab).classList.add('text-indigo-600');
-      if (tab === 'Riwayat') muatRiwayat();
-    }
-
-    function gantiTabGuru(tab) {
-      ['Absen', 'Jurnal', 'Cetak'].forEach(t => {
-        document.getElementById('tabGuru' + t).classList.add('hidden');
-        document.getElementById('navGuru' + t).classList.remove('text-indigo-600');
-      });
-      document.getElementById('tabGuru' + tab).classList.add('hidden'); // reset
-      document.getElementById('tabGuru' + tab).classList.remove('hidden');
-      document.getElementById('navGuru' + tab).classList.add('text-indigo-600');
-    }
-
-    function logout() { 
-      localStorage.removeItem('pkl_user');
-      location.reload(); 
-    }
-  </script>
-</body>
-</html>
+      let sudahAbsenSesiIni = (jenisAbsen === '
