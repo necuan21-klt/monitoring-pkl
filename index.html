@@ -77,9 +77,14 @@
             <canvas id="canvasCam" class="hidden"></canvas>
             <img id="previewFoto" class="hidden w-full h-full object-cover" />
           </div>
-          <div class="flex gap-2 mt-2.5">
-            <button onclick="ambilFoto()" id="btnCapture" class="flex-1 bg-slate-800 text-white text-xs py-2.5 rounded-xl font-semibold">Ambil Foto</button>
-            <button onclick="ulangFoto()" id="btnRetake" class="hidden flex-1 bg-slate-300 text-slate-800 text-xs py-2.5 rounded-xl font-semibold">Foto Ulang</button>
+          
+          <!-- TOMBOL KAMERA & KONFIRMASI -->
+          <div class="mt-2.5">
+            <button onclick="ambilFoto()" id="btnCapture" class="w-full bg-slate-800 text-white text-xs py-2.5 rounded-xl font-semibold">Ambil Foto</button>
+            <div id="konfirmasiFotoDiv" class="hidden flex gap-2">
+              <button onclick="ulangFoto()" class="flex-1 bg-slate-300 text-slate-800 text-xs py-2.5 rounded-xl font-semibold">🔄 Foto Ulang</button>
+              <button onclick="konfirmasiFoto()" class="flex-1 bg-emerald-600 text-white text-xs py-2.5 rounded-xl font-semibold">✔ Gunakan Foto Ini</button>
+            </div>
           </div>
         </div>
 
@@ -92,16 +97,16 @@
             </select>
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">Status Lokasi</label>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Status Presensi</label>
             <select id="selStatusHadir" class="w-full p-2.5 text-sm rounded-xl border border-slate-300 bg-white">
-              <option value="Hadir di DUDI">Hadir di Studio/DUDI</option>
-              <option value="Dinas Luar / Liputan">Liputan / Shooting Luar</option>
-              <option value="Izin / Sakit">Izin / Sakit</option>
+              <option value="Hadir">Hadir</option>
+              <option value="Ijin">Ijin</option>
+              <option value="Sakit">Sakit</option>
             </select>
           </div>
         </div>
 
-        <button onclick="kirimAbsensi()" id="btnSubmitAbsen" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl shadow-md">Kirim Presensi Sekarang</button>
+        <button onclick="kirimAbsensi()" id="btnSubmitAbsen" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl shadow-md transition opacity-50 cursor-not-allowed" disabled>Kirim Presensi Sekarang</button>
       </section>
 
       <!-- TAB JURNAL SISWA -->
@@ -241,8 +246,18 @@
     let currentUser = null;
     let currentCoords = { lat: 0, lng: 0, jarak: 9999 };
     let capturedImageBase64 = '';
+    let isPhotoConfirmed = false;
     let dataRekapCache = [];
     let dataJurnalCache = [];
+
+    // Cek Sesi Tersimpan saat halaman dimuat (agar tidak kembali ke login saat refresh)
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedUser = localStorage.getItem('pkl_user');
+      if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        inisialisasiUIUser();
+      }
+    });
 
     async function callAPI(payload) {
       const res = await fetch(GAS_API_URL, {
@@ -265,29 +280,9 @@
       try {
         const result = await callAPI({ action: 'login', nis, pin });
         if (result.status === 'success') {
-          currentUser = result.user;
-          document.getElementById('loginView').classList.add('hidden');
-          document.getElementById('btnLogout').classList.remove('hidden');
-
-          if (result.role === 'guru') {
-            document.getElementById('guruView').classList.remove('hidden');
-            document.getElementById('bottomNavGuru').classList.remove('hidden');
-            document.getElementById('txtNamaGuru').innerText = currentUser.nama;
-            document.getElementById('txtJabatanGuru').innerText = currentUser.jabatan;
-            
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('filterTanggalGuru').value = today;
-            muatDataMonitoringGuru();
-          } else {
-            document.getElementById('siswaView').classList.remove('hidden');
-            document.getElementById('bottomNavSiswa').classList.remove('hidden');
-            document.getElementById('txtNamaSiswa').innerText = currentUser.nama;
-            document.getElementById('txtKelasSiswa').innerText = `${currentUser.kelas} • NIS: ${currentUser.nis}`;
-            document.getElementById('txtNamaDudi').innerText = currentUser.dudi.nama;
-
-            mulaiKamera();
-            deteksiGPS();
-          }
+          currentUser = result; // Simpan role & user
+          localStorage.setItem('pkl_user', JSON.stringify(currentUser));
+          inisialisasiUIUser();
         } else {
           alert(result.message);
         }
@@ -296,6 +291,31 @@
       } finally {
         btn.innerText = 'Masuk Portal PKL';
         btn.disabled = false;
+      }
+    }
+
+    function inisialisasiUIUser() {
+      document.getElementById('loginView').classList.add('hidden');
+      document.getElementById('btnLogout').classList.remove('hidden');
+
+      if (currentUser.role === 'guru') {
+        document.getElementById('guruView').classList.remove('hidden');
+        document.getElementById('bottomNavGuru').classList.remove('hidden');
+        document.getElementById('txtNamaGuru').innerText = currentUser.user.nama;
+        document.getElementById('txtJabatanGuru').innerText = currentUser.user.jabatan;
+        
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('filterTanggalGuru').value = today;
+        muatDataMonitoringGuru();
+      } else {
+        document.getElementById('siswaView').classList.remove('hidden');
+        document.getElementById('bottomNavSiswa').classList.remove('hidden');
+        document.getElementById('txtNamaSiswa').innerText = currentUser.user.nama;
+        document.getElementById('txtKelasSiswa').innerText = `${currentUser.user.kelas} • NIS: ${currentUser.user.nis}`;
+        document.getElementById('txtNamaDudi').innerText = currentUser.user.dudi.nama;
+
+        mulaiKamera();
+        deteksiGPS();
       }
     }
 
@@ -487,7 +507,7 @@
             <p>Klaten, ${new Date().toLocaleDateString('id-ID')}</p>
             <p>Guru Pembimbing PKL,</p>
             <br><br>
-            <p><b><u>${currentUser.nama}</u></b></p>
+            <p><b><u>${currentUser.user.nama}</u></b></p>
           </div>
         </body>
         </html>
@@ -508,6 +528,7 @@
       document.getElementById('navGuru' + tab).classList.add('text-indigo-600');
     }
 
+    // ================= FUNGSI SISWA =================
     function mulaiKamera() {
       const video = document.getElementById('videoCam');
       navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
@@ -526,18 +547,27 @@
 
       capturedImageBase64 = canvas.toDataURL('image/jpeg', 0.7);
       preview.src = capturedImageBase64;
+      
       video.classList.add('hidden');
       preview.classList.remove('hidden');
       document.getElementById('btnCapture').classList.add('hidden');
-      document.getElementById('btnRetake').classList.remove('hidden');
+      document.getElementById('konfirmasiFotoDiv').classList.remove('hidden');
+    }
+
+    function konfirmasiFoto() {
+      isPhotoConfirmed = true;
+      document.getElementById('konfirmasiFotoDiv').classList.add('hidden');
+      cekValidasiAbsen();
     }
 
     function ulangFoto() {
       capturedImageBase64 = '';
+      isPhotoConfirmed = false;
       document.getElementById('videoCam').classList.remove('hidden');
       document.getElementById('previewFoto').classList.add('hidden');
       document.getElementById('btnCapture').classList.remove('hidden');
-      document.getElementById('btnRetake').classList.add('hidden');
+      document.getElementById('konfirmasiFotoDiv').classList.add('hidden');
+      cekValidasiAbsen();
     }
 
     function deteksiGPS() {
@@ -545,10 +575,18 @@
       navigator.geolocation.watchPosition(pos => {
         currentCoords.lat = pos.coords.latitude;
         currentCoords.lng = pos.coords.longitude;
-        currentCoords.jarak = hitungJarak(currentCoords.lat, currentCoords.lng, currentUser.dudi.lat, currentUser.dudi.lng);
+        currentCoords.jarak = hitungJarak(currentCoords.lat, currentCoords.lng, currentUser.user.dudi.lat, currentUser.user.dudi.lng);
+        
         const elJarak = document.getElementById('txtJarakGps');
         elJarak.innerText = `${currentCoords.jarak} Meter dari DUDI`;
-        elJarak.className = currentCoords.jarak <= currentUser.dudi.radius ? 'font-bold text-emerald-600' : 'font-bold text-rose-600';
+        
+        const maxRadius = currentUser.user.dudi.radius || 100;
+        if (currentCoords.jarak <= maxRadius) {
+          elJarak.className = 'font-bold text-emerald-600';
+        } else {
+          elJarak.className = 'font-bold text-rose-600 (Di Luar Radius)';
+        }
+        cekValidasiAbsen();
       }, () => {
         document.getElementById('txtJarakGps').innerText = 'GPS tidak aktif';
       }, { enableHighAccuracy: true });
@@ -561,18 +599,47 @@
       return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
     }
 
+    // Validasi Mutlak: Tombol Absen hanya aktif jika foto sudah dikonfirmasi DAN (jarak masuk radius ATAU status Ijin/Sakit)
+    function cekValidasiAbsen() {
+      const statusPresensi = document.getElementById('selStatusHadir').value;
+      const maxRadius = currentUser.user.dudi.radius || 100;
+      const isRadiusValid = currentCoords.jarak <= maxRadius;
+      const isIjinSakit = statusPresensi === 'Ijin' || statusPresensi === 'Sakit';
+
+      const btnSubmit = document.getElementById('btnSubmitAbsen');
+
+      if (isPhotoConfirmed && (isRadiusValid || isIjinSakit)) {
+        btnSubmit.disabled = false;
+        btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed');
+      } else {
+        btnSubmit.disabled = true;
+        btnSubmit.classList.add('opacity-50', 'cursor-not-allowed');
+      }
+    }
+
+    // Event Listener perubahan status presensi
+    document.getElementById('selStatusHadir').addEventListener('change', cekValidasiAbsen);
+
     async function kirimAbsensi() {
-      if (!capturedImageBase64) return alert('Silakan ambil foto selfie terlebih dahulu!');
+      const statusPresensi = document.getElementById('selStatusHadir').value;
+      const maxRadius = currentUser.user.dudi.radius || 100;
+      
+      if (!isPhotoConfirmed) return alert('Silakan ambil dan konfirmasi foto selfie terlebih dahulu!');
+      if (currentCoords.jarak > maxRadius && statusPresensi === 'Hadir') {
+        return alert(`Gagal! Jarak Anda (${currentCoords.jarak}m) melebihi batas radius DUDI (${maxRadius}m). Anda tidak dapat melakukan presensi Hadir.`);
+      }
+
       const btn = document.getElementById('btnSubmitAbsen');
       btn.innerText = 'Mengunggah Presensi...';
       btn.disabled = true;
+
       try {
         const res = await callAPI({
           action: 'submitAbsen',
-          nis: currentUser.nis,
-          nama: currentUser.nama,
+          nis: currentUser.user.nis,
+          nama: currentUser.user.nama,
           jenisAbsen: document.getElementById('selJenisAbsen').value,
-          statusKehadiran: document.getElementById('selStatusHadir').value,
+          statusKehadiran: statusPresensi,
           jarak: currentCoords.jarak,
           koordinat: `${currentCoords.lat},${currentCoords.lng}`,
           imageBase64: capturedImageBase64
@@ -596,9 +663,9 @@
       try {
         const res = await callAPI({
           action: 'submitJurnal',
-          nis: currentUser.nis,
-          nama: currentUser.nama,
-          idDudi: currentUser.dudi.id,
+          nis: currentUser.user.nis,
+          nama: currentUser.user.nama,
+          idDudi: currentUser.user.dudi.id,
           kompetensi: document.getElementById('selKompetensi').value,
           uraian: uraian,
           linkKarya: document.getElementById('txtLinkKarya').value.trim()
@@ -615,7 +682,7 @@
     }
 
     async function muatRiwayat() {
-      const res = await callAPI({ action: 'getRiwayat', nis: currentUser.nis });
+      const res = await callAPI({ action: 'getRiwayat', nis: currentUser.user.nis });
       if (res.status === 'success') {
         document.getElementById('listRiwayatAbsen').innerHTML = res.absen.map(a => 
           `<div class="p-3 bg-slate-50 rounded-lg border flex justify-between">
@@ -641,10 +708,13 @@
       });
       document.getElementById('tab' + tab).classList.remove('hidden');
       document.getElementById('nav' + tab).classList.add('text-indigo-600');
-      if (tab === 'Riwayat') muitRiwayat();
+      if (tab === 'Riwayat') muatRiwayat();
     }
 
-    function logout() { location.reload(); }
+    function logout() { 
+      localStorage.removeItem('pkl_user');
+      location.reload(); 
+    }
   </script>
 </body>
 </html>
