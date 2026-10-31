@@ -127,7 +127,7 @@
       </div>
     </header>
 
-    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 hidden md:hidden"></div>
+    <div id="sidebarOverlay" onclick="tutupSidebarMobile()" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 hidden md:hidden"></div>
 
     <!-- SIDEBAR KIRI -->
     <aside id="sidebarMenu" class="fixed md:sticky top-0 left-0 z-50 h-screen w-64 bg-slate-900 text-white flex flex-col justify-between transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shrink-0 shadow-2xl md:shadow-none">
@@ -140,7 +140,7 @@
               <p class="text-[10px] text-indigo-400 font-semibold">Monitoring PKL DKV</p>
             </div>
           </div>
-          <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white p-1">✕</button>
+          <button onclick="tutupSidebarMobile()" class="md:hidden text-slate-400 hover:text-white p-1">✕</button>
         </div>
 
         <div class="p-4 border-b border-slate-800/80 bg-slate-800/40">
@@ -445,7 +445,7 @@
           </button>
         </section>
 
-        <!-- TAB SISWA 3: REKAP PRESENSI BULANAN (LENGKAP 5 METRIK & CETAK KOP RESMI) -->
+        <!-- TAB SISWA 3: REKAP PRESENSI BULANAN (LENGKAP 5 METRIK & CETAK KOP SISWA) -->
         <section id="tabRekap" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
           <div class="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 p-3.5 rounded-2xl space-y-3">
             <div class="flex justify-between items-center">
@@ -476,7 +476,7 @@
               </div>
             </div>
 
-            <button onclick="cetakRekapPresensiSiswaPDF()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow">🖨️ Cetak PDF Laporan Presensi Bulanan (Kop Resmi)</button>
+            <button onclick="cetakRekapPresensiSiswaPDF()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow">🖨️ Cetak PDF Laporan Presensi Bulanan</button>
           </div>
 
           <div class="overflow-x-auto rounded-xl border border-slate-200">
@@ -504,8 +504,8 @@
               <h4 class="font-bold text-xs text-indigo-950 dark:text-indigo-300 uppercase">📖 Bulan Laporan Jurnal</h4>
               <input type="month" id="filterBulanJurnalSiswa" onchange="muatRekapJurnalSiswa()" class="text-xs font-bold p-1.5 rounded-lg border border-indigo-300 bg-white">
             </div>
-            <p class="text-[11px] text-slate-600">Laporan jurnal dicetak lengkap dengan Kop Surat Resmi serta tanda tangan Siswa, Pembimbing DUDI, dan Guru Pembimbing.</p>
-            <button onclick="cetakRekapJurnalSiswaPDF()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow">🖨️ Cetak PDF Laporan Jurnal Bulanan (Kop Resmi)</button>
+            <p class="text-[11px] text-slate-600">Laporan jurnal dicetak menggunakan <b>kop_laporansiswa1.png</b> beserta tanda tangan Siswa, Pembimbing DUDI, dan Guru Pembimbing.</p>
+            <button onclick="cetakRekapJurnalSiswaPDF()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow">🖨️ Cetak PDF Laporan Jurnal Bulanan</button>
           </div>
 
           <div class="overflow-x-auto rounded-xl border border-slate-200">
@@ -635,8 +635,8 @@
         <!-- TAB GURU 5: CETAK LAPORAN KELOMPOK -->
         <section id="tabGuruCetak" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
           <div class="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 p-4 rounded-2xl space-y-3">
-            <h4 class="font-bold text-sm text-indigo-900 dark:text-indigo-300">🖨️ Cetak Rekapitulasi Kelompok Binaan (Kop Resmi)</h4>
-            <p class="text-xs text-slate-600">Mencetak laporan kehadiran harian serta rekap kunjungan monitoring kelompok bimbingan Anda ke format PDF resmi.</p>
+            <h4 class="font-bold text-sm text-indigo-900 dark:text-indigo-300">🖨️ Cetak Rekapitulasi Kelompok Binaan</h4>
+            <p class="text-xs text-slate-600">Mencetak laporan kehadiran harian serta rekap kunjungan monitoring kelompok bimbingan Anda menggunakan <b>kop_laporanguru1.png</b>.</p>
             <button onclick="cetakLaporanPDF()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-xs shadow">🖨️ Cetak / Unduh PDF Laporan Binaan</button>
           </div>
         </section>
@@ -701,8 +701,8 @@
         <!-- TAB ADMIN 3: CETAK REKAP BULANAN PER KELAS (XII DKV 1 / XII DKV 2) -->
         <section id="tabAdminCetakKelas" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
           <div class="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 p-4 rounded-2xl space-y-3">
-            <h4 class="font-bold text-sm text-indigo-900 dark:text-indigo-300">🖨️ Cetak Rekapitulasi Presensi Bulanan Per Kelas (Kop Resmi)</h4>
-            <p class="text-xs text-slate-600">Menyusun matriks rekap kehadiran bulanan utuh (Hadir, Dinas Luar, Ijin, Sakit, Libur) khusus per kelas untuk laporan Wali Kelas & Pokja PKL.</p>
+            <h4 class="font-bold text-sm text-indigo-900 dark:text-indigo-300">🖨️ Cetak Rekapitulasi Presensi Bulanan Per Kelas</h4>
+            <p class="text-xs text-slate-600">Menyusun matriks rekap kehadiran bulanan utuh (Hadir, Dinas Luar, Ijin, Sakit, Libur) khusus per kelas menggunakan <b>kop_laporanguru1.png</b>.</p>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
               <div>
                 <label class="block text-[11px] font-bold text-slate-700 mb-1">Pilih Kelas</label>
@@ -802,34 +802,81 @@
       });
     }
 
+    // Konfigurasi Nama File Gambar Logo & Kop Surat Terpisah (Siswa vs Guru/Admin)
     const SCHOOL_CONFIG = {
       namaSekolah: 'SMK NEGERI 1 KLATEN',
       jurusan: 'Program Keahlian Desain Komunikasi Visual (DKV)',
       subJudulAplikasi: 'Sistem Presensi & Monitoring PKL',
-      logoUrl: 'logo.png'
+      logoUrl: 'logo.png',
+      kopSiswaUrl: 'kop_laporansiswa1.png',
+      kopGuruUrl: 'kop_laporanguru1.png'
     };
 
-    // Template Kop Surat Resmi SMKN 1 Klaten (Sesuai Lampiran Gambar Resmi)
-    const KOP_SURAT_HTML = `
-      <table style="width:100%; border-collapse:collapse; border:none; border-bottom:3px double #000; padding-bottom:8px; margin-bottom:14px;">
-        <tr style="border:none;">
-          <td style="border:none; width:80px; text-align:center; vertical-align:middle;">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Pemerintah_Provinsi_Jawa_Tengah.png/300px-Pemerintah_Provinsi_Jawa_Tengah.png" style="width:68px; height:auto;">
-          </td>
-          <td style="border:none; text-align:center; vertical-align:middle; font-family:'Times New Roman', Times, serif; line-height:1.25;">
-            <div style="font-size:14px;">PEMERINTAH PROVINSI JAWA TENGAH</div>
-            <div style="font-size:15px; font-weight:bold;">DINAS PENDIDIKAN</div>
-            <div style="font-size:16px; font-weight:bold;">SEKOLAH MENENGAH KEJURUAN NEGERI 1 KLATEN</div>
-            <div style="font-size:11px;">Jalan dr. Wahidin Sudiro Husodo Nomor 22, Klaten, Jawa Tengah, Kode Pos 57432</div>
-            <div style="font-size:11px;">Telepon 0272-321266</div>
-            <div style="font-size:11px;">Laman www.smkn1klaten.sch.id, Pos-el smkn20309691@gmail.com</div>
-          </td>
-          <td style="border:none; width:80px; text-align:center; vertical-align:middle;">
-            <img src="logo.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135755.png'" style="width:68px; height:auto;">
-          </td>
-        </tr>
-      </table>
-    `;
+    // Fungsi Pembuat Elemen Kop Surat Berbasis Gambar (Akurat 100% + Fallback Otomatis)
+    function buatKopSuratGambarHTML(jenisKop) {
+      const namaFile = (jenisKop === 'GURU') ? SCHOOL_CONFIG.kopGuruUrl : SCHOOL_CONFIG.kopSiswaUrl;
+      const resolvedImgUrl = new URL(namaFile, window.location.href).href;
+      const resolvedLogoUrl = new URL(SCHOOL_CONFIG.logoUrl, window.location.href).href;
+
+      return `
+        <div style="width:100%; margin-bottom:14px; text-align:center;">
+          <img id="imgKopCetak" src="${resolvedImgUrl}" style="width:100%; max-height:145px; object-fit:contain; display:block; margin:0 auto;"
+               onerror="this.style.display='none'; document.getElementById('fallbackKopTeks').style.display='table';">
+          <table id="fallbackKopTeks" style="display:none; width:100%; border-collapse:collapse; border:none; border-bottom:3px double #000; padding-bottom:8px;">
+            <tr style="border:none;">
+              <td style="border:none; width:75px; text-align:center; vertical-align:middle;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Pemerintah_Provinsi_Jawa_Tengah.png/300px-Pemerintah_Provinsi_Jawa_Tengah.png" style="width:65px; height:auto;">
+              </td>
+              <td style="border:none; text-align:center; vertical-align:middle; font-family:'Times New Roman', Times, serif; line-height:1.25;">
+                <div style="font-size:14px;">PEMERINTAH PROVINSI JAWA TENGAH</div>
+                <div style="font-size:15px; font-weight:bold;">DINAS PENDIDIKAN</div>
+                <div style="font-size:16px; font-weight:bold;">SEKOLAH MENENGAH KEJURUAN NEGERI 1 KLATEN</div>
+                <div style="font-size:11px;">Jalan dr. Wahidin Sudiro Husodo Nomor 22, Klaten, Jawa Tengah, Kode Pos 57432</div>
+                <div style="font-size:11px;">Telepon 0272-321266</div>
+                <div style="font-size:11px;">Laman www.smkn1klaten.sch.id, Pos-el smkn20309691@gmail.com</div>
+              </td>
+              <td style="border:none; width:75px; text-align:center; vertical-align:middle;">
+                <img src="${resolvedLogoUrl}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135755.png'" style="width:65px; height:auto;">
+              </td>
+            </tr>
+          </table>
+        </div>
+      `;
+    }
+
+    // Fungsi Pembuka Jendela Cetak yang Menunggu Gambar Kop Surat Selesai Dimuat
+    function bukaJendelaCetakDenganKop(htmlContent) {
+      const w = window.open('', '_blank');
+      if (!w) {
+        alert('Izinkan pop-up pada browser Anda untuk mencetak laporan PDF.');
+        return;
+      }
+      w.document.write(htmlContent);
+      w.document.close();
+
+      const imgKop = w.document.getElementById('imgKopCetak');
+      let sudahPrint = false;
+      const jalankanPrint = () => {
+        if (sudahPrint) return;
+        sudahPrint = true;
+        setTimeout(() => {
+          w.focus();
+          w.print();
+        }, 300);
+      };
+
+      if (imgKop) {
+        if (imgKop.complete) {
+          jalankanPrint();
+        } else {
+          imgKop.addEventListener('load', jalankanPrint);
+          imgKop.addEventListener('error', jalankanPrint);
+          setTimeout(jalankanPrint, 1800);
+        }
+      } else {
+        jalankanPrint();
+      }
+    }
 
     document.getElementById('txtNamaSekolahLogin').innerText = SCHOOL_CONFIG.namaSekolah;
     document.getElementById('txtJurusanLogin').innerText = SCHOOL_CONFIG.jurusan;
@@ -861,6 +908,54 @@
     let cacheRekapKelasAdmin = [];
     let cacheKalenderPresensi = [];
     let cacheJurnalBulanan = [];
+
+    // ================= MANAJEMEN TOMBOL BACK HP (HTML5 HISTORY API) =================
+    let currentActiveMenu = { role: null, tab: null };
+
+    function catatRiwayatNavigasi(role, tab, replace = false) {
+      currentActiveMenu = { role, tab };
+      const stateObj = { role, tab };
+      if (replace) {
+        history.replaceState(stateObj, '', `#${role.toLowerCase()}-${tab.toLowerCase()}`);
+      } else {
+        history.pushState(stateObj, '', `#${role.toLowerCase()}-${tab.toLowerCase()}`);
+      }
+    }
+
+    window.addEventListener('popstate', (event) => {
+      if (!currentUser) return;
+
+      // 1. Jika sidebar mobile sedang terbuka, tombol Back menutup sidebar dulu
+      const sb = document.getElementById('sidebarMenu');
+      if (sb && !sb.classList.contains('-translate-x-full') && window.innerWidth < 768) {
+        tutupSidebarMobile();
+        catatRiwayatNavigasi(currentActiveMenu.role, currentActiveMenu.tab, false);
+        return;
+      }
+
+      // 2. Jika ada state riwayat tab sebelumnya, kembali ke tab tersebut tanpa menutup aplikasi
+      if (event.state && event.state.role === currentUser.role && event.state.tab) {
+        if (currentUser.role === 'siswa') pilihMenuSiswa(event.state.tab, false);
+        else if (currentUser.role === 'guru') pilihMenuGuru(event.state.tab, false);
+        else if (currentUser.role === 'admin') pilihMenuAdmin(event.state.tab, false);
+        return;
+      }
+
+      // 3. Jika sudah di halaman beranda utama dan menekan tombol Back
+      const homeTab = currentUser.role === 'siswa' ? 'Profil' : (currentUser.role === 'guru' ? 'Absen' : 'Pantau');
+      if (currentActiveMenu.tab !== homeTab) {
+        if (currentUser.role === 'siswa') pilihMenuSiswa(homeTab, false);
+        else if (currentUser.role === 'guru') pilihMenuGuru(homeTab, false);
+        else if (currentUser.role === 'admin') pilihMenuAdmin(homeTab, false);
+        catatRiwayatNavigasi(currentUser.role, homeTab, false);
+      } else {
+        if (confirm('Apakah Anda ingin keluar (Logout) dari aplikasi?')) {
+          logout();
+        } else {
+          catatRiwayatNavigasi(currentUser.role, homeTab, false);
+        }
+      }
+    });
 
     // ================= FITUR LIHAT / SEMBUNYIKAN PIN =================
     function toggleShowPin(inputId, btnId) {
@@ -989,7 +1084,6 @@
       }
     });
 
-    // Header text/plain wajib ada agar bebas blokir CORS Google Apps Script
     async function callAPI(payload) {
       const res = await fetch(GAS_API_URL, {
         method: 'POST',
@@ -1050,6 +1144,8 @@
         document.getElementById('txtJabatanAdmin').innerText = currentUser.user.jabatan;
         document.getElementById('filterTanggalAdmin').value = today;
         document.getElementById('cetakAdminBulan').value = today.substring(0, 7);
+        catatRiwayatNavigasi('admin', 'Pantau', true);
+        pilihMenuAdmin('Pantau', true);
         muatDataAdminGlobal();
 
       } else if (currentUser.role === 'guru') {
@@ -1062,6 +1158,8 @@
         document.getElementById('txtJabatanGuru').innerText = currentUser.user.jabatan;
         document.getElementById('filterTanggalGuru').value = today;
         document.getElementById('monevTanggal').value = today;
+        catatRiwayatNavigasi('guru', 'Absen', true);
+        pilihMenuGuru('Absen', true);
         muatDataMonitoringGuru();
 
       } else {
@@ -1090,7 +1188,8 @@
         deteksiGPS();
         sinkronDataSiswa();
         handleStatusChange();
-        pilihMenuSiswa('Profil');
+        catatRiwayatNavigasi('siswa', 'Profil', true);
+        pilihMenuSiswa('Profil', true);
       }
     }
 
@@ -1183,9 +1282,15 @@
       }
     }
 
-    function pilihMenuSiswa(menu) {
+    function pilihMenuSiswa(menu, pushHistory = true) {
       if (menu !== 'Absen') matikanKamera();
       tutupSidebarMobile();
+
+      if (pushHistory && (currentActiveMenu.role !== 'siswa' || currentActiveMenu.tab !== menu)) {
+        catatRiwayatNavigasi('siswa', menu, false);
+      } else {
+        currentActiveMenu = { role: 'siswa', tab: menu };
+      }
 
       ['Profil', 'Absen', 'Jurnal', 'Rekap', 'RekapJurnal'].forEach(m => {
         document.getElementById('tab' + m).classList.add('hidden');
@@ -1209,6 +1314,7 @@
       if (menu === 'Jurnal') {
         sinkronFormJurnalTunggalHariIni();
       }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // ================= KAMERA PORTRAIT & DETEKSI WAJAH =================
@@ -1725,7 +1831,7 @@
       }
     }
 
-    // ================= REKAP BULANAN SISWA & CETAK PDF (KOP RESMI + TTD OPSI B) =================
+    // ================= REKAP BULANAN SISWA & CETAK PDF (KOP GAMBAR SISWA + TTD OPSI B) =================
     async function muatRekapAbsenSiswa() {
       const bulanFilter = document.getElementById('filterBulanSiswa').value;
       if (!bulanFilter) return;
@@ -1802,11 +1908,10 @@
       }).join('');
     }
 
-    // Template Tanda Tangan Opsi B (Hierarki Segitiga: Siswa di Kanan Atas, Guru di Kiri Bawah, DUDI di Kanan Bawah)
     function buatTandaTanganOpsiB() {
       const tglCetak = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
       return `
-        <table style="width:100%; margin-top:25px; border:none; font-size:11px;">
+        <table style="width:100%; margin-top:25px; border:none; font-size:11px; page-break-inside:avoid;">
           <tr style="border:none;">
             <td style="border:none; width:50%; text-align:center;"></td>
             <td style="border:none; width:50%; text-align:center;">
@@ -1834,18 +1939,18 @@
 
     function cetakRekapPresensiSiswaPDF() {
       const bulan = document.getElementById('filterBulanSiswa').value;
-      const w = window.open('', '_blank');
-      w.document.write(`
+      const htmlContent = `
         <html><head><title>Laporan Presensi PKL - ${currentUser.user.nama}</title>
         <style>
-          body { font-family: Arial, sans-serif; padding: 20px 25px; color: #111; font-size: 11px; }
-          .judul { text-align: center; font-weight: bold; font-size: 13px; margin: 10px 0 12px; text-decoration: underline; }
+          @page { size: A4 portrait; margin: 12mm 15mm; }
+          body { font-family: Arial, sans-serif; color: #111; font-size: 11px; margin: 0; padding: 0; }
+          .judul { text-align: center; font-weight: bold; font-size: 13px; margin: 8px 0 12px; text-decoration: underline; }
           .meta { margin-bottom: 12px; line-height: 1.5; }
           table.data { width: 100%; border-collapse: collapse; font-size: 10.5px; }
           table.data th, table.data td { border: 1px solid #222; padding: 4px 6px; text-align: center; }
-          table.data th { background: #e2e8f0; }
+          table.data th { background: #e2e8f0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         </style></head><body>
-          ${KOP_SURAT_HTML}
+          ${buatKopSuratGambarHTML('SISWA')}
           <div class="judul">LAPORAN REKAPITULASI PRESENSI BULANAN PKL (PERIODE: ${bulan})</div>
           <div class="meta">
             <b>Nama Siswa:</b> ${currentUser.user.nama} (${currentUser.user.kelas} / NIS: ${currentUser.user.nis})<br>
@@ -1862,9 +1967,8 @@
           </table>
           ${buatTandaTanganOpsiB()}
         </body></html>
-      `);
-      w.document.close();
-      setTimeout(() => w.print(), 500);
+      `;
+      bukaJendelaCetakDenganKop(htmlContent);
     }
 
     async function muatRekapJurnalSiswa() {
@@ -1896,18 +2000,18 @@
 
     function cetakRekapJurnalSiswaPDF() {
       const bulan = document.getElementById('filterBulanJurnalSiswa').value;
-      const w = window.open('', '_blank');
-      w.document.write(`
+      const htmlContent = `
         <html><head><title>Laporan Jurnal PKL - ${currentUser.user.nama}</title>
         <style>
-          body { font-family: Arial, sans-serif; padding: 20px 25px; color: #111; font-size: 11px; }
-          .judul { text-align: center; font-weight: bold; font-size: 13px; margin: 10px 0 12px; text-decoration: underline; }
+          @page { size: A4 portrait; margin: 12mm 15mm; }
+          body { font-family: Arial, sans-serif; color: #111; font-size: 11px; margin: 0; padding: 0; }
+          .judul { text-align: center; font-weight: bold; font-size: 13px; margin: 8px 0 12px; text-decoration: underline; }
           .meta { margin-bottom: 12px; line-height: 1.5; }
           table.data { width: 100%; border-collapse: collapse; font-size: 10.5px; }
           table.data th, table.data td { border: 1px solid #222; padding: 5px 7px; text-align: left; }
-          table.data th { background: #e2e8f0; text-align: center; }
+          table.data th { background: #e2e8f0; text-align: center; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         </style></head><body>
-          ${KOP_SURAT_HTML}
+          ${buatKopSuratGambarHTML('SISWA')}
           <div class="judul">LAPORAN JURNAL KEGIATAN BULANAN PKL (PERIODE: ${bulan})</div>
           <div class="meta">
             <b>Nama Siswa:</b> ${currentUser.user.nama} (${currentUser.user.kelas} / NIS: ${currentUser.user.nis})<br>
@@ -1929,20 +2033,26 @@
           </table>
           ${buatTandaTanganOpsiB()}
         </body></html>
-      `);
-      w.document.close();
-      setTimeout(() => w.print(), 500);
+      `;
+      bukaJendelaCetakDenganKop(htmlContent);
     }
 
     // ================= FUNGSI LENGKAP GURU PEMBIMBING =================
-    function pilihMenuGuru(tab) {
+    function pilihMenuGuru(tab, pushHistory = true) {
       tutupSidebarMobile();
+      if (pushHistory && (currentActiveMenu.role !== 'guru' || currentActiveMenu.tab !== tab)) {
+        catatRiwayatNavigasi('guru', tab, false);
+      } else {
+        currentActiveMenu = { role: 'guru', tab: tab };
+      }
+
       ['Absen', 'ProfilBinaan', 'Jurnal', 'Monev', 'Cetak'].forEach(t => {
         document.getElementById('tabGuru' + t).classList.add('hidden');
         document.getElementById('btnMenuGuru' + t).className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 transition';
       });
       document.getElementById('tabGuru' + tab).classList.remove('hidden');
       document.getElementById('btnMenuGuru' + tab).className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-indigo-600 text-white transition shadow';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     async function muatDataMonitoringGuru() {
@@ -2219,17 +2329,17 @@
     function cetakLaporanPDF() {
       const tanggal = document.getElementById('filterTanggalGuru').value;
       const tglCetak = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-      const printWindow = window.open('', '_blank');
-      printWindow.document.write(`
+      const htmlContent = `
         <html><head><title>Rekap Laporan PKL - ${SCHOOL_CONFIG.namaSekolah}</title>
         <style>
-          body { font-family: Arial, sans-serif; padding: 20px 25px; color: #111; font-size: 11px; }
-          .judul { text-align: center; font-weight: bold; font-size: 13px; margin: 10px 0 14px; text-decoration: underline; }
+          @page { size: A4 portrait; margin: 12mm 15mm; }
+          body { font-family: Arial, sans-serif; color: #111; font-size: 11px; margin: 0; padding: 0; }
+          .judul { text-align: center; font-weight: bold; font-size: 13px; margin: 8px 0 14px; text-decoration: underline; }
           table.data { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 10.5px; }
           table.data th, table.data td { border: 1px solid #222; padding: 5px 7px; text-align: left; }
-          table.data th { background-color: #e2e8f0; text-align: center; }
+          table.data th { background-color: #e2e8f0; text-align: center; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         </style></head><body>
-          ${KOP_SURAT_HTML}
+          ${buatKopSuratGambarHTML('GURU')}
           <div class="judul">LAPORAN MONITORING KELOMPOK BINAAN PKL (TANGGAL: ${tanggal})</div>
           <p><b>Nama Guru Pembimbing:</b> ${currentUser.user.nama}</p>
           <h4>A. Rekapitulasi Kehadiran Siswa Binaan</h4>
@@ -2250,19 +2360,24 @@
               `).join('') : '<tr><td colspan="5" style="text-align:center;">Belum ada catatan kunjungan.</td></tr>'}
             </tbody>
           </table>
-          <div style="margin-top: 30px; float: right; text-align: center; width: 240px;">
+          <div style="margin-top: 30px; float: right; text-align: center; width: 240px; page-break-inside: avoid;">
             <p>Klaten, ${tglCetak}<br>Guru Pembimbing PKL,</p><br><br><br>
             <p><b><u>${currentUser.user.nama}</u></b></p>
           </div>
         </body></html>
-      `);
-      printWindow.document.close();
-      setTimeout(() => printWindow.print(), 500);
+      `;
+      bukaJendelaCetakDenganKop(htmlContent);
     }
 
     // ================= FUNGSI ADMIN POKJA PKL (FILTER XII DKV 1 & XII DKV 2) =================
-    function pilihMenuAdmin(tab) {
+    function pilihMenuAdmin(tab, pushHistory = true) {
       tutupSidebarMobile();
+      if (pushHistory && (currentActiveMenu.role !== 'admin' || currentActiveMenu.tab !== tab)) {
+        catatRiwayatNavigasi('admin', tab, false);
+      } else {
+        currentActiveMenu = { role: 'admin', tab: tab };
+      }
+
       ['Pantau', 'KelolaSiswa', 'CetakKelas', 'TambahMaster'].forEach(t => {
         document.getElementById('tabAdmin' + t).classList.add('hidden');
         document.getElementById('btnMenuAdmin' + t).className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 transition';
@@ -2273,6 +2388,7 @@
       if (tab === 'CetakKelas') {
         muatRekapKelasAdmin();
       }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function setFilterKelasAdmin(kelas) {
@@ -2414,7 +2530,7 @@
       muatDataAdminGlobal();
     }
 
-    // ================= CETAK REKAP BULANAN PER KELAS (ADMIN) =================
+    // ================= CETAK REKAP BULANAN PER KELAS (ADMIN - MENGGUNAKAN KOP GURU) =================
     async function muatRekapKelasAdmin() {
       const kelas = document.getElementById('cetakAdminKelas').value;
       const bulan = document.getElementById('cetakAdminBulan').value;
@@ -2453,18 +2569,18 @@
       const kelas = document.getElementById('cetakAdminKelas').value;
       const bulan = document.getElementById('cetakAdminBulan').value;
       const tglCetak = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-      const w = window.open('', '_blank');
-      w.document.write(`
+      const htmlContent = `
         <html><head><title>Rekap Presensi PKL Kelas ${kelas}</title>
         <style>
-          body { font-family: Arial, sans-serif; padding: 20px 25px; color: #111; font-size: 11px; }
-          .judul { text-align: center; font-weight: bold; font-size: 13px; margin: 10px 0 14px; text-decoration: underline; }
+          @page { size: A4 portrait; margin: 12mm 15mm; }
+          body { font-family: Arial, sans-serif; color: #111; font-size: 11px; margin: 0; padding: 0; }
+          .judul { text-align: center; font-weight: bold; font-size: 13px; margin: 8px 0 14px; text-decoration: underline; }
           table.data { width: 100%; border-collapse: collapse; font-size: 10.5px; margin-top: 10px; }
           table.data th, table.data td { border: 1px solid #222; padding: 5px 7px; text-align: center; }
-          table.data th { background: #e2e8f0; }
+          table.data th { background: #e2e8f0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           table.data td.left { text-align: left; }
         </style></head><body>
-          ${KOP_SURAT_HTML}
+          ${buatKopSuratGambarHTML('GURU')}
           <div class="judul">REKAPITULASI PRESENSI BULANAN PKL • KELAS: ${kelas} • PERIODE: ${bulan}</div>
           <table class="data">
             <thead>
@@ -2498,14 +2614,13 @@
               `).join('')}
             </tbody>
           </table>
-          <div style="margin-top: 30px; float: right; text-align: center; width: 240px;">
+          <div style="margin-top: 30px; float: right; text-align: center; width: 240px; page-break-inside: avoid;">
             <p>Klaten, ${tglCetak}<br>Koordinator Pokja PKL DKV,</p><br><br><br>
             <p><b><u>${currentUser.user.nama}</u></b></p>
           </div>
         </body></html>
-      `);
-      w.document.close();
-      setTimeout(() => w.print(), 500);
+      `;
+      bukaJendelaCetakDenganKop(htmlContent);
     }
 
     async function adminSimpanMaster(jenisData) {
@@ -2544,6 +2659,7 @@
       hentikanStreamVideo();
       localStorage.removeItem('pkl_user');
       localStorage.removeItem('pkl_last_active');
+      history.replaceState(null, '', window.location.pathname);
       location.reload(); 
     }
   </script>
