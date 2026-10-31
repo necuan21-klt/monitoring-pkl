@@ -1,3 +1,3 @@
 self.addEventListener('fetch', function(event) {
-  // Service worker dasar untuk memenuhi syarat instalasi PWA
+  // Service worker dasar untuk mengaktifkan instalasi PWA di Android & iOS
 });
