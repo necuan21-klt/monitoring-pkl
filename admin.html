@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="id" class="">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Panel Admin Pokja PKL - SMK Negeri 1 Klaten</title>
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#4f46e5">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="logo.png">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' };</script>
+  <style>
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-pop { animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    body, div, section, aside, header, input, select, textarea, table, th, td {
+      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+    html.dark body { background-color: #0f172a; color: #f1f5f9; }
+    html.dark .bg-white { background-color: #1e293b !important; color: #f1f5f9; }
+    html.dark .bg-slate-50 { background-color: #0f172a !important; color: #e2e8f0; }
+    html.dark .bg-slate-100 { background-color: #0f172a !important; }
+    html.dark .text-slate-800 { color: #f8fafc !important; }
+    html.dark .text-slate-700 { color: #e2e8f0 !important; }
+    html.dark .text-slate-600 { color: #cbd5e1 !important; }
+    html.dark .text-slate-500 { color: #94a3b8 !important; }
+    html.dark .border-slate-200, html.dark .border-slate-300, html.dark .border-slate-100 { border-color: #334155 !important; }
+    html.dark input, html.dark select, html.dark textarea {
+      background-color: #0f172a !important;
+      color: #f8fafc !important;
+      border-color: #475569 !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen font-sans text-slate-800">
+
+  <!-- MODAL KONFIRMASI KELUAR APLIKASI (SAAT TOMBOL BACK DI UJUNG) -->
+  <div id="modalExitApp" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[60] hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-xs w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700 text-center space-y-4 animate-pop">
+      <div class="w-14 h-14 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto text-2xl">🚪</div>
+      <div>
+        <h4 class="font-extrabold text-base text-slate-800 dark:text-white">Keluar dari Aplikasi?</h4>
+        <p class="text-xs text-slate-500 dark:text-slate-300 mt-1">Apakah Anda yakin ingin keluar (Logout) dari Panel Admin Pokja PKL?</p>
+      </div>
+      <div class="flex gap-2.5 pt-1">
+        <button onclick="batalKeluarAplikasi()" class="flex-1 py-2.5 px-3 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs hover:bg-slate-300 transition">Batal</button>
+        <button onclick="logout()" class="flex-1 py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md transition">Ya, Keluar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="min-h-screen flex flex-col md:flex-row bg-slate-100">
+
+    <!-- HEADER MOBILE -->
+    <header class="md:hidden bg-gradient-to-r from-indigo-700 to-blue-600 dark:from-slate-900 dark:to-indigo-950 text-white p-3.5 shadow-md sticky top-0 z-30 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <button onclick="toggleSidebar()" class="p-2 rounded-xl bg-white/15 hover:bg-white/25 active:scale-95 transition">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+        <div class="flex items-center gap-2.5">
+          <img src="logo.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135755.png'" class="w-8 h-8 rounded-lg bg-white p-0.5 object-contain">
+          <div>
+            <h1 class="text-xs font-extrabold tracking-wide leading-tight">SMK NEGERI 1 KLATEN</h1>
+            <p class="text-[10px] text-indigo-100">Admin Pokja PKL DKV</p>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleDarkMode()" class="p-2 rounded-lg bg-white/15 hover:bg-white/25 text-xs">
+          <span id="iconDarkMobile">🌙</span>
+        </button>
+        <button onclick="tampilkanModalKeluar()" class="text-xs bg-white/20 hover:bg-white/30 px-2.5 py-1.5 rounded-lg font-semibold">Keluar</button>
+      </div>
+    </header>
+
+    <div id="sidebarOverlay" onclick="tutupSidebarMobile()" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 hidden md:hidden"></div>
+
+    <!-- SIDEBAR KIRI ADMIN -->
+    <aside id="sidebarMenu" class="fixed md:sticky top-0 left-0 z-50 h-screen w-64 bg-slate-900 text-white flex flex-col justify-between transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shrink-0 shadow-2xl md:shadow-none">
+      <div class="overflow-y-auto">
+        <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <img src="logo.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135755.png'" class="w-10 h-10 rounded-xl bg-white p-1 object-contain">
+            <div>
+              <h2 class="text-xs font-extrabold tracking-wide text-white">SMKN 1 KLATEN</h2>
+              <p class="text-[10px] text-rose-400 font-semibold">Admin Pokja PKL DKV</p>
+            </div>
+          </div>
+          <button onclick="tutupSidebarMobile()" class="md:hidden text-slate-400 hover:text-white p-1">✕</button>
+        </div>
+
+        <div class="p-4 border-b border-slate-800/80 bg-slate-800/40">
+          <span class="inline-block text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-rose-600 text-white mb-1">ADMIN POKJA</span>
+          <p id="txtNamaUserSidebar" class="font-bold text-sm text-white truncate">-</p>
+          <p id="txtSubUserSidebar" class="text-[11px] text-slate-400 truncate">-</p>
+        </div>
+
+        <nav class="p-3 space-y-1 text-xs font-semibold">
+          <button onclick="pilihMenuAdmin('Pantau')" id="btnMenuAdminPantau" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-indigo-600 text-white transition">
+            <span>📊</span> <span>Pantauan Harian & Reset</span>
+          </button>
+          <button onclick="pilihMenuAdmin('KelolaSiswa')" id="btnMenuAdminKelolaSiswa" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 transition">
+            <span>🔓</span> <span>Kelola Siswa, PIN & Profil</span>
+          </button>
+          <button onclick="pilihMenuAdmin('CetakKelas')" id="btnMenuAdminCetakKelas" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 transition">
+            <span>🖨️</span> <span>Cetak Rekap Per Kelas</span>
+          </button>
+          <button onclick="pilihMenuAdmin('TambahMaster')" id="btnMenuAdminTambahMaster" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 transition">
+            <span>➕</span> <span>Master Data & Monev Guru</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="p-4 border-t border-slate-800 space-y-2">
+        <button onclick="toggleDarkMode()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2.5 rounded-xl transition flex items-center justify-center gap-2">
+          <span id="iconDarkSidebar">🌙</span> <span id="txtDarkSidebar">Mode Gelap</span>
+        </button>
+        <button onclick="tampilkanModalKeluar()" class="w-full bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white text-xs font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2">
+          <span>🚪</span> <span>Keluar Aplikasi</span>
+        </button>
+        <p class="text-[10px] text-center text-slate-500">© copyright_DKV_SMKN 1 Klaten</p>
+      </div>
+    </aside>
+
+    <!-- AREA KONTEN UTAMA ADMIN -->
+    <div class="flex-1 p-4 md:p-6 max-w-5xl mx-auto w-full">
+      <main class="space-y-4">
+
+        <!-- BANNER HEADER ADMIN & FILTER KELAS -->
+        <div class="bg-gradient-to-r from-slate-900 to-indigo-950 text-white p-4 rounded-2xl shadow flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <p class="text-[10px] uppercase tracking-wider text-amber-400 font-bold">Panel Kendali Utama Pokja PKL (Superuser)</p>
+            <h3 id="txtNamaAdmin" class="font-extrabold text-base">-</h3>
+            <p id="txtJabatanAdmin" class="text-xs text-slate-300">-</p>
+          </div>
+          <div class="flex bg-slate-800 p-1 rounded-xl gap-1 text-xs font-bold">
+            <button onclick="setFilterKelasAdmin('SEMUA')" id="btnKelasAdminSEMUA" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white">Semua Kelas</button>
+            <button onclick="setFilterKelasAdmin('XII DKV 1')" id="btnKelasAdminDKV1" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white">XII DKV 1</button>
+            <button onclick="setFilterKelasAdmin('XII DKV 2')" id="btnKelasAdminDKV2" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white">XII DKV 2</button>
+          </div>
+        </div>
+
+        <!-- STATISTIK PERBANDINGAN 2 KELAS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs flex justify-between items-center">
+            <div>
+              <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-indigo-100 text-indigo-800">KELAS XII DKV 1</span>
+              <p id="statAdminDkv1Detail" class="text-slate-500 mt-1.5 font-medium">Memuat data...</p>
+            </div>
+            <p id="statAdminDkv1Total" class="text-2xl font-extrabold text-indigo-600">0</p>
+          </div>
+          <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs flex justify-between items-center">
+            <div>
+              <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">KELAS XII DKV 2</span>
+              <p id="statAdminDkv2Detail" class="text-slate-500 mt-1.5 font-medium">Memuat data...</p>
+            </div>
+            <p id="statAdminDkv2Total" class="text-2xl font-extrabold text-emerald-600">0</p>
+          </div>
+        </div>
+
+        <!-- TAB 1: PANTAUAN HARIAN & RESET PRESENSI -->
+        <section id="tabAdminPantau" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
+            <div>
+              <label class="text-xs font-bold text-slate-700 block">Tanggal Pantauan & Koreksi Presensi:</label>
+              <span class="text-[11px] text-slate-500">Jika siswa salah pilih status sehingga terkunci, klik tombol <b>🗑️ Reset Presensi</b>.</span>
+            </div>
+            <input type="date" id="filterTanggalAdmin" onchange="muatDataAdminGlobal()" class="text-xs font-semibold p-2 rounded-lg border border-slate-300 bg-white">
+          </div>
+          <div id="listPantauAdmin" class="space-y-2.5 text-xs"></div>
+        </section>
+
+        <!-- TAB 2: KELOLA SISWA, RESET PIN, BUKA KUNCI PROFIL & EDIT PENEMPATAN -->
+        <section id="tabAdminKelolaSiswa" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <div>
+            <h4 class="font-bold text-sm text-slate-800">🔓 Manajemen PIN, Penempatan DUDI/Guru & Kunci Profil</h4>
+            <p class="text-xs text-slate-500">Anda dapat melihat/mengganti PIN siswa yang lupa, mengubah kelas/DUDI/Guru Pembimbing, atau membuka kunci profil & WA siswa.</p>
+          </div>
+          <div id="listKelolaSiswaAdmin" class="space-y-3 text-xs"></div>
+        </section>
+
+        <!-- TAB 3: CETAK REKAP BULANAN PER KELAS -->
+        <section id="tabAdminCetakKelas" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <div class="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 p-4 rounded-2xl space-y-3">
+            <h4 class="font-bold text-sm text-indigo-900 dark:text-indigo-300">🖨️ Cetak Rekapitulasi Presensi Bulanan Per Kelas</h4>
+            <p class="text-xs text-slate-600">Menyusun matriks rekap kehadiran bulanan utuh (Hadir, Dinas Luar, Ijin, Sakit, Libur) khusus per kelas menggunakan <b>kop_laporanguru1.png</b>.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Pilih Kelas</label>
+                <select id="cetakAdminKelas" onchange="muatRekapKelasAdmin()" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white text-xs font-bold">
+                  <option value="XII DKV 1">XII DKV 1</option>
+                  <option value="XII DKV 2">XII DKV 2</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Pilih Bulan Laporan</label>
+                <input type="month" id="cetakAdminBulan" onchange="muatRekapKelasAdmin()" class="w-full p-2 rounded-xl border border-slate-300 bg-white text-xs font-bold">
+              </div>
+              <div class="flex items-end">
+                <button onclick="cetakRekapKelasAdminPDF()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow">🖨️ Cetak PDF Kelas Ini</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto rounded-xl border border-slate-200">
+            <table class="w-full text-xs text-left border-collapse">
+              <thead class="bg-slate-800 text-white">
+                <tr>
+                  <th class="p-2.5 border-r border-slate-700 w-10 text-center">No</th>
+                  <th class="p-2.5 border-r border-slate-700">NIS & Nama Siswa</th>
+                  <th class="p-2.5 border-r border-slate-700">Tempat DUDI & Guru</th>
+                  <th class="p-2.5 border-r border-slate-700 text-center">Hadir</th>
+                  <th class="p-2.5 border-r border-slate-700 text-center">DL</th>
+                  <th class="p-2.5 border-r border-slate-700 text-center">Ijin</th>
+                  <th class="p-2.5 border-r border-slate-700 text-center">Sakit</th>
+                  <th class="p-2.5 text-center">Libur</th>
+                </tr>
+              </thead>
+              <tbody id="tabelRekapKelasAdmin" class="divide-y divide-slate-200 bg-white">
+                <tr><td colspan="8" class="p-4 text-center text-slate-400">Pilih bulan untuk melihat rekapitulasi kelas...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- TAB 4: TAMBAH DATA MASTER LENGKAP & PANTAUAN MONEV GURU -->
+        <section id="tabAdminTambahMaster" class="hidden space-y-5 text-xs">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2.5">
+              <h5 class="font-extrabold text-slate-800 text-sm border-b pb-2">➕ Tambah Siswa Baru</h5>
+              <input type="text" id="addSiswaNis" placeholder="NIS" class="w-full p-2.5 rounded-xl border">
+              <input type="text" id="addSiswaNama" placeholder="Nama Lengkap Siswa" class="w-full p-2.5 rounded-xl border">
+              <select id="addSiswaKelas" class="w-full p-2.5 rounded-xl border bg-white font-semibold">
+                <option value="XII DKV 1">XII DKV 1</option>
+                <option value="XII DKV 2">XII DKV 2</option>
+              </select>
+              <input type="text" id="addSiswaPin" placeholder="PIN Login Awal" class="w-full p-2.5 rounded-xl border">
+              <input type="text" id="addSiswaDudi" placeholder="ID DUDI" class="w-full p-2.5 rounded-xl border">
+              <input type="text" id="addSiswaGuru" placeholder="ID Guru Pembimbing" class="w-full p-2.5 rounded-xl border">
+              <button onclick="adminSimpanMaster('SISWA')" class="w-full bg-indigo-600 text-white font-bold py-2.5 rounded-xl">Simpan Siswa</button>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2.5">
+              <h5 class="font-extrabold text-slate-800 text-sm border-b pb-2">➕ Tambah Guru Pembimbing</h5>
+              <input type="text" id="addGuruId" placeholder="ID Guru" class="w-full p-2.5 rounded-xl border">
+              <input type="text" id="addGuruNama" placeholder="Nama Lengkap & Gelar" class="w-full p-2.5 rounded-xl border">
+              <input type="text" id="addGuruPin" placeholder="PIN Login Guru" class="w-full p-2.5 rounded-xl border">
+              <input type="text" id="addGuruJabatan" placeholder="Jabatan" class="w-full p-2.5 rounded-xl border">
+              <button onclick="adminSimpanMaster('GURU')" class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-xl">Simpan Guru</button>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2.5">
+              <h5 class="font-extrabold text-slate-800 text-sm border-b pb-2">➕ Tambah Tempat DUDI</h5>
+              <input type="text" id="addDudiId" placeholder="ID DUDI" class="w-full p-2.5 rounded-xl border">
+              <input type="text" id="addDudiNama" placeholder="Nama Studio / Industri" class="w-full p-2.5 rounded-xl border">
+              <input type="text" id="addDudiAlamat" placeholder="Alamat Lengkap" class="w-full p-2.5 rounded-xl border">
+              <input type="number" step="any" id="addDudiLat" placeholder="Latitude (Contoh: -7.7058)" class="w-full p-2.5 rounded-xl border">
+              <input type="number" step="any" id="addDudiLng" placeholder="Longitude (Contoh: 110.6012)" class="w-full p-2.5 rounded-xl border">
+              <input type="number" id="addDudiRadius" placeholder="Radius Meter (Default: 150)" class="w-full p-2.5 rounded-xl border">
+              <input type="text" id="addDudiInstruktur" placeholder="Nama Pembimbing DUDI" class="w-full p-2.5 rounded-xl border">
+              <button onclick="adminSimpanMaster('DUDI')" class="w-full bg-amber-600 text-white font-bold py-2.5 rounded-xl">Simpan DUDI</button>
+            </div>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+            <h5 class="font-bold text-sm text-slate-800">📋 Pantauan Riwayat Kunjungan Monitoring Seluruh Guru</h5>
+            <div id="listMonevGlobalAdmin" class="space-y-2.5"></div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwi7JawplrCbbPJSaWfWsBcH_FfmPV4un5lruxssQqiePZ372172qepYIw163X4PKM-aQ/exec';
+    const KOP_GURU_FILE = 'kop_laporanguru1.png';
+    const LOGO_FILE = 'logo.png';
+
+    let currentUser = null;
+    let dataRekapCache = [];
+    let masterDudiCache = [];
+    let masterGuruCache = [];
+    let dataMonevCache = [];
+    let filterKelasAdminAktif = 'SEMUA';
+    let cacheRekapKelasAdmin = [];
+    let currentTab = 'Pantau';
+
+    // ================= TEMA GELAP / TERANG =================
+    function terapkanTemaAwal() {
+      const isDark = localStorage.getItem('pkl_theme') === 'dark';
+      document.documentElement.classList.toggle('dark', isDark);
+      const icon = isDark ? '☀️' : '🌙';
+      const label = isDark ? 'Mode Terang' : 'Mode Gelap';
+      document.getElementById('iconDarkMobile').innerText = icon;
+      document.getElementById('iconDarkSidebar').innerText = icon;
+      document.getElementById('txtDarkSidebar').innerText = label;
+    }
+
+    function toggleDarkMode() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('pkl_theme', isDark ? 'dark' : 'light');
+      terapkanTemaAwal();
+    }
+
+    terapkanTemaAwal();
+
+    function toggleSidebar() {
+      document.getElementById('sidebarMenu').classList.toggle('-translate-x-full');
+      document.getElementById('sidebarOverlay').classList.toggle('hidden');
+    }
+
+    function tutupSidebarMobile() {
+      document.getElementById('sidebarMenu').classList.add('-translate-x-full');
+      document.getElementById('sidebarOverlay').classList.add('hidden');
+    }
+
+    function getLocalTodayISO() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function pastikanUrlGambarDriveValid(url) {
+      if (!url || url === '-') return '';
+      if (url.startsWith('data:image')) return url;
+      const matchId = url.match(/[-\w]{25,}/);
+      if (matchId && (url.includes('drive.google.com') || url.includes('docs.google.com'))) {
+        return 'https://drive.google.com/thumbnail?id=' + matchId[0] + '&sz=w600';
+      }
+      return url;
+    }
+
+    function formatNomorWA(nomor) {
+      if (!nomor) return '';
+      let clean = String(nomor).replace(/[^0-9]/g, '');
+      if (clean.startsWith('0')) clean = '62' + clean.substring(1);
+      return clean;
+    }
+
+    // ================= MANAJEMEN TOMBOL BACK HP & POP-UP KELUAR =================
+    function siapkanHistoryAwal() {
+      history.replaceState({ tab: 'EXIT_GUARD' }, '', '#guard');
+      history.pushState({ tab: 'Pantau' }, '', '#pantau');
+    }
+
+    function tampilkanModalKeluar() {
+      document.getElementById('modalExitApp').classList.remove('hidden');
+    }
+
+    function batalKeluarAplikasi() {
+      document.getElementById('modalExitApp').classList.add('hidden');
+      history.pushState({ tab: currentTab }, '', `#${currentTab.toLowerCase()}`);
+    }
+
+    window.addEventListener('popstate', (event) => {
+      const modalExit = document.getElementById('modalExitApp');
+      if (modalExit && !modalExit.classList.contains('hidden')) {
+        batalKeluarAplikasi();
+        return;
+      }
+
+      const sb = document.getElementById('sidebarMenu');
+      if (sb && !sb.classList.contains('-translate-x-full') && window.innerWidth < 768) {
+        tutupSidebarMobile();
+        history.pushState({ tab: currentTab }, '', `#${currentTab.toLowerCase()}`);
+        return;
+      }
+
+      if (event.state && event.state.tab && event.state.tab !== 'EXIT_GUARD') {
+        pilihMenuAdmin(event.state.tab, false);
+        return;
+      }
+
+      if (currentTab !== 'Pantau') {
+        pilihMenuAdmin('Pantau', false);
+        history.pushState({ tab: 'Pantau' }, '', '#pantau');
+      } else {
+        tampilkanModalKeluar();
+      }
+    });
+
+    // ================= AUTO-LOGOUT 10 MENIT & CEK SESI ADMIN =================
+    const INACTIVITY_LIMIT_MS = 10 * 60 * 1000;
+    let inactivityTimer = null;
+
+    function resetInactivityTimer() {
+      localStorage.setItem('pkl_last_active', Date.now().toString());
+      if (inactivityTimer) clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => {
+        alert('Sesi berakhir otomatis karena tidak ada aktivitas selama 10 menit.');
+        logout();
+      }, INACTIVITY_LIMIT_MS);
+    }
+
+    ['click', 'touchstart', 'keydown', 'scroll', 'mousemove'].forEach(evt => {
+      window.addEventListener(evt, resetInactivityTimer, { passive: true });
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem('pkl_user');
+      if (!saved) return window.location.replace('index.html');
+      try {
+        currentUser = JSON.parse(saved);
+        if (!currentUser || currentUser.role !== 'admin') {
+          return window.location.replace('index.html');
+        }
+        inisialisasiHalamanAdmin();
+      } catch (e) {
+        window.location.replace('index.html');
+      }
+    });
+
+    async function callAPI(payload) {
+      const res = await fetch(GAS_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+      return await res.json();
+    }
+
+    function inisialisasiHalamanAdmin() {
+      resetInactivityTimer();
+      const today = getLocalTodayISO();
+      document.getElementById('txtNamaUserSidebar').innerText = currentUser.user.nama;
+      document.getElementById('txtSubUserSidebar').innerText = currentUser.user.jabatan;
+      document.getElementById('txtNamaAdmin').innerText = currentUser.user.nama;
+      document.getElementById('txtJabatanAdmin').innerText = currentUser.user.jabatan;
+
+      document.getElementById('filterTanggalAdmin').value = today;
+      document.getElementById('cetakAdminBulan').value = today.substring(0, 7);
+
+      siapkanHistoryAwal();
+      pilihMenuAdmin('Pantau', false);
+      muatDataAdminGlobal();
+    }
+
+    function pilihMenuAdmin(tab, pushHistory = true) {
+      tutupSidebarMobile();
+      if (pushHistory && currentTab !== tab) {
+        history.pushState({ tab }, '', `#${tab.toLowerCase()}`);
+      }
+      currentTab = tab;
+
+      ['Pantau', 'KelolaSiswa', 'CetakKelas', 'TambahMaster'].forEach(t => {
+        document.getElementById('tabAdmin' + t).classList.add('hidden');
+        document.getElementById('btnMenuAdmin' + t).className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 transition';
+      });
+      document.getElementById('tabAdmin' + tab).classList.remove('hidden');
+      document.getElementById('btnMenuAdmin' + tab).className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-indigo-600 text-white transition shadow';
+
+      if (tab === 'CetakKelas') {
+        muatRekapKelasAdmin();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function setFilterKelasAdmin(kelas) {
+      filterKelasAdminAktif = kelas;
+      document.getElementById('btnKelasAdminSEMUA').className = kelas === 'SEMUA' ? 'px-3 py-1.5 rounded-lg bg-indigo-600 text-white' : 'px-3 py-1.5 rounded-lg text-slate-300 hover:text-white';
+      document.getElementById('btnKelasAdminDKV1').className = kelas === 'XII DKV 1' ? 'px-3 py-1.5 rounded-lg bg-indigo-600 text-white' : 'px-3 py-1.5 rounded-lg text-slate-300 hover:text-white';
+      document.getElementById('btnKelasAdminDKV2').className = kelas === 'XII DKV 2' ? 'px-3 py-1.5 rounded-lg bg-indigo-600 text-white' : 'px-3 py-1.5 rounded-lg text-slate-300 hover:text-white';
+      terapkanRenderFilterKelasAdmin();
+    }
+
+    async function muatDataAdminGlobal() {
+      const tanggal = document.getElementById('filterTanggalAdmin').value;
+      document.getElementById('listPantauAdmin').innerHTML = '<p class="text-center text-slate-400 py-6">Memuat seluruh data siswa...</p>';
+      try {
+        const res = await callAPI({ action: 'getMonitoringGuru', idGuru: 'ALL', tanggal });
+        if (res.status === 'success') {
+          dataRekapCache = res.rekapSiswa || [];
+          masterDudiCache = res.masterDudi || [];
+          masterGuruCache = res.masterGuru || [];
+          dataMonevCache = res.listMonev || [];
+
+          hitungStatistikDuaKelasAdmin();
+          terapkanRenderFilterKelasAdmin();
+          renderRiwayatMonevGlobal(dataMonevCache);
+        }
+      } catch (e) {
+        alert('Gagal memuat data admin.');
+      }
+    }
+
+    function hitungStatistikDuaKelasAdmin() {
+      const dkv1 = dataRekapCache.filter(s => s.kelas.toUpperCase() === 'XII DKV 1');
+      const dkv2 = dataRekapCache.filter(s => s.kelas.toUpperCase() === 'XII DKV 2');
+
+      const dkv1Sudah = dkv1.filter(s => s.sudahAbsen).length;
+      const dkv2Sudah = dkv2.filter(s => s.sudahAbsen).length;
+
+      document.getElementById('statAdminDkv1Total').innerText = `${dkv1Sudah}/${dkv1.length}`;
+      document.getElementById('statAdminDkv1Detail').innerText = `Sudah Presensi: ${dkv1Sudah} • Belum: ${dkv1.length - dkv1Sudah} Siswa`;
+
+      document.getElementById('statAdminDkv2Total').innerText = `${dkv2Sudah}/${dkv2.length}`;
+      document.getElementById('statAdminDkv2Detail').innerText = `Sudah Presensi: ${dkv2Sudah} • Belum: ${dkv2.length - dkv2Sudah} Siswa`;
+    }
+
+    function terapkanRenderFilterKelasAdmin() {
+      const filtered = filterKelasAdminAktif === 'SEMUA'
+        ? dataRekapCache
+        : dataRekapCache.filter(s => s.kelas.toUpperCase() === filterKelasAdminAktif.toUpperCase());
+
+      renderDaftarPantauAdmin(filtered);
+      renderKelolaSiswaAdmin(filtered);
+    }
+
+    function renderDaftarPantauAdmin(list) {
+      const container = document.getElementById('listPantauAdmin');
+      if (list.length === 0) {
+        container.innerHTML = '<p class="text-center text-slate-400 py-6">Tidak ada data siswa pada filter ini.</p>';
+        return;
+      }
+      const defAva = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+      container.innerHTML = list.map(s => {
+        const badgeClass = s.sudahAbsen ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-rose-100 text-rose-800 border-rose-300';
+        const badgeText = s.sudahAbsen ? `${s.status} (${s.jamMasuk})` : 'Belum Presensi';
+        const avatarSrc = pastikanUrlGambarDriveValid(s.fotoProfil) || defAva;
+        const mapsUrl = s.koordinat ? `https://www.google.com/maps?q=${s.koordinat}` : '';
+        const waSiswaClean = formatNomorWA(s.waSiswa);
+        const waTeguranUrl = waSiswaClean ? `https://wa.me/${waSiswaClean}?text=${encodeURIComponent(`Halo ${s.nama}, pantauan Pokja PKL menunjukkan kamu belum melakukan presensi hari ini di ${s.dudi}.`)}` : '';
+
+        return `
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+            <div class="flex justify-between items-start gap-2">
+              <div class="flex items-center gap-2.5">
+                <img src="${avatarSrc}" onerror="this.src='${defAva}'" class="w-10 h-10 rounded-xl object-cover bg-white border">
+                <div>
+                  <h5 class="font-bold text-slate-800 text-sm">${s.nama} <span class="text-[11px] font-semibold text-indigo-600">(${s.kelas})</span></h5>
+                  <p class="text-[11px] text-slate-500">🏢 ${s.dudi} • 👨‍🏫 ${s.namaGuru}</p>
+                </div>
+              </div>
+              <span class="px-2.5 py-1 rounded-full text-[10px] font-bold border ${badgeClass} shrink-0">${badgeText}</span>
+            </div>
+
+            ${s.sudahAbsen ? `
+              <div class="pt-2 border-t border-slate-200/70 flex flex-wrap justify-between items-center gap-2 text-[11px] text-slate-600">
+                <span>${s.status === 'Dinas Luar' ? '🛰️ <b>Mode Dinas Luar</b>' : `📍 Jarak: <b>${s.jarak}m</b> | Pulang: <b>${s.jamPulang}</b>`}</span>
+                <div class="flex items-center gap-2.5">
+                  ${mapsUrl ? `<a href="${mapsUrl}" target="_blank" class="text-emerald-600 font-bold hover:underline">🗺️ Lokasi Maps</a>` : ''}
+                  ${s.fotoUrl && s.fotoUrl !== '-' ? `<a href="${s.fotoUrl}" target="_blank" class="text-indigo-600 font-bold hover:underline">🖼️ Bukti Foto</a>` : ''}
+                  <button onclick="resetPresensiSiswaHariIni('${s.nis}', '${s.nama}')" class="bg-rose-600 hover:bg-rose-700 text-white px-2.5 py-1 rounded-lg font-bold text-[10px]">🗑️ Reset Presensi</button>
+                </div>
+              </div>
+            ` : `
+              <div class="pt-2 border-t border-slate-200/70 flex justify-between items-center text-[11px]">
+                <span class="text-rose-600 font-medium">Belum ada rekaman presensi pada tanggal ini.</span>
+                ${waTeguranUrl ? `<a href="${waTeguranUrl}" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-lg font-bold text-[10px]">💬 Tegur via WA</a>` : ''}
+              </div>
+            `}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function resetPresensiSiswaHariIni(nis, nama) {
+      const tanggal = document.getElementById('filterTanggalAdmin').value;
+      if (!confirm(`Hapus/Reset rekaman presensi ${nama} (NIS: ${nis}) pada tanggal ${tanggal} agar siswa dapat presensi ulang?`)) return;
+      const res = await callAPI({ action: 'adminResetPresensiHarian', nis, tanggal });
+      alert(res.message);
+      muatDataAdminGlobal();
+    }
+
+    function renderKelolaSiswaAdmin(list) {
+      const container = document.getElementById('listKelolaSiswaAdmin');
+      if (list.length === 0) {
+        container.innerHTML = '<p class="text-center text-slate-400 py-6">Tidak ada siswa pada kelas ini.</p>';
+        return;
+      }
+      const defAva = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+      container.innerHTML = list.map(s => {
+        const validFoto = pastikanUrlGambarDriveValid(s.fotoProfil);
+        const terkunci = validFoto !== '';
+        const optsDudi = masterDudiCache.map(d => `<option value="${d.id}" ${d.id === s.idDudi ? 'selected' : ''}>${d.nama} (${d.id})</option>`).join('');
+        const optsGuru = masterGuruCache.map(g => `<option value="${g.id}" ${String(g.id).toUpperCase() === s.idGuru ? 'selected' : ''}>${g.nama} (${g.id})</option>`).join('');
+
+        return `
+          <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <img src="${terkunci ? validFoto : defAva}" onerror="this.src='${defAva}'" class="w-12 h-14 rounded-xl object-cover border bg-white shrink-0">
+                <div>
+                  <h5 class="font-bold text-slate-800 text-sm">${s.nama} <span class="text-xs font-normal text-slate-500">(NIS: ${s.nis})</span></h5>
+                  <p class="text-[11px] text-slate-500">📱 WA Siswa: <b>${s.waSiswa || '-'}</b> • 👪 WA Ortu: <b>${s.waKeluarga || '-'}</b></p>
+                  <p class="text-[11px] text-slate-500">🏠 Alamat Siswa: ${s.alamatSiswa || '-'} • 📍 Alamat DUDI: ${s.alamatDudi || '-'}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                ${terkunci ? `
+                  <button onclick="bukaKunciFotoSiswa('${s.nis}', '${s.nama}')" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-xl font-bold text-[11px]">🔓 Buka Kunci Profil & WA</button>
+                ` : `
+                  <span class="text-[11px] text-slate-400 italic px-2">Profil Terbuka</span>
+                `}
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-5 gap-2 pt-2 border-t border-slate-200/80">
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500">Kelas</label>
+                <select id="editKelas_${s.nis}" class="w-full p-2 rounded-lg border bg-white text-xs">
+                  <option value="XII DKV 1" ${s.kelas === 'XII DKV 1' ? 'selected' : ''}>XII DKV 1</option>
+                  <option value="XII DKV 2" ${s.kelas === 'XII DKV 2' ? 'selected' : ''}>XII DKV 2</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500">PIN Login (Bisa Diubah)</label>
+                <input type="text" id="editPin_${s.nis}" value="${s.pin}" class="w-full p-2 rounded-lg border bg-white text-xs font-bold">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500">Tempat DUDI</label>
+                <select id="editDudi_${s.nis}" class="w-full p-2 rounded-lg border bg-white text-xs">${optsDudi}</select>
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500">Guru Pembimbing</label>
+                <select id="editGuru_${s.nis}" class="w-full p-2 rounded-lg border bg-white text-xs">${optsGuru}</select>
+              </div>
+              <div class="flex items-end">
+                <button onclick="simpanEditSiswaAdmin('${s.nis}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg text-xs">💾 Simpan Perubahan</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function simpanEditSiswaAdmin(nis) {
+      const kelas = document.getElementById('editKelas_' + nis).value;
+      const pin = document.getElementById('editPin_' + nis).value.trim();
+      const idDudi = document.getElementById('editDudi_' + nis).value;
+      const idGuru = document.getElementById('editGuru_' + nis).value;
+
+      if (!pin) return alert('PIN Login tidak boleh kosong!');
+      const res = await callAPI({ action: 'adminUpdateSiswa', nis, kelas, pin, idDudi, idGuru });
+      alert(res.message);
+      muatDataAdminGlobal();
+    }
+
+    async function bukaKunciFotoSiswa(nis, nama) {
+      if (!confirm(`Buka kunci Foto Profil, Alamat, Nomor WA & Ubah PIN untuk siswa ${nama} (NIS: ${nis})?`)) return;
+      const res = await callAPI({ action: 'adminResetFotoProfil', nis });
+      alert(res.message);
+      muatDataAdminGlobal();
+    }
+
+    function renderRiwayatMonevGlobal(list) {
+      const container = document.getElementById('listMonevGlobalAdmin');
+      if (!list || list.length === 0) {
+        container.innerHTML = '<p class="text-slate-400 italic py-3">Belum ada catatan kunjungan monitoring dari Guru Pembimbing.</p>';
+        return;
+      }
+      container.innerHTML = list.map(m => `
+        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="text-[10px] font-bold text-indigo-600">📅 ${m.tanggal} • 👨‍🏫 ${m.namaGuru}</span>
+              <h5 class="font-bold text-slate-800 text-sm">🏢 ${m.namaDudi} <span class="text-xs font-normal text-slate-500">(Instruktur: ${m.instruktur})</span></h5>
+            </div>
+            ${m.fotoUrl ? `<a href="${m.fotoUrl}" target="_blank" class="text-indigo-600 font-bold text-[11px] underline">🖼️ Foto Kunjungan</a>` : ''}
+          </div>
+          <p class="text-slate-700 bg-white p-2.5 rounded-lg border border-slate-200/80">${m.catatan}</p>
+        </div>
+      `).join('');
+    }
+
+    // ================= CETAK REKAP BULANAN PER KELAS (kop_laporanguru1.png) =================
+    function buatKopSuratGuruHTML() {
+      const resolvedImgUrl = new URL(KOP_GURU_FILE, window.location.href).href;
+      const resolvedLogoUrl = new URL(LOGO_FILE, window.location.href).href;
+      return `
+        <div style="width:100%; margin-bottom:14px; text-align:center;">
+          <img id="imgKopCetak" src="${resolvedImgUrl}" style="width:100%; max-height:145px; object-fit:contain; display:block; margin:0 auto;"
+               onerror="this.style.display='none'; document.getElementById('fallbackKopTeks').style.display='table';">
+          <table id="fallbackKopTeks" style="display:none; width:100%; border-collapse:collapse; border:none; border-bottom:3px double #000; padding-bottom:8px;">
+            <tr style="border:none;">
+              <td style="border:none; width:75px; text-align:center; vertical-align:middle;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Pemerintah_Provinsi_Jawa_Tengah.png/300px-Pemerintah_Provinsi_Jawa_Tengah.png" style="width:65px; height:auto;">
+              </td>
+              <td style="border:none; text-align:center; vertical-align:middle; font-family:'Times New Roman', Times, serif; line-height:1.25;">
+                <div style="font-size:14px;">PEMERINTAH PROVINSI JAWA TENGAH</div>
+                <div style="font-size:15px; font-weight:bold;">DINAS PENDIDIKAN</div>
+                <div style="font-size:16px; font-weight:bold;">SEKOLAH MENENGAH KEJURUAN NEGERI 1 KLATEN</div>
+                <div style="font-size:11px;">Jalan dr. Wahidin Sudiro Husodo Nomor 22, Klaten, Jawa Tengah, Kode Pos 57432</div>
+                <div style="font-size:11px;">Telepon 0272-321266 • Laman www.smkn1klaten.sch.id, Pos-el smkn20309691@gmail.com</div>
+              </td>
+              <td style="border:none; width:75px; text-align:center; vertical-align:middle;">
+                <img src="${resolvedLogoUrl}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135755.png'" style="width:65px; height:auto;">
+              </td>
+            </tr>
+          </table>
+        </div>
+      `;
+    }
+
+    function bukaJendelaCetakDenganKop(htmlContent) {
+      const w = window.open('', '_blank');
+      if (!w) return alert('Izinkan pop-up pada browser Anda untuk mencetak laporan PDF.');
+      w.document.write(htmlContent);
+      w.document.close();
+
+      const imgKop = w.document.getElementById('imgKopCetak');
+      let sudahPrint = false;
+      const jalankanPrint = () => {
+        if (sudahPrint) return;
+        sudahPrint = true;
+        setTimeout(() => { w.focus(); w.print(); }, 300);
+      };
+
+      if (imgKop) {
+        if (imgKop.complete) jalankanPrint();
+        else {
+          imgKop.addEventListener('load', jalankanPrint);
+          imgKop.addEventListener('error', jalankanPrint);
+          setTimeout(jalankanPrint, 1800);
+        }
+      } else jalankanPrint();
+    }
+
+    async function muatRekapKelasAdmin() {
+      const kelas = document.getElementById('cetakAdminKelas').value;
+      const bulan = document.getElementById('cetakAdminBulan').value;
+      if (!bulan) return;
+
+      const tbody = document.getElementById('tabelRekapKelasAdmin');
+      tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-400">Menyusun matriks rekapitulasi kelas...</td></tr>';
+
+      try {
+        const res = await callAPI({ action: 'getRekapBulananKelasAdmin', kelas, bulan });
+        if (res.status === 'success') {
+          cacheRekapKelasAdmin = res.rekapKelas || [];
+          if (cacheRekapKelasAdmin.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-400">Belum ada data siswa di kelas ini.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = cacheRekapKelasAdmin.map((r, i) => `
+            <tr>
+              <td class="p-2.5 border-r border-slate-100 text-center font-bold">${i + 1}</td>
+              <td class="p-2.5 border-r border-slate-100"><b>${r.nama}</b><br><span class="text-[10px] text-slate-500">NIS: ${r.nis}</span></td>
+              <td class="p-2.5 border-r border-slate-100">${r.dudi}<br><span class="text-[10px] text-indigo-600">Pembimbing: ${r.namaGuru}</span></td>
+              <td class="p-2.5 border-r border-slate-100 text-center font-bold text-emerald-700">${r.hadir}</td>
+              <td class="p-2.5 border-r border-slate-100 text-center font-bold text-purple-700">${r.dl}</td>
+              <td class="p-2.5 border-r border-slate-100 text-center font-bold text-amber-700">${r.ijin}</td>
+              <td class="p-2.5 border-r border-slate-100 text-center font-bold text-rose-700">${r.sakit}</td>
+              <td class="p-2.5 text-center font-bold text-sky-700">${r.libur}</td>
+            </tr>
+          `).join('');
+        }
+      } catch (e) {
+        alert('Gagal memuat rekap kelas.');
+      }
+    }
+
+    function cetakRekapKelasAdminPDF() {
+      const kelas = document.getElementById('cetakAdminKelas').value;
+      const bulan = document.getElementById('cetakAdminBulan').value;
+      const tglCetak = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+      const htmlContent = `
+        <html><head><title>Rekap Presensi PKL Kelas ${kelas}</title>
+        <style>
+          @page { size: A4 portrait; margin: 12mm 15mm; }
+          body { font-family: Arial, sans-serif; color: #111; font-size: 11px; margin: 0; padding: 0; }
+          .judul { text-align: center; font-weight: bold; font-size: 13px; margin: 8px 0 14px; text-decoration: underline; }
+          table.data { width: 100%; border-collapse: collapse; font-size: 10.5px; margin-top: 10px; }
+          table.data th, table.data td { border: 1px solid #222; padding: 5px 7px; text-align: center; }
+          table.data th { background: #e2e8f0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          table.data td.left { text-align: left; }
+        </style></head><body>
+          ${buatKopSuratGuruHTML()}
+          <div class="judul">REKAPITULASI PRESENSI BULANAN PKL • KELAS: ${kelas} • PERIODE: ${bulan}</div>
+          <table class="data">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>NIS</th>
+                <th>Nama Siswa</th>
+                <th>Tempat PKL (DUDI)</th>
+                <th>Guru Pembimbing</th>
+                <th>Hadir</th>
+                <th>Dinas Luar</th>
+                <th>Ijin</th>
+                <th>Sakit</th>
+                <th>Libur</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${cacheRekapKelasAdmin.map((r, idx) => `
+                <tr>
+                  <td>${idx + 1}</td>
+                  <td>${r.nis}</td>
+                  <td class="left"><b>${r.nama}</b></td>
+                  <td class="left">${r.dudi}</td>
+                  <td class="left">${r.namaGuru}</td>
+                  <td><b>${r.hadir}</b></td>
+                  <td><b>${r.dl}</b></td>
+                  <td>${r.ijin}</td>
+                  <td>${r.sakit}</td>
+                  <td>${r.libur}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <div style="margin-top: 30px; float: right; text-align: center; width: 240px; page-break-inside: avoid;">
+            <p>Klaten, ${tglCetak}<br>Koordinator Pokja PKL DKV,</p><br><br><br>
+            <p><b><u>${currentUser.user.nama}</u></b></p>
+          </div>
+        </body></html>
+      `;
+      bukaJendelaCetakDenganKop(htmlContent);
+    }
+
+    async function adminSimpanMaster(jenisData) {
+      let payload = { action: 'adminTambahData', jenisData };
+      if (jenisData === 'SISWA') {
+        payload.nis = document.getElementById('addSiswaNis').value.trim();
+        payload.nama = document.getElementById('addSiswaNama').value.trim();
+        payload.kelas = document.getElementById('addSiswaKelas').value;
+        payload.pin = document.getElementById('addSiswaPin').value.trim();
+        payload.idDudi = document.getElementById('addSiswaDudi').value.trim();
+        payload.idGuru = document.getElementById('addSiswaGuru').value.trim();
+        if (!payload.nis || !payload.nama || !payload.pin) return alert('NIS, Nama, dan PIN Awal wajib diisi!');
+      } else if (jenisData === 'GURU') {
+        payload.idGuru = document.getElementById('addGuruId').value.trim();
+        payload.namaGuru = document.getElementById('addGuruNama').value.trim();
+        payload.pinGuru = document.getElementById('addGuruPin').value.trim();
+        payload.jabatanGuru = document.getElementById('addGuruJabatan').value.trim() || 'Guru Pembimbing';
+        if (!payload.idGuru || !payload.namaGuru || !payload.pinGuru) return alert('ID Guru, Nama, dan PIN wajib diisi!');
+      } else if (jenisData === 'DUDI') {
+        payload.idDudi = document.getElementById('addDudiId').value.trim();
+        payload.namaDudi = document.getElementById('addDudiNama').value.trim();
+        payload.alamatDudi = document.getElementById('addDudiAlamat').value.trim();
+        payload.latDudi = document.getElementById('addDudiLat').value.trim();
+        payload.lngDudi = document.getElementById('addDudiLng').value.trim();
+        payload.radiusDudi = document.getElementById('addDudiRadius').value.trim() || '150';
+        payload.instrukturDudi = document.getElementById('addDudiInstruktur').value.trim();
+        if (!payload.idDudi || !payload.namaDudi || !payload.latDudi || !payload.lngDudi) return alert('ID DUDI, Nama Industri, Latitude, dan Longitude wajib diisi!');
+      }
+
+      const res = await callAPI(payload);
+      alert(res.message);
+      muatDataAdminGlobal();
+    }
+
+    function logout() {
+      localStorage.removeItem('pkl_user');
+      localStorage.removeItem('pkl_last_active');
+      window.location.replace('index.html');
+    }
+  </script>
+</body>
+</html>
