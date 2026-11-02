@@ -169,15 +169,20 @@
     <div class="flex-1 p-4 md:p-6 max-w-5xl mx-auto w-full">
       <main class="space-y-4">
 
-        <!-- BANNER SAMBUTAN UTAMA -->
-        <div class="bg-gradient-to-r from-indigo-600 via-indigo-700 to-blue-600 text-white p-5 rounded-3xl shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <!-- BANNER SAMBUTAN EKSKLUSIF DI HALAMAN PROFIL (3 BARIS BERTINGKAT) -->
+        <div id="bannerProfilSiswa" class="bg-gradient-to-r from-indigo-600 via-indigo-700 to-blue-600 text-white p-5 rounded-3xl shadow-md space-y-1">
+          <h3 class="font-extrabold text-sm sm:text-base tracking-tight opacity-90">Selamat Datang di E-PKL DKV</h3>
+          <h2 id="txtBannerNamaKelas" class="font-extrabold text-base sm:text-lg tracking-wide">-</h2>
+          <p id="txtBannerDudi" class="text-xs text-indigo-100 font-medium pt-0.5">-</p>
+        </div>
+
+        <!-- HEADER JUDUL HALAMAN (UNTUK TAB SELAIN PROFIL) -->
+        <div id="headerJudulTabLain" class="hidden bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs flex items-center justify-between">
           <div>
-            <h3 class="font-extrabold text-base sm:text-lg tracking-tight">Selamat Datang di E-PKL DKV. Semangat Berkarya!!</h3>
-            <p id="txtBannerSubSiswa" class="text-xs text-indigo-100 mt-0.5">-</p>
+            <h3 id="txtJudulTabUtama" class="font-extrabold text-sm sm:text-base text-slate-800 dark:text-white">-</h3>
+            <p id="txtSubJudulTab" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">-</p>
           </div>
-          <div class="bg-white/15 backdrop-blur-xs px-3.5 py-2 rounded-2xl text-xs font-bold border border-white/20 shrink-0 self-start sm:self-auto">
-            ⚡ SMK Negeri 1 Klaten
-          </div>
+          <div class="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 flex items-center justify-center text-base shrink-0" id="iconJudulTab">📌</div>
         </div>
 
         <!-- TAB 0: PROFIL SISWA PKL -->
@@ -197,7 +202,7 @@
             </div>
 
             <div class="flex-1 w-full space-y-4 text-xs">
-              <!-- Form Inisialisasi Awal (Hanya Muncul Jika Profil Belum Dikunci) -->
+              <!-- Form Inisialisasi Awal -->
               <div id="boxUploadFotoProfil" class="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 p-4 rounded-2xl space-y-3">
                 <p class="font-bold text-indigo-950 dark:text-indigo-300 text-sm">📸 Lengkapi Profil, Alamat, WA & Buat PIN Baru (1x di Awal)</p>
                 <p class="text-[11px] text-slate-600">Unggah foto berseragam, isi alamat domisili, nomor WhatsApp aktif, dan ganti PIN bawaan dengan PIN baru Anda. Setelah disimpan, data akan disimpan permanen.</p>
@@ -283,7 +288,7 @@
           </div>
         </section>
 
-        <!-- TAB 1: PRESENSI KEHADIRAN (DILENGKAPI INDIKATOR GPS & INFO DUDI) -->
+        <!-- TAB 1: PRESENSI KEHADIRAN -->
         <section id="tabAbsen" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
           <div class="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 p-3.5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
             <div>
@@ -371,7 +376,7 @@
           </button>
         </section>
 
-        <!-- TAB 2: ISI JURNAL HARIAN (MODE BACA & EDIT) -->
+        <!-- TAB 2: ISI JURNAL HARIAN -->
         <section id="tabJurnal" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
           <div id="bannerStatusJurnalHarian" class="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 p-3 rounded-xl text-xs flex justify-between items-center">
             <span id="txtInfoModeJurnal" class="text-indigo-900 dark:text-indigo-300 font-semibold">📝 Silakan isi jurnal kegiatan Anda hari ini (1x sehari).</span>
@@ -438,7 +443,7 @@
           </div>
         </section>
 
-        <!-- TAB 3: REKAP PRESENSI BULANAN + TOMBOL BUKA DRIVE FOTO PRESENSI -->
+        <!-- TAB 3: REKAP PRESENSI BULANAN -->
         <section id="tabRekap" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
           <div class="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 p-3.5 rounded-2xl space-y-3">
             <div class="flex justify-between items-center">
@@ -493,7 +498,7 @@
           </div>
         </section>
 
-        <!-- TAB 4: REKAP JURNAL BULANAN + TOMBOL BUKA DRIVE BUKTI JURNAL -->
+        <!-- TAB 4: REKAP JURNAL BULANAN -->
         <section id="tabRekapJurnal" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
           <div class="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 p-3.5 rounded-2xl space-y-3">
             <div class="flex justify-between items-center">
@@ -551,7 +556,7 @@
     let cacheKalenderPresensi = [];
     let cacheJurnalBulanan = [];
     let currentTab = 'Profil';
-    let pendingCetakTipe = ''; // 'presensi' atau 'jurnal'
+    let pendingCetakTipe = '';
 
     function terapkanTemaAwal() {
       const isDark = localStorage.getItem('pkl_theme') === 'dark';
@@ -689,7 +694,10 @@
       document.getElementById('txtSubUserSidebar').innerText = `${currentUser.user.kelas} • NIS: ${currentUser.user.nis}`;
 
       document.getElementById('absenNamaDudi').innerText = currentUser.user.dudi.nama;
-      document.getElementById('txtBannerSubSiswa').innerText = `${currentUser.user.nama} • ${currentUser.user.kelas} • DUDI: ${currentUser.user.dudi.nama}`;
+      
+      // Isi Teks Banner 3 Baris Khusus Profil
+      document.getElementById('txtBannerNamaKelas').innerText = `${currentUser.user.nama} • ${currentUser.user.kelas}`;
+      document.getElementById('txtBannerDudi').innerText = `🏢 Tempat DUDI: ${currentUser.user.dudi.nama}`;
 
       document.getElementById('profNama').innerText = currentUser.user.nama;
       document.getElementById('profNisKelas').innerText = `${currentUser.user.nis} / ${currentUser.user.kelas}`;
@@ -721,7 +729,6 @@
       document.getElementById('profAlamatSiswa').innerText = alamatSiswa || 'Belum diisi';
 
       if (validUrl) {
-        // Sembunyikan badge bawah foto agar tidak berulang, cukup tampilkan ✔ Terverifikasi di tabel
         document.getElementById('badgeStatusFotoProfil').classList.add('hidden');
         document.getElementById('boxUploadFotoProfil').classList.add('hidden');
         document.getElementById('boxInfoFotoTerkunci').classList.remove('hidden');
@@ -766,11 +773,11 @@
       const alamatSiswa = document.getElementById('inputAlamatSiswa').value.trim();
       const newPin = document.getElementById('inputNewPin').value.trim();
 
-      if (!waSiswa || !waKeluarga) return alert('Nomor WhatsApp Siswa dan Nomor WhatsApp Orang Tua/Wali wajib diisi!');
+      if (!waSiswa || !waKeluarga) return alert('Nomor WhatsApp Siswa dan Orang Tua wajib diisi!');
       if (!alamatSiswa) return alert('Alamat Lengkap Siswa wajib diisi!');
-      if (!newPin || newPin.length < 4) return alert('PIN Login Baru wajib diisi (minimal 4 karakter)!');
+      if (!newPin || newPin.length < 4) return alert('PIN Login Baru minimal 4 karakter!');
       if (!fotoProfilBase64) return alert('Pilih file foto profil resmi terlebih dahulu!');
-      if (!confirm('Apakah Anda yakin Foto Profil, Alamat, Nomor WA, dan PIN Baru sudah benar?')) return;
+      if (!confirm('Apakah Anda yakin data dan foto profil sudah benar?')) return;
 
       const btn = document.getElementById('btnSimpanFotoProfil');
       btn.disabled = true;
@@ -818,6 +825,39 @@
 
       document.getElementById('tab' + menu).classList.remove('hidden');
       document.getElementById('btnMenuSiswa' + menu).className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-indigo-600 text-white transition shadow';
+
+      // Pengaturan Tampilan Banner Profil vs Header Judul Tab Lain
+      const bannerProfil = document.getElementById('bannerProfilSiswa');
+      const headerTabLain = document.getElementById('headerJudulTabLain');
+      const txtJudulUtama = document.getElementById('txtJudulTabUtama');
+      const txtSubJudul = document.getElementById('txtSubJudulTab');
+      const iconTab = document.getElementById('iconJudulTab');
+
+      if (menu === 'Profil') {
+        bannerProfil.classList.remove('hidden');
+        headerTabLain.classList.add('hidden');
+      } else {
+        bannerProfil.classList.add('hidden');
+        headerTabLain.classList.remove('hidden');
+
+        if (menu === 'Absen') {
+          txtJudulUtama.innerText = '📸 Presensi Kehadiran Harian';
+          txtSubJudul.innerText = 'Pastikan GPS aktif dan wajah terlihat jelas pada kamera portrait';
+          iconTab.innerText = '📍';
+        } else if (menu === 'Jurnal') {
+          txtJudulUtama.innerText = '📝 Jurnal Kegiatan Harian';
+          txtSubJudul.innerText = 'Catat aktivitas pekerjaan dan unggah bukti karya hari ini';
+          iconTab.innerText = '✍️';
+        } else if (menu === 'Rekap') {
+          txtJudulUtama.innerText = '📅 Rekapitulasi Presensi Bulanan';
+          txtSubJudul.innerText = 'Pantau riwayat kehadiran dan cetak laporan presensi';
+          iconTab.innerText = '📊';
+        } else if (menu === 'RekapJurnal') {
+          txtJudulUtama.innerText = '📖 Rekapitulasi Jurnal Bulanan';
+          txtSubJudul.innerText = 'Daftar kegiatan bulanan, catatan guru, dan cetak laporan';
+          iconTab.innerText = '📖';
+        }
+      }
 
       const currentMonth = getLocalTodayISO().substring(0, 7);
       if (menu === 'Rekap') {
@@ -1522,7 +1562,6 @@
       }).join('');
     }
 
-    // Blok Tanda Tangan: Jika NIP Kosong, Baris NIP Otomatis Dihilangkan
     function buatTandaTanganOpsiB() {
       const tglCetak = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
       const barisNipGuru = currentUser.user.nipGuru ? `<br>NIP. ${currentUser.user.nipGuru}` : '';
