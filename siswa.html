@@ -25,6 +25,11 @@
     body, div, section, aside, header, input, select, textarea, table, th, td {
       transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
     }
+    /* Pastikan Kamera & Foto Tidak Mirror (Teks Seragam Terbaca Normal) */
+    .no-mirror {
+      transform: scaleX(1) !important;
+      -webkit-transform: scaleX(1) !important;
+    }
     html.dark body { background-color: #0f172a; color: #f1f5f9; }
     html.dark .bg-white { background-color: #1e293b !important; color: #f1f5f9; }
     html.dark .bg-slate-50 { background-color: #0f172a !important; color: #e2e8f0; }
@@ -206,7 +211,7 @@
               <div id="boxUploadFotoProfil" class="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 p-4 rounded-2xl space-y-3">
                 <p class="font-bold text-indigo-950 dark:text-indigo-300 text-sm">📸 Lengkapi Profil, Alamat, WA & Buat PIN Baru (1x di Awal)</p>
                 <p class="text-[11px] text-slate-600">Unggah foto berseragam, isi alamat domisili, nomor WhatsApp aktif, dan ganti PIN bawaan dengan PIN baru Anda. Setelah disimpan, data akan disimpan permanen.</p>
-                
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <div>
                     <label class="block text-[11px] font-bold text-slate-700 mb-1">📱 No. WhatsApp Siswa</label>
@@ -307,7 +312,7 @@
           <div id="boxKameraPresensi" class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
             <div class="flex justify-between items-center mb-2.5">
               <div>
-                <label class="text-xs font-bold text-slate-700 block">📸 Kamera Bukti Kehadiran (Portrait)</label>
+                <label class="text-xs font-bold text-slate-700 block">📸 Kamera Bukti Kehadiran (Wide & Normal)</label>
                 <span id="subLabelDeteksiWajah" class="text-[10px] text-indigo-600 dark:text-indigo-400 font-semibold">🤖 Deteksi Wajah AI Aktif (Wajib terlihat wajah)</span>
               </div>
               <div id="kontrolKameraAtas" class="hidden flex gap-1.5">
@@ -316,21 +321,22 @@
               </div>
             </div>
 
-            <div class="relative rounded-2xl overflow-hidden bg-slate-900 aspect-[3/4] max-w-[270px] mx-auto flex items-center justify-center shadow-inner border-2 border-slate-800">
+            <!-- Bingkai Kamera Lebih Lebar (Wide) & Tidak Mirror -->
+            <div class="relative rounded-2xl overflow-hidden bg-slate-950 min-h-[260px] max-w-[330px] mx-auto flex items-center justify-center shadow-inner border-2 border-slate-800">
               <div id="placeholderKamera" class="text-center p-5 flex flex-col items-center justify-center">
                 <div class="w-14 h-14 rounded-full bg-slate-800 text-indigo-400 flex items-center justify-center mb-2.5 text-2xl">📱</div>
-                <p class="text-xs text-slate-200 font-bold">Kamera Portrait Siap</p>
-                <p class="text-[10px] text-slate-400 mt-1 mb-4 leading-relaxed">Kamera hanya menyala saat dibutuhkan agar baterai HP hemat. Pastikan wajah terlihat jelas.</p>
+                <p class="text-xs text-slate-200 font-bold">Kamera Sudut Lebar (Wide) Siap</p>
+                <p class="text-[10px] text-slate-400 mt-1 mb-4 leading-relaxed">Kamera tampil utuh tanpa terpotong dan tidak mode cermin. Pastikan wajah terlihat jelas.</p>
                 <button onclick="mulaiKamera()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow">Aktifkan Kamera</button>
               </div>
-              <video id="videoCam" autoplay playsinline class="hidden w-full h-full object-cover"></video>
+              <video id="videoCam" autoplay playsinline class="hidden w-full h-auto max-h-[380px] object-contain no-mirror"></video>
               <canvas id="canvasCam" class="hidden"></canvas>
-              <img id="previewFoto" class="hidden w-full h-full object-cover" />
+              <img id="previewFoto" class="hidden w-full h-auto max-h-[380px] object-contain no-mirror" />
             </div>
 
             <div id="bannerDeteksiWajah" class="hidden mt-3 p-2.5 rounded-xl text-xs font-bold text-center border"></div>
-            
-            <div class="mt-3 max-w-[270px] mx-auto">
+
+            <div class="mt-3 max-w-[330px] mx-auto">
               <button onclick="ambilFoto()" id="btnCapture" class="hidden w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs py-2.5 rounded-xl font-bold shadow">📸 Jepret Foto Sekarang</button>
               <div id="konfirmasiFotoDiv" class="hidden flex gap-2">
                 <button onclick="ulangFoto()" class="flex-1 bg-slate-300 dark:bg-slate-700 text-slate-800 dark:text-white text-xs py-2.5 rounded-xl font-bold">🔄 Foto Ulang</button>
@@ -450,7 +456,7 @@
               <h4 class="font-bold text-xs text-indigo-950 dark:text-indigo-300 uppercase">📅 Pilih Bulan Presensi</h4>
               <input type="month" id="filterBulanSiswa" onchange="muatRekapAbsenSiswa()" class="text-xs font-bold p-1.5 rounded-lg border border-indigo-300 bg-white">
             </div>
-            
+
             <div class="grid grid-cols-5 gap-1.5 text-center">
               <div class="bg-emerald-100 p-2 rounded-xl border border-emerald-200">
                 <p class="text-[9px] font-bold text-emerald-800 uppercase">Hadir</p>
@@ -506,7 +512,7 @@
               <input type="month" id="filterBulanJurnalSiswa" onchange="muatRekapJurnalSiswa()" class="text-xs font-bold p-1.5 rounded-lg border border-indigo-300 bg-white">
             </div>
             <p class="text-[11px] text-slate-600">Laporan jurnal dicetak menggunakan tanda tangan Siswa, Pembimbing DUDI, dan Guru Pembimbing.</p>
-            
+
             <div class="space-y-2 pt-1">
               <button onclick="bukaModalCetakJurnal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow">🖨️ Cetak PDF Laporan Jurnal Bulanan</button>
               <a id="btnDriveJurnalBulan" href="https://drive.google.com" target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs shadow text-center flex items-center justify-center gap-1.5">📂 Buka Google Drive Bukti Dukung Jurnal Bulan Ini</a>
@@ -549,7 +555,7 @@
     let useFrontCamera = true;
     let videoStream = null;
     let faceModel = null;
-    
+
     let statusAbsenHariIni = { masuk: false, pulang: false, nonHadirStatus: null };
     let riwayatAbsenGlobal = [];
     let riwayatJurnalGlobal = [];
@@ -694,7 +700,7 @@
       document.getElementById('txtSubUserSidebar').innerText = `${currentUser.user.kelas} • NIS: ${currentUser.user.nis}`;
 
       document.getElementById('absenNamaDudi').innerText = currentUser.user.dudi.nama;
-      
+
       // Isi Teks Banner 3 Baris Khusus Profil
       document.getElementById('txtBannerNamaKelas').innerText = `${currentUser.user.nama} • ${currentUser.user.kelas}`;
       document.getElementById('txtBannerDudi').innerText = `🏢 Tempat DUDI: ${currentUser.user.dudi.nama}`;
@@ -842,7 +848,7 @@
 
         if (menu === 'Absen') {
           txtJudulUtama.innerText = '📸 Presensi Kehadiran Harian';
-          txtSubJudul.innerText = 'Pastikan GPS aktif dan wajah terlihat jelas pada kamera portrait';
+          txtSubJudul.innerText = 'Pastikan GPS aktif dan wajah terlihat jelas pada kamera';
           iconTab.innerText = '📍';
         } else if (menu === 'Jurnal') {
           txtJudulUtama.innerText = '📝 Jurnal Kegiatan Harian';
@@ -876,7 +882,7 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // ================= KAMERA & AI DETEKSI WAJAH =================
+    // ================= KAMERA WIDE (TANPA CROP & TANPA MIRROR) + DETEKSI WAJAH =================
     async function siapkanModelDeteksiWajah() {
       if (faceModel) return faceModel;
       if (typeof blazeface !== 'undefined') {
@@ -932,11 +938,25 @@
     function mulaiKamera() {
       hentikanStreamVideo();
       const video = document.getElementById('videoCam');
+      // Meminta sudut tangkapan asli sensor kamera (tanpa paksaan rasio sempit)
       navigator.mediaDevices.getUserMedia({
-        video: { facingMode: useFrontCamera ? 'user' : 'environment', width: { ideal: 480 }, height: { ideal: 640 } },
+        video: {
+          facingMode: useFrontCamera ? 'user' : 'environment',
+          width: { ideal: 640 },
+          height: { ideal: 480 }
+        },
         audio: false
-      }).then(stream => {
+      }).then(async stream => {
         videoStream = stream;
+        // Pastikan kamera berada di zoom paling lebar (1.0 / minimum) jika didukung perangkat
+        try {
+          const track = stream.getVideoTracks()[0];
+          const caps = track.getCapabilities ? track.getCapabilities() : {};
+          if (caps.zoom) {
+            await track.applyConstraints({ advanced: [{ zoom: caps.zoom.min || 1 }] });
+          }
+        } catch (e) {}
+
         video.srcObject = stream;
         document.getElementById('placeholderKamera').classList.add('hidden');
         document.getElementById('previewFoto').classList.add('hidden');
@@ -981,17 +1001,21 @@
       const canvas = document.getElementById('canvasCam');
       const preview = document.getElementById('previewFoto');
 
-      const targetW = 360, targetH = 480;
-      canvas.width = targetW; canvas.height = targetH;
+      // Ambil 100% bingkai asli kamera (Wide / Tidak di-crop) dan Tidak Mirror
+      const vw = video.videoWidth || 640;
+      const vh = video.videoHeight || 480;
+      const maxDim = 640;
+      const scale = Math.min(maxDim / vw, maxDim / vh, 1);
+      const targetW = Math.round(vw * scale);
+      const targetH = Math.round(vh * scale);
 
-      const vw = video.videoWidth || 360, vh = video.videoHeight || 480;
-      const targetRatio = targetW / targetH, videoRatio = vw / vh;
-      let sx = 0, sy = 0, sw = vw, sh = vh;
-      if (videoRatio > targetRatio) { sw = vh * targetRatio; sx = (vw - sw) / 2; }
-      else { sh = vw / targetRatio; sy = (vh - sh) / 2; }
+      canvas.width = targetW;
+      canvas.height = targetH;
 
-      canvas.getContext('2d').drawImage(video, sx, sy, sw, sh, 0, 0, targetW, targetH);
-      capturedImageBase64 = canvas.toDataURL('image/jpeg', 0.78);
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, targetW, targetH);
+
+      capturedImageBase64 = canvas.toDataURL('image/jpeg', 0.8);
       preview.src = capturedImageBase64;
       hentikanStreamVideo();
 
@@ -1248,7 +1272,7 @@
         currentCoords.lng = pos.coords.longitude;
         currentCoords.gpsAktif = true;
         currentCoords.jarak = hitungJarak(currentCoords.lat, currentCoords.lng, currentUser.user.dudi.lat, currentUser.user.dudi.lng);
-        
+
         const elJarak = document.getElementById('txtJarakGps');
         elJarak.innerText = `${currentCoords.jarak} Meter dari DUDI`;
         const maxRadius = currentUser.user.dudi.radius || 100;
@@ -1274,7 +1298,7 @@
       const jenisAbsen = document.getElementById('selJenisAbsen').value;
       const maxRadius = currentUser.user.dudi.radius || 100;
       const isRadiusValid = currentCoords.jarak <= maxRadius;
-      
+
       const sudahHadir = statusAbsenHariIni.masuk || statusAbsenHariIni.pulang;
       const sudahNonHadir = statusAbsenHariIni.nonHadirStatus !== null;
 
@@ -1304,7 +1328,7 @@
       const statusPresensi = document.getElementById('selStatusHadir').value;
       const jenisAbsen = document.getElementById('selJenisAbsen').value;
       const maxRadius = currentUser.user.dudi.radius || 100;
-      
+
       if (statusPresensi !== 'Libur' && !isPhotoConfirmed) return alert('Ambil dan konfirmasi foto terlebih dahulu!');
       if (statusPresensi === 'Hadir' && currentCoords.jarak > maxRadius) return alert(`Jarak Anda (${currentCoords.jarak}m) di luar radius DUDI (${maxRadius}m).`);
       if (statusPresensi === 'Dinas Luar' && !currentCoords.gpsAktif) return alert('Pastikan GPS HP Anda aktif!');
@@ -1312,7 +1336,7 @@
       const btn = document.getElementById('btnSubmitAbsen');
       const txtBtn = document.getElementById('txtBtnAbsen');
       const spinner = document.getElementById('loadingSpinner');
-      
+
       btn.disabled = true;
       txtBtn.innerText = 'Mengirim Presensi...';
       spinner.classList.remove('hidden');
@@ -1372,7 +1396,7 @@
       const btn = document.getElementById('btnSubmitJurnal');
       const txtBtn = document.getElementById('txtBtnJurnal');
       const spinner = document.getElementById('spinnerJurnal');
-      
+
       btn.disabled = true;
       txtBtn.innerText = 'Menyimpan ke Server & Drive...';
       spinner.classList.remove('hidden');
@@ -1403,7 +1427,7 @@
       }
     }
 
-    // ================= MODAL CETAK & TANDA TANGAN DINAMIS DUDI =================
+    // ================= MODAL CETAK & FORMAT LAPORAN PDF SISWA =================
     function bukaModalCetakPresensi() {
       pendingCetakTipe = 'presensi';
       document.getElementById('inputModalNamaDudi').value = currentUser.user.dudi.instruktur || '';
@@ -1441,8 +1465,8 @@
       const resolvedImgUrl = new URL(KOP_SISWA_FILE, window.location.href).href;
       const resolvedLogoUrl = new URL(LOGO_FILE, window.location.href).href;
       return `
-        <div style="width:100%; margin-bottom:14px; text-align:center;">
-          <img id="imgKopCetak" src="${resolvedImgUrl}" style="width:100%; max-height:145px; object-fit:contain; display:block; margin:0 auto;"
+        <div style="width:100%; margin-bottom:12px; text-align:center;">
+          <img id="imgKopCetak" src="${resolvedImgUrl}" style="width:100%; max-height:140px; object-fit:contain; display:block; margin:0 auto;"
                onerror="this.style.display='none'; document.getElementById('fallbackKopTeks').style.display='table';">
           <table id="fallbackKopTeks" style="display:none; width:100%; border-collapse:collapse; border:none; border-bottom:3px double #000; padding-bottom:8px;">
             <tr style="border:none;">
@@ -1458,6 +1482,59 @@
               </td>
               <td style="border:none; width:75px; text-align:center; vertical-align:middle;">
                 <img src="${resolvedLogoUrl}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135755.png'" style="width:65px; height:auto;">
+              </td>
+            </tr>
+          </table>
+        </div>
+      `;
+    }
+
+    // Identitas Siswa Sederhana 3 Baris (Tanpa Alamat & Tanpa Guru Pembimbing di Atas)
+    function buatIdentitasSiswaCetakHTML() {
+      return `
+        <table style="border:none; border-collapse:collapse; margin-bottom:12px; font-size:11.5px; line-height:1.5;">
+          <tr style="border:none;">
+            <td style="border:none; padding:1px 8px 1px 0; font-weight:bold; width:95px;">Nama Siswa</td>
+            <td style="border:none; padding:1px 6px;">:</td>
+            <td style="border:none; padding:1px 0; font-weight:bold;">${currentUser.user.nama}</td>
+          </tr>
+          <tr style="border:none;">
+            <td style="border:none; padding:1px 8px 1px 0; font-weight:bold;">Kelas/NIS</td>
+            <td style="border:none; padding:1px 6px;">:</td>
+            <td style="border:none; padding:1px 0;">${currentUser.user.kelas} / ${currentUser.user.nis}</td>
+          </tr>
+          <tr style="border:none;">
+            <td style="border:none; padding:1px 8px 1px 0; font-weight:bold;">Tempat PKL</td>
+            <td style="border:none; padding:1px 6px;">:</td>
+            <td style="border:none; padding:1px 0;">${currentUser.user.dudi.nama}</td>
+          </tr>
+        </table>
+      `;
+    }
+
+    function buatTandaTanganOpsiB() {
+      const tglCetak = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+      const barisNipGuru = currentUser.user.nipGuru ? `<br>NIP. ${currentUser.user.nipGuru}` : '';
+      const barisNipDudi = currentUser.user.dudi.nip ? `<br>NIP. ${currentUser.user.dudi.nip}` : '';
+
+      return `
+        <div class="blok-ttd" style="page-break-inside:avoid; break-inside:avoid; margin-top:18px;">
+          <table style="width:100%; border:none; border-collapse:collapse; font-size:11px; page-break-inside:avoid; break-inside:avoid;">
+            <tr style="border:none;">
+              <td style="border:none; width:50%; text-align:center;"></td>
+              <td style="border:none; width:50%; text-align:center;">
+                Klaten, ${tglCetak}<br>Siswa Praktikan,<br><br><br><br>
+                <b><u>${currentUser.user.nama}</u></b><br>NIS. ${currentUser.user.nis}
+              </td>
+            </tr>
+            <tr style="border:none;">
+              <td style="border:none; width:50%; text-align:center; padding-top:18px; vertical-align:top;">
+                Mengetahui,<br>Guru Pembimbing Sekolah<br><br><br><br>
+                <b><u>${currentUser.user.namaGuru || '....................................'}</u></b>${barisNipGuru}
+              </td>
+              <td style="border:none; width:50%; text-align:center; padding-top:18px; vertical-align:top;">
+                Menyetujui,<br>Pembimbing Industri (DUDI)<br><br><br><br>
+                <b><u>${currentUser.user.dudi.instruktur || '....................................'}</u></b>${barisNipDudi}
               </td>
             </tr>
           </table>
@@ -1562,57 +1639,26 @@
       }).join('');
     }
 
-    function buatTandaTanganOpsiB() {
-      const tglCetak = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-      const barisNipGuru = currentUser.user.nipGuru ? `<br>NIP. ${currentUser.user.nipGuru}` : '';
-      const barisNipDudi = currentUser.user.dudi.nip ? `<br>NIP. ${currentUser.user.dudi.nip}` : '';
-
-      return `
-        <table style="width:100%; margin-top:25px; border:none; font-size:11px; page-break-inside:avoid;">
-          <tr style="border:none;">
-            <td style="border:none; width:50%; text-align:center;"></td>
-            <td style="border:none; width:50%; text-align:center;">
-              Klaten, ${tglCetak}<br>Siswa Praktikan,<br><br><br><br>
-              <b><u>${currentUser.user.nama}</u></b><br>NIS. ${currentUser.user.nis}
-            </td>
-          </tr>
-          <tr style="border:none;">
-            <td style="border:none; width:50%; text-align:center; padding-top:20px; vertical-align:top;">
-              Mengetahui,<br>Guru Pembimbing Sekolah<br><br><br><br>
-              <b><u>${currentUser.user.namaGuru || '....................................'}</u></b>${barisNipGuru}
-            </td>
-            <td style="border:none; width:50%; text-align:center; padding-top:20px; vertical-align:top;">
-              Menyetujui,<br>Pembimbing Industri (DUDI)<br><br><br><br>
-              <b><u>${currentUser.user.dudi.instruktur || '....................................'}</u></b>${barisNipDudi}
-            </td>
-          </tr>
-        </table>
-      `;
-    }
-
+    // Cetak Presensi: Tabel Ditinggikan (Padding 7.5px) Agar Sebagian Baris Turun ke Halaman 2 Bersama Tanda Tangan
     function cetakRekapPresensiSiswaPDF() {
       const bulan = document.getElementById('filterBulanSiswa').value;
       const htmlContent = `
         <html><head><title>Laporan Presensi PKL - ${currentUser.user.nama}</title>
         <style>
-          @page { size: A4 portrait; margin: 12mm 15mm; }
+          @page { size: A4 portrait; margin: 14mm 15mm; }
           body { font-family: Arial, sans-serif; color: #111; font-size: 11px; margin: 0; padding: 0; }
           .judul { text-align: center; font-weight: bold; font-size: 13px; margin: 8px 0 12px; text-decoration: underline; }
-          .meta { margin-bottom: 12px; line-height: 1.5; }
-          table.data { width: 100%; border-collapse: collapse; font-size: 10.5px; }
-          table.data th, table.data td { border: 1px solid #222; padding: 4px 6px; text-align: center; }
+          table.data { width: 100%; border-collapse: collapse; font-size: 11px; }
+          table.data thead { display: table-header-group; }
+          table.data tr { page-break-inside: avoid; break-inside: avoid; }
+          table.data th, table.data td { border: 1px solid #222; padding: 7.5px 6px; text-align: center; }
           table.data th { background: #e2e8f0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         </style></head><body>
           ${buatKopSuratSiswaHTML()}
           <div class="judul">LAPORAN REKAPITULASI PRESENSI BULANAN PKL (PERIODE: ${bulan})</div>
-          <div class="meta">
-            <b>Nama Siswa:</b> ${currentUser.user.nama} (${currentUser.user.kelas} / NIS: ${currentUser.user.nis})<br>
-            <b>Alamat Siswa:</b> ${currentUser.user.alamatSiswa || '-'}<br>
-            <b>Tempat PKL (DUDI):</b> ${currentUser.user.dudi.nama} (${currentUser.user.dudi.alamat || '-'})<br>
-            <b>Guru Pembimbing:</b> ${currentUser.user.namaGuru || '-'}
-          </div>
+          ${buatIdentitasSiswaCetakHTML()}
           <table class="data">
-            <thead><tr><th>No</th><th>Hari</th><th>Tanggal</th><th>Jam Masuk</th><th>Jam Pulang</th><th>Keterangan</th></tr></thead>
+            <thead><tr><th style="width:38px;">No</th><th>Hari</th><th>Tanggal</th><th>Jam Masuk</th><th>Jam Pulang</th><th>Keterangan</th></tr></thead>
             <tbody>
               ${cacheKalenderPresensi.map((r, idx) => `
                 <tr><td>${idx + 1}</td><td>${r.hari}</td><td>${r.tglFormatted}</td><td>${r.masuk}</td><td>${r.pulang}</td><td><b>${r.ket}</b></td></tr>
@@ -1657,22 +1703,18 @@
       const htmlContent = `
         <html><head><title>Laporan Jurnal PKL - ${currentUser.user.nama}</title>
         <style>
-          @page { size: A4 portrait; margin: 12mm 15mm; }
+          @page { size: A4 portrait; margin: 14mm 15mm; }
           body { font-family: Arial, sans-serif; color: #111; font-size: 11px; margin: 0; padding: 0; }
           .judul { text-align: center; font-weight: bold; font-size: 13px; margin: 8px 0 12px; text-decoration: underline; }
-          .meta { margin-bottom: 12px; line-height: 1.5; }
-          table.data { width: 100%; border-collapse: collapse; font-size: 10.5px; }
-          table.data th, table.data td { border: 1px solid #222; padding: 5px 7px; text-align: left; }
+          table.data { width: 100%; border-collapse: collapse; font-size: 11px; }
+          table.data thead { display: table-header-group; }
+          table.data tr { page-break-inside: avoid; break-inside: avoid; }
+          table.data th, table.data td { border: 1px solid #222; padding: 6.5px 7px; text-align: left; }
           table.data th { background: #e2e8f0; text-align: center; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         </style></head><body>
           ${buatKopSuratSiswaHTML()}
           <div class="judul">LAPORAN JURNAL KEGIATAN BULANAN PKL (PERIODE: ${bulan})</div>
-          <div class="meta">
-            <b>Nama Siswa:</b> ${currentUser.user.nama} (${currentUser.user.kelas} / NIS: ${currentUser.user.nis})<br>
-            <b>Alamat Siswa:</b> ${currentUser.user.alamatSiswa || '-'}<br>
-            <b>Tempat PKL (DUDI):</b> ${currentUser.user.dudi.nama} (${currentUser.user.dudi.alamat || '-'})<br>
-            <b>Guru Pembimbing:</b> ${currentUser.user.namaGuru || '-'}
-          </div>
+          ${buatIdentitasSiswaCetakHTML()}
           <table class="data">
             <thead><tr><th style="width:35px;">No</th><th style="width:125px;">Hari & Tanggal</th><th>Uraian Kegiatan Siswa & Catatan Pembimbing</th><th style="width:95px;">Status Paraf</th></tr></thead>
             <tbody>
