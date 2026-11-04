@@ -41,14 +41,6 @@
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
 
-  <!-- TOMBOL PANAH NAVIGASI PINDAH HALAMAN (KIRI & KANAN) -->
-  <button type="button" onclick="navigasiTabSebelah(-1)" title="Halaman Sebelumnya" class="fixed left-2 md:left-68 top-1/2 -translate-y-1/2 z-30 w-9 h-12 rounded-2xl bg-white/85 dark:bg-slate-800/85 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 text-slate-700 dark:text-slate-200 shadow-lg border border-slate-200 dark:border-slate-700 backdrop-blur-xs flex items-center justify-center font-extrabold text-sm active:scale-90 transition">
-    ❮
-  </button>
-  <button type="button" onclick="navigasiTabSebelah(1)" title="Halaman Berikutnya" class="fixed right-2 top-1/2 -translate-y-1/2 z-30 w-9 h-12 rounded-2xl bg-white/85 dark:bg-slate-800/85 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 text-slate-700 dark:text-slate-200 shadow-lg border border-slate-200 dark:border-slate-700 backdrop-blur-xs flex items-center justify-center font-extrabold text-sm active:scale-90 transition">
-    ❯
-  </button>
-
   <!-- OVERLAY LOADING GLOBAL (UNTUK PROSES SIMPAN / SINKRONISASI) -->
   <div id="globalLoadingOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-[80] hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-2xl px-6 py-5 shadow-2xl border border-slate-200 dark:border-slate-700 flex items-center gap-3.5 animate-pop">
@@ -212,7 +204,7 @@
     </aside>
 
     <!-- AREA KONTEN UTAMA GURU -->
-    <div class="flex-1 p-4 md:p-6 max-w-6xl mx-auto w-full">
+    <div class="flex-1 p-4 md:p-6 pb-24 max-w-6xl mx-auto w-full">
       <main class="space-y-4">
 
         <!-- HEADER BANNER RINGKAS GURU (TAMPIL DI TAB UTAMA PRESENSI) -->
@@ -426,13 +418,13 @@
         </section>
 
         <!-- ========================================================================= -->
-        <!-- TAB 5: REKAP & CETAK LAPORAN BULANAN GURU                                 -->
+        <!-- TAB 5: REKAP & CETAK LAPORAN BULANAN GURU (DENGAN KOLOM ALPHA MERAH)      -->
         <!-- ========================================================================= -->
         <section id="tabLaporan" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
           <div class="border-b border-slate-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <h3 class="font-extrabold text-base text-slate-800">🖨️ Rekapitulasi & Cetak Laporan Bulanan Siswa Binaan</h3>
-              <p class="text-xs text-slate-500">Laporan resmi dilengkapi pengesahan Guru Pembimbing dan Kepala Sekolah</p>
+              <p class="text-xs text-slate-500">Laporan resmi dilengkapi perhitungan Alpha otomatis serta pengesahan Guru Pembimbing dan Kepala Sekolah</p>
             </div>
             <button onclick="segarkanDataSesuaiTab()" class="self-start sm:self-auto px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs flex items-center gap-1.5 active:scale-95 transition">
               <span class="icon-refresh-global inline-block">🔄</span> <span>Segarkan Data</span>
@@ -476,17 +468,43 @@
                   <th class="p-2.5 border-r border-slate-700 text-center">DL</th>
                   <th class="p-2.5 border-r border-slate-700 text-center">Ijin</th>
                   <th class="p-2.5 border-r border-slate-700 text-center">Sakit</th>
+                  <th class="p-2.5 border-r border-slate-700 text-center bg-rose-900/70">Alpha</th>
                   <th class="p-2.5 text-center">Jurnal Disetujui</th>
                 </tr>
               </thead>
               <tbody id="tabelRekapBulananGuruBody" class="divide-y divide-slate-200 bg-white">
-                <tr><td colspan="8" class="p-4 text-center text-slate-400">Pilih bulan untuk melihat rekapitulasi...</td></tr>
+                <tr><td colspan="9" class="p-4 text-center text-slate-400">Pilih bulan untuk melihat rekapitulasi...</td></tr>
               </tbody>
             </table>
           </div>
         </section>
 
       </main>
+
+      <!-- NAVIGASI SLIDE KIRI-KANAN MODERN & ELEGAN DI BAGIAN BAWAH (GURU) -->
+      <div class="fixed bottom-4 left-1/2 md:left-[calc(50%+8rem)] -translate-x-1/2 z-20 w-[92%] max-w-xs">
+        <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/90 dark:border-slate-700 shadow-xl rounded-full px-2 py-1.5 flex items-center justify-between">
+          <button type="button" onclick="navigasiTabSebelah(-1)" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold text-xs active:scale-90 transition shadow-2xs" title="Halaman Sebelumnya">
+            ◀
+          </button>
+
+          <div class="flex flex-col items-center px-2">
+            <span id="txtNavigasiBawahGuru" class="text-[11px] font-extrabold text-slate-800 dark:text-white tracking-tight">1/5 • Pantauan Presensi</span>
+            <div class="flex items-center gap-1 mt-1" id="dotsNavigasiBawahGuru">
+              <span class="w-4 h-1.5 rounded-full bg-indigo-600 transition-all"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 transition-all"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 transition-all"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 transition-all"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 transition-all"></span>
+            </div>
+          </div>
+
+          <button type="button" onclick="navigasiTabSebelah(1)" class="w-8 h-8 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center font-bold text-xs active:scale-90 transition shadow-xs" title="Halaman Berikutnya">
+            ▶
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -495,6 +513,13 @@
     const KOP_GURU_FILE = 'kop_laporanguru1.png';
     const LOGO_FILE = 'logo.png';
     const URUTAN_TAB_GURU = ['Presensi', 'Jurnal', 'Biodata', 'Monev', 'Laporan'];
+    const LABEL_TAB_GURU = {
+      Presensi: 'Pantauan Presensi',
+      Jurnal: 'Validasi Jurnal',
+      Biodata: 'Biodata & WA',
+      Monev: 'Monev DUDI',
+      Laporan: 'Rekap & Cetak'
+    };
 
     let currentUser = null;
     let currentTab = 'Presensi';
@@ -557,6 +582,21 @@
       const idxSekarang = URUTAN_TAB_GURU.indexOf(currentTab);
       const idxBerikut = (idxSekarang + arah + URUTAN_TAB_GURU.length) % URUTAN_TAB_GURU.length;
       pilihMenuGuru(URUTAN_TAB_GURU[idxBerikut]);
+    }
+
+    function perbaruiIndikatorSlideGuru(menuAktif) {
+      const idx = URUTAN_TAB_GURU.indexOf(menuAktif);
+      const label = LABEL_TAB_GURU[menuAktif] || menuAktif;
+      const elTxt = document.getElementById('txtNavigasiBawahGuru');
+      const elDots = document.getElementById('dotsNavigasiBawahGuru');
+      if (elTxt) elTxt.innerText = `${idx + 1}/${URUTAN_TAB_GURU.length} • ${label}`;
+      if (elDots) {
+        elDots.innerHTML = URUTAN_TAB_GURU.map((m, i) =>
+          i === idx
+            ? `<span class="w-4 h-1.5 rounded-full bg-indigo-600 transition-all"></span>`
+            : `<span onclick="pilihMenuGuru('${m}')" class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 cursor-pointer transition-all"></span>`
+        ).join('');
+      }
     }
 
     function toggleSidebar() {
@@ -748,6 +788,8 @@
         ? 'w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-indigo-600 text-white transition shadow'
         : 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-indigo-600 text-white transition shadow';
 
+      perbaruiIndikatorSlideGuru(menu);
+
       if (menu === 'Jurnal') {
         muatDataJurnalBulananGuru(false);
       } else if (menu === 'Laporan') {
@@ -921,8 +963,8 @@
           if (s.status === 'Hadir') badgeStatus = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800">HADIR DI DUDI</span>`;
           else if (s.status === 'Dinas Luar') badgeStatus = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-purple-100 text-purple-800">DINAS LUAR</span>`;
           else if (s.status === 'Ijin') badgeStatus = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800">IJIN</span>`;
-          else if (s.status === 'Sakit') badgeStatus = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-100 text-rose-800">SAKIT</span>`;
-          else if (s.status === 'Libur') badgeStatus = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-100 text-sky-800">LIBUR</span>`;
+          else if (s.status === 'Sakit') badgeStatus = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-100 text-sky-800">SAKIT</span>`;
+          else if (s.status === 'Libur') badgeStatus = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-200 text-slate-700">LIBUR</span>`;
         }
 
         let infoLokasiHtml = `<p class="text-[11px] text-slate-400 mt-0.5">📍 Lokasi: Belum ada rekaman titik GPS</p>`;
@@ -1455,7 +1497,7 @@
     }
 
     // =========================================================================
-    // 5. REKAP BULANAN & CETAK PDF GURU (DENGAN FALLBACK KOP SURAT)
+    // 5. REKAP BULANAN & CETAK PDF GURU (ALPHA OTOMATIS + FALLBACK KOP SURAT)
     // =========================================================================
     async function muatRekapBulananGuru() {
       const bulan = document.getElementById('filterBulanLaporanGuru').value || getLocalTodayISO().substring(0, 7);
@@ -1464,7 +1506,7 @@
 
       loadingBox.classList.remove('hidden');
       setAnimasiSpinRefresh(true);
-      tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-400">Menghitung rekapitulasi bulanan...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">Menghitung rekapitulasi bulanan...</td></tr>';
 
       try {
         const res = await callAPI({
@@ -1483,6 +1525,11 @@
           const absenList = res.absenBulan || [];
           const jurnalList = res.jurnalBulan || [];
 
+          const [yearStr, monthStr] = bulan.split('-');
+          const year = Number(yearStr), month = Number(monthStr);
+          const daysInMonth = new Date(year, month, 0).getDate();
+          const todayIso = getLocalTodayISO();
+
           cacheRekapTabelBulanan = siswaList.map(s => {
             const logA = absenList.filter(a => String(a.nis) === String(s.nis));
             const mapTglStatus = {};
@@ -1492,13 +1539,24 @@
               }
             });
 
-            let hadir = 0, dl = 0, ijin = 0, sakit = 0;
-            Object.values(mapTglStatus).forEach(st => {
+            let hadir = 0, dl = 0, ijin = 0, sakit = 0, alpha = 0;
+
+            for (let d = 1; d <= daysInMonth; d++) {
+              const dayStr = String(d).padStart(2, '0');
+              const fullIso = `${yearStr}-${monthStr}-${dayStr}`;
+              const dayIndex = new Date(year, month - 1, d).getDay();
+              const st = mapTglStatus[fullIso];
+
+              // Prioritaskan data presensi yang masuk (termasuk jika masuk di hari Minggu)
               if (st === 'Hadir') hadir++;
               else if (st === 'Dinas Luar') dl++;
               else if (st === 'Ijin') ijin++;
               else if (st === 'Sakit') sakit++;
-            });
+              else if (!st && dayIndex !== 0 && fullIso <= todayIso) {
+                // Tanggal sudah lewat/hari ini, bukan hari Minggu, dan tidak ada presensi -> Alpha
+                alpha++;
+              }
+            }
 
             const logJ = jurnalList.filter(j => String(j.nis) === String(s.nis));
             const jmlDisetujui = logJ.filter(j => String(j.validasi).includes('Disetujui')).length;
@@ -1508,14 +1566,14 @@
               nama: s.nama,
               kelas: s.kelas,
               dudi: s.dudi,
-              hadir, dl, ijin, sakit,
+              hadir, dl, ijin, sakit, alpha,
               totalJurnal: logJ.length,
               jurnalDisetujui: jmlDisetujui
             };
           });
 
           if (cacheRekapTabelBulanan.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-400">Tidak ada siswa binaan.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-slate-400">Tidak ada siswa binaan.</td></tr>';
           } else {
             tbody.innerHTML = cacheRekapTabelBulanan.map((r, i) => `
               <tr>
@@ -1525,14 +1583,15 @@
                 <td class="p-2.5 border-r border-slate-100 text-center font-bold text-emerald-700">${r.hadir}</td>
                 <td class="p-2.5 border-r border-slate-100 text-center font-bold text-purple-700">${r.dl}</td>
                 <td class="p-2.5 border-r border-slate-100 text-center font-bold text-amber-700">${r.ijin}</td>
-                <td class="p-2.5 border-r border-slate-100 text-center font-bold text-rose-700">${r.sakit}</td>
+                <td class="p-2.5 border-r border-slate-100 text-center font-bold text-sky-700">${r.sakit}</td>
+                <td class="p-2.5 border-r border-slate-100 text-center font-extrabold text-rose-700 bg-rose-50/70">${r.alpha}</td>
                 <td class="p-2.5 text-center font-bold text-indigo-700">${r.jurnalDisetujui} / ${r.totalJurnal}</td>
               </tr>
             `).join('');
           }
         }
       } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-rose-500">Gagal memuat rekap bulanan.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="p-4 text-center text-rose-500">Gagal memuat rekap bulanan.</td></tr>';
       } finally {
         loadingBox.classList.add('hidden');
         setAnimasiSpinRefresh(false);
@@ -1656,13 +1715,13 @@
           <p><b>Nama Guru Pembimbing :</b> ${currentUser.user.nama} ${currentUser.user.nip ? '(NIP. ' + currentUser.user.nip + ')' : ''}</p>
           <table class="data">
             <thead>
-              <tr><th>No</th><th>NIS</th><th>Nama Siswa</th><th>Kelas</th><th>Tempat PKL (DUDI)</th><th>Hadir</th><th>DL</th><th>Ijin</th><th>Sakit</th><th>Jurnal Disetujui</th></tr>
+              <tr><th>No</th><th>NIS</th><th>Nama Siswa</th><th>Kelas</th><th>Tempat PKL (DUDI)</th><th>Hadir</th><th>DL</th><th>Ijin</th><th>Sakit</th><th>Alpha</th><th>Jurnal Disetujui</th></tr>
             </thead>
             <tbody>
               ${cacheRekapTabelBulanan.map((r, i) => `
                 <tr>
                   <td>${i + 1}</td><td>${r.nis}</td><td style="text-align:left;">${r.nama}</td><td>${r.kelas}</td><td style="text-align:left;">${r.dudi}</td>
-                  <td>${r.hadir}</td><td>${r.dl}</td><td>${r.ijin}</td><td>${r.sakit}</td><td>${r.jurnalDisetujui}/${r.totalJurnal}</td>
+                  <td>${r.hadir}</td><td>${r.dl}</td><td>${r.ijin}</td><td>${r.sakit}</td><td><b>${r.alpha}</b></td><td>${r.jurnalDisetujui}/${r.totalJurnal}</td>
                 </tr>
               `).join('')}
             </tbody>
