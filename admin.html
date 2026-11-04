@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Panel Admin Pokja PKL - SMK Negeri 1 Klaten</title>
+  <title>Portal Admin Pokja PKL - SMK Negeri 1 Klaten</title>
 
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#4f46e5">
@@ -16,12 +16,12 @@
   <script>tailwind.config = { darkMode: 'class' };</script>
   <style>
     @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(16px); }
+      from { opacity: 0; transform: translateY(14px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .animate-pop { animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    body, div, section, aside, header, input, select, textarea, table, th, td {
-      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    .animate-pop { animation: fadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    body, div, section, aside, header, input, select, textarea, table, th, td, button {
+      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
     }
     html.dark body { background-color: #0f172a; color: #f1f5f9; }
     html.dark .bg-white { background-color: #1e293b !important; color: #f1f5f9; }
@@ -41,17 +41,210 @@
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
 
-  <!-- MODAL KONFIRMASI KELUAR APLIKASI (SAAT TOMBOL BACK DI UJUNG) -->
+  <!-- OVERLAY LOADING GLOBAL -->
+  <div id="globalLoadingOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-[90] hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl px-6 py-5 shadow-2xl border border-slate-200 dark:border-slate-700 flex items-center gap-3.5 animate-pop">
+      <svg class="animate-spin h-6 w-6 text-indigo-600 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <div>
+        <p id="txtGlobalLoading" class="text-xs font-extrabold text-slate-800 dark:text-white">Memproses data ke server...</p>
+        <p class="text-[10px] text-slate-500">Mohon tunggu sebentar</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL KONFIRMASI KELUAR APLIKASI -->
   <div id="modalExitApp" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[60] hidden flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-xs w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700 text-center space-y-4 animate-pop">
       <div class="w-14 h-14 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto text-2xl">🚪</div>
       <div>
-        <h4 class="font-extrabold text-base text-slate-800 dark:text-white">Keluar dari Aplikasi?</h4>
-        <p class="text-xs text-slate-500 dark:text-slate-300 mt-1">Apakah Anda yakin ingin keluar (Logout) dari Panel Admin Pokja PKL?</p>
+        <h4 class="font-extrabold text-base text-slate-800 dark:text-white">Keluar dari Portal Admin?</h4>
+        <p class="text-xs text-slate-500 dark:text-slate-300 mt-1">Apakah Anda yakin ingin keluar (Logout) dari sistem Admin Pokja PKL?</p>
       </div>
       <div class="flex gap-2.5 pt-1">
-        <button onclick="batalKeluarAplikasi()" class="flex-1 py-2.5 px-3 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs hover:bg-slate-300 transition">Batal</button>
-        <button onclick="logout()" class="flex-1 py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md transition">Ya, Keluar</button>
+        <button onclick="batalKeluarAplikasi()" class="flex-1 py-2.5 px-3 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs">Batal</button>
+        <button onclick="logout()" class="flex-1 py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md">Ya, Keluar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL PRATINJAU FOTO -->
+  <div id="modalPreviewFoto" onclick="tutupModalFoto()" class="fixed inset-0 bg-slate-900/80 backdrop-blur-xs z-[80] hidden flex items-center justify-center p-4">
+    <div onclick="event.stopPropagation()" class="bg-white dark:bg-slate-800 rounded-3xl max-w-md w-full p-4 shadow-2xl border border-slate-200 dark:border-slate-700 space-y-3 animate-pop">
+      <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2.5">
+        <h4 id="judulModalFoto" class="font-extrabold text-xs text-slate-800 dark:text-white truncate">📸 Pratinjau Foto</h4>
+        <button onclick="tutupModalFoto()" class="text-slate-400 hover:text-rose-600 font-bold text-sm px-2">✕</button>
+      </div>
+      <div class="bg-slate-950 rounded-2xl overflow-hidden flex items-center justify-center min-h-[240px] max-h-[70vh]">
+        <img id="imgModalPreview" src="" class="max-w-full max-h-[68vh] object-contain" />
+      </div>
+      <div class="flex justify-end gap-2">
+        <a id="btnBukaTabBaruFoto" href="#" target="_blank" class="px-3.5 py-2 rounded-xl bg-indigo-50 text-indigo-700 font-bold text-xs">🔗 Buka Ukuran Penuh</a>
+        <button onclick="tutupModalFoto()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL POIN 2: EDIT / INPUT PRESENSI MANUAL OLEH ADMIN -->
+  <div id="modalEditPresensi" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[75] hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700 space-y-4 animate-pop">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-lg font-bold">✏️</div>
+          <div>
+            <h4 class="font-extrabold text-sm text-slate-800 dark:text-white">Edit / Input Presensi Siswa</h4>
+            <p id="subJudulModalEditPresensi" class="text-[11px] text-slate-500">-</p>
+          </div>
+        </div>
+        <button onclick="tutupModalEditPresensi()" class="text-slate-400 hover:text-rose-500 font-bold">✕</button>
+      </div>
+
+      <input type="hidden" id="editPresensiNis">
+      <input type="hidden" id="editPresensiNama">
+      <input type="hidden" id="editPresensiTanggal">
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Status Kehadiran</label>
+          <select id="editPresensiStatus" onchange="aturTampilanJamModalPresensi()" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white font-bold">
+            <option value="Hadir">Hadir (Di DUDI)</option>
+            <option value="Dinas Luar">Dinas Luar (DL)</option>
+            <option value="Ijin">Ijin</option>
+            <option value="Sakit">Sakit</option>
+            <option value="Libur">Libur</option>
+          </select>
+        </div>
+
+        <div id="boxJamModalPresensi" class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">🟢 Jam Masuk (WIB)</label>
+            <input type="time" id="editPresensiJamMasuk" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white font-bold">
+          </div>
+          <div id="colJamPulangModal">
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">🔵 Jam Pulang (WIB)</label>
+            <input type="time" id="editPresensiJamPulang" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white font-bold">
+            <p class="text-[10px] text-slate-400 mt-0.5">*Kosongkan jika belum pulang</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-2.5 pt-2">
+        <button onclick="tutupModalEditPresensi()" class="flex-1 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs">Batal</button>
+        <button onclick="simpanEditPresensiAdmin()" class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow">💾 Simpan Presensi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL POIN 5: KELOLA SISWA & BUKA KUNCI PROFIL PARSIAL (GABUNGAN) -->
+  <div id="modalKelolaProfilSiswa" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[75] hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700 space-y-4 animate-pop my-auto">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-lg font-bold">👤</div>
+          <div>
+            <h4 id="judulModalKelolaSiswa" class="font-extrabold text-sm text-slate-800 dark:text-white">Kelola Data & Profil Siswa</h4>
+            <p id="subJudulModalKelolaSiswa" class="text-[11px] text-slate-500">Edit langsung data siswa atau buka kunci bagian tertentu saja</p>
+          </div>
+        </div>
+        <button onclick="tutupModalKelolaSiswa()" class="text-slate-400 hover:text-rose-500 font-bold">✕</button>
+      </div>
+
+      <input type="hidden" id="kelolaNisSiswa">
+
+      <div class="space-y-3 text-xs max-h-[68vh] overflow-y-auto pr-1">
+        <!-- Bagian A: Penempatan & PIN -->
+        <div class="bg-slate-50 dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200 space-y-2.5">
+          <p class="font-extrabold text-[11px] uppercase tracking-wider text-indigo-600 dark:text-indigo-400">🏢 1. Penempatan PKL & PIN Login</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Kelas</label>
+              <input type="text" id="kelolaKelasSiswa" class="w-full p-2 rounded-xl border border-slate-300 bg-white font-bold">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">🔑 PIN Login Siswa</label>
+              <input type="text" id="kelolaPinSiswa" class="w-full p-2 rounded-xl border border-slate-300 bg-white font-mono font-bold">
+            </div>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Tempat PKL (DUDI)</label>
+            <select id="kelolaDudiSiswa" class="w-full p-2 rounded-xl border border-slate-300 bg-white font-semibold"></select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Guru Pembimbing Sekolah</label>
+            <select id="kelolaGuruSiswa" class="w-full p-2 rounded-xl border border-slate-300 bg-white font-semibold"></select>
+          </div>
+        </div>
+
+        <!-- Bagian B: Edit Langsung Kontak WA & Alamat (Tanpa Perlu Siswa Mengulang) -->
+        <div class="bg-slate-50 dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200 space-y-2.5">
+          <p class="font-extrabold text-[11px] uppercase tracking-wider text-emerald-600">📱 2. Edit Langsung Nomor WA & Alamat</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">No. WhatsApp Siswa</label>
+              <input type="text" id="kelolaWaSiswa" placeholder="Belum diisi" class="w-full p-2 rounded-xl border border-slate-300 bg-white">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">No. WhatsApp Ortu/Wali</label>
+              <input type="text" id="kelolaWaKeluarga" placeholder="Belum diisi" class="w-full p-2 rounded-xl border border-slate-300 bg-white">
+            </div>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Alamat Domisili Siswa</label>
+            <input type="text" id="kelolaAlamatSiswa" placeholder="Belum diisi" class="w-full p-2 rounded-xl border border-slate-300 bg-white">
+          </div>
+        </div>
+
+        <!-- Bagian C: Opsi Buka Kunci / Reset Parsial -->
+        <div class="bg-amber-50 dark:bg-slate-900 p-3.5 rounded-2xl border border-amber-200 dark:border-slate-700 space-y-2">
+          <p class="font-extrabold text-[11px] uppercase tracking-wider text-amber-800 dark:text-amber-400">🔓 3. Opsi Buka Kunci / Reset Parsial (Opsional)</p>
+          <p class="text-[11px] text-slate-600">Centang hanya bagian yang ingin di-reset agar siswa tidak perlu mengisi ulang semuanya dari awal:</p>
+
+          <label class="flex items-start gap-2.5 pt-1 cursor-pointer">
+            <input type="checkbox" id="chkResetFotoProfil" class="mt-0.5 rounded text-indigo-600">
+            <span class="text-[11px] font-bold text-slate-700">📸 Buka Kunci & Kosongkan Foto Profil <span class="font-normal text-slate-500">(Siswa dapat mengunggah foto baru; data WA & Alamat di atas tetap tersimpan)</span></span>
+          </label>
+
+          <label class="flex items-start gap-2.5 pt-1 cursor-pointer">
+            <input type="checkbox" id="chkResetPinDefault" onchange="if(this.checked) document.getElementById('kelolaPinSiswa').value = document.getElementById('kelolaNisSiswa').value;" class="mt-0.5 rounded text-indigo-600">
+            <span class="text-[11px] font-bold text-slate-700">🔑 Kembalikan PIN Login ke Default (Sama dengan NIS Siswa)</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="flex gap-2.5 pt-2">
+        <button onclick="tutupModalKelolaSiswa()" class="flex-1 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs">Batal</button>
+        <button onclick="simpanKelolaSiswaDanProfil()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow">✔ Simpan Perubahan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL KONFIRMASI PENGESAHAN KEPALA SEKOLAH SEBELUM CETAK PDF -->
+  <div id="modalCetakAdmin" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[75] hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700 space-y-4 animate-pop">
+      <div class="flex items-center gap-3 border-b border-slate-100 dark:border-slate-700 pb-3">
+        <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-lg font-bold">🖨️</div>
+        <div>
+          <h4 class="font-extrabold text-sm text-slate-800 dark:text-white">Konfirmasi Pengesahan Kepala Sekolah</h4>
+          <p class="text-[11px] text-slate-500">Pastikan Nama & NIP Kepala Sekolah sudah sesuai sebelum mencetak PDF.</p>
+        </div>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Kepala Sekolah</label>
+          <input type="text" id="inputAdminNamaKepsek" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white dark:bg-slate-900">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">NIP Kepala Sekolah <span class="text-slate-400 font-normal">(Kosongkan jika tidak ada)</span></label>
+          <input type="text" id="inputAdminNipKepsek" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white dark:bg-slate-900">
+        </div>
+      </div>
+
+      <div class="flex gap-2.5 pt-2">
+        <button onclick="tutupModalCetakAdmin()" class="flex-1 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs">Batal</button>
+        <button onclick="eksekusiCetakPDFAdminFinal()" class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow">Lanjutkan Cetak PDF</button>
       </div>
     </div>
   </div>
@@ -59,7 +252,7 @@
   <div class="min-h-screen flex flex-col md:flex-row bg-slate-100">
 
     <!-- HEADER MOBILE -->
-    <header class="md:hidden bg-gradient-to-r from-indigo-700 to-blue-600 dark:from-slate-900 dark:to-indigo-950 text-white p-3.5 shadow-md sticky top-0 z-30 flex justify-between items-center">
+    <header class="md:hidden bg-gradient-to-r from-slate-900 to-indigo-900 text-white p-3.5 shadow-md sticky top-0 z-30 flex justify-between items-center">
       <div class="flex items-center gap-3">
         <button onclick="toggleSidebar()" class="p-2 rounded-xl bg-white/15 hover:bg-white/25 active:scale-95 transition">
           <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -69,8 +262,8 @@
         <div class="flex items-center gap-2.5">
           <img src="logo.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135755.png'" class="w-8 h-8 rounded-lg bg-white p-0.5 object-contain">
           <div>
-            <h1 class="text-xs font-extrabold tracking-wide leading-tight">SMK NEGERI 1 KLATEN</h1>
-            <p class="text-[10px] text-indigo-100">Admin Pokja PKL DKV</p>
+            <h1 class="text-xs font-extrabold tracking-wide leading-tight">ADMIN POKJA PKL</h1>
+            <p class="text-[10px] text-indigo-200">SMK Negeri 1 Klaten</p>
           </div>
         </div>
       </div>
@@ -84,7 +277,7 @@
 
     <div id="sidebarOverlay" onclick="tutupSidebarMobile()" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 hidden md:hidden"></div>
 
-    <!-- SIDEBAR KIRI ADMIN -->
+    <!-- SIDEBAR KIRI ADMIN (5 MENU TERPISAH SESUAI POIN 6) -->
     <aside id="sidebarMenu" class="fixed md:sticky top-0 left-0 z-50 h-screen w-64 bg-slate-900 text-white flex flex-col justify-between transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shrink-0 shadow-2xl md:shadow-none">
       <div class="overflow-y-auto">
         <div class="p-4 border-b border-slate-800 flex items-center justify-between">
@@ -92,30 +285,33 @@
             <img src="logo.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135755.png'" class="w-10 h-10 rounded-xl bg-white p-1 object-contain">
             <div>
               <h2 class="text-xs font-extrabold tracking-wide text-white">SMKN 1 KLATEN</h2>
-              <p class="text-[10px] text-rose-400 font-semibold">Admin Pokja PKL DKV</p>
+              <p class="text-[10px] text-indigo-400 font-semibold">Administrator Pokja PKL</p>
             </div>
           </div>
           <button onclick="tutupSidebarMobile()" class="md:hidden text-slate-400 hover:text-white p-1">✕</button>
         </div>
 
         <div class="p-4 border-b border-slate-800/80 bg-slate-800/40">
-          <span class="inline-block text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-rose-600 text-white mb-1">ADMIN POKJA</span>
-          <p id="txtNamaUserSidebar" class="font-bold text-sm text-white truncate">-</p>
-          <p id="txtSubUserSidebar" class="text-[11px] text-slate-400 truncate">-</p>
+          <span class="inline-block text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-rose-600 text-white mb-1">ADMIN UTAMA</span>
+          <p id="txtNamaAdminSidebar" class="font-bold text-sm text-white truncate">-</p>
+          <p id="txtSubAdminSidebar" class="text-[11px] text-slate-400 truncate">-</p>
         </div>
 
         <nav class="p-3 space-y-1 text-xs font-semibold">
-          <button onclick="pilihMenuAdmin('Pantau')" id="btnMenuAdminPantau" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-indigo-600 text-white transition">
-            <span>📊</span> <span>Pantauan Harian & Reset</span>
+          <button onclick="pilihMenuAdmin('Pantauan')" id="btnMenuAdminPantauan" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-indigo-600 text-white transition">
+            <span>📍</span> <span>Pantauan Harian & Edit</span>
           </button>
           <button onclick="pilihMenuAdmin('KelolaSiswa')" id="btnMenuAdminKelolaSiswa" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 transition">
-            <span>🔓</span> <span>Kelola Siswa, PIN & Profil</span>
+            <span>👥</span> <span>Kelola Siswa & Profil</span>
           </button>
-          <button onclick="pilihMenuAdmin('CetakKelas')" id="btnMenuAdminCetakKelas" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 transition">
-            <span>🖨️</span> <span>Cetak Rekap Per Kelas</span>
+          <button onclick="pilihMenuAdmin('RekapKelas')" id="btnMenuAdminRekapKelas" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 transition">
+            <span>🖨️</span> <span>Rekap Bulanan Kelas</span>
           </button>
-          <button onclick="pilihMenuAdmin('TambahMaster')" id="btnMenuAdminTambahMaster" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 transition">
-            <span>➕</span> <span>Master Data & Monev Guru</span>
+          <button onclick="pilihMenuAdmin('MasterData')" id="btnMenuAdminMasterData" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 transition">
+            <span>🗂️</span> <span>Master Data PKL</span>
+          </button>
+          <button onclick="pilihMenuAdmin('MonevGuru')" id="btnMenuAdminMonevGuru" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 transition">
+            <span>🚗</span> <span>Pantauan Monev Guru</span>
           </button>
         </nav>
       </div>
@@ -132,92 +328,160 @@
     </aside>
 
     <!-- AREA KONTEN UTAMA ADMIN -->
-    <div class="flex-1 p-4 md:p-6 max-w-5xl mx-auto w-full">
+    <div class="flex-1 p-4 md:p-6 max-w-6xl mx-auto w-full">
       <main class="space-y-4">
 
-        <!-- BANNER HEADER ADMIN & FILTER KELAS -->
-        <div class="bg-gradient-to-r from-slate-900 to-indigo-950 text-white p-4 rounded-2xl shadow flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <!-- POIN 3: HEADER JUDUL HALAMAN DINAMIS (MENGGANTIKAN TULISAN KOORDINATOR PKL) -->
+        <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-900 text-white p-5 rounded-3xl shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <p class="text-[10px] uppercase tracking-wider text-amber-400 font-bold">Panel Kendali Utama Pokja PKL (Superuser)</p>
-            <h3 id="txtNamaAdmin" class="font-extrabold text-base">-</h3>
-            <p id="txtJabatanAdmin" class="text-xs text-slate-300">-</p>
+            <span id="badgeKategoriHalamanAdmin" class="inline-block text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 mb-1">PANEL KENDALI ADMIN</span>
+            <h2 id="txtJudulHalamanAdmin" class="font-extrabold text-base sm:text-lg tracking-wide">📍 Pantauan Presensi Harian & Koreksi Data</h2>
+            <p id="txtSubJudulHalamanAdmin" class="text-xs text-indigo-200 mt-0.5">Pantau kehadiran seluruh siswa PKL, bantu input/edit presensi, atau reset rekaman harian</p>
           </div>
-          <div class="flex bg-slate-800 p-1 rounded-xl gap-1 text-xs font-bold">
-            <button onclick="setFilterKelasAdmin('SEMUA')" id="btnKelasAdminSEMUA" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white">Semua Kelas</button>
-            <button onclick="setFilterKelasAdmin('XII DKV 1')" id="btnKelasAdminDKV1" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white">XII DKV 1</button>
-            <button onclick="setFilterKelasAdmin('XII DKV 2')" id="btnKelasAdminDKV2" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white">XII DKV 2</button>
-          </div>
+          <button onclick="muatDataGlobalAdmin(true)" class="bg-white/15 hover:bg-white/25 px-3.5 py-2 rounded-2xl text-xs font-bold border border-white/20 flex items-center gap-1.5 self-start sm:self-auto shrink-0 active:scale-95 transition">
+            <span id="iconRefreshAdmin">🔄</span> <span>Segarkan Data</span>
+          </button>
         </div>
 
-        <!-- STATISTIK PERBANDINGAN 2 KELAS -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-          <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs flex justify-between items-center">
-            <div>
-              <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-indigo-100 text-indigo-800">KELAS XII DKV 1</span>
-              <p id="statAdminDkv1Detail" class="text-slate-500 mt-1.5 font-medium">Memuat data...</p>
-            </div>
-            <p id="statAdminDkv1Total" class="text-2xl font-extrabold text-indigo-600">0</p>
-          </div>
-          <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs flex justify-between items-center">
-            <div>
-              <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">KELAS XII DKV 2</span>
-              <p id="statAdminDkv2Detail" class="text-slate-500 mt-1.5 font-medium">Memuat data...</p>
-            </div>
-            <p id="statAdminDkv2Total" class="text-2xl font-extrabold text-emerald-600">0</p>
-          </div>
-        </div>
-
-        <!-- TAB 1: PANTAUAN HARIAN & RESET PRESENSI -->
-        <section id="tabAdminPantau" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-          <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
-            <div>
-              <label class="text-xs font-bold text-slate-700 block">Tanggal Pantauan & Koreksi Presensi:</label>
-              <span class="text-[11px] text-slate-500">Jika siswa salah pilih status sehingga terkunci, klik tombol <b>🗑️ Reset Presensi</b>.</span>
-            </div>
-            <input type="date" id="filterTanggalAdmin" onchange="muatDataAdminGlobal()" class="text-xs font-semibold p-2 rounded-lg border border-slate-300 bg-white">
-          </div>
-          <div id="listPantauAdmin" class="space-y-2.5 text-xs"></div>
-        </section>
-
-        <!-- TAB 2: KELOLA SISWA, RESET PIN, BUKA KUNCI PROFIL & EDIT PENEMPATAN -->
-        <section id="tabAdminKelolaSiswa" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-          <div>
-            <h4 class="font-bold text-sm text-slate-800">🔓 Manajemen PIN, Penempatan DUDI/Guru & Kunci Profil</h4>
-            <p class="text-xs text-slate-500">Anda dapat melihat/mengganti PIN siswa yang lupa, mengubah kelas/DUDI/Guru Pembimbing, atau membuka kunci profil & WA siswa.</p>
-          </div>
-          <div id="listKelolaSiswaAdmin" class="space-y-3 text-xs"></div>
-        </section>
-
-        <!-- TAB 3: CETAK REKAP BULANAN PER KELAS -->
-        <section id="tabAdminCetakKelas" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-          <div class="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 p-4 rounded-2xl space-y-3">
-            <h4 class="font-bold text-sm text-indigo-900 dark:text-indigo-300">🖨️ Cetak Rekapitulasi Presensi Bulanan Per Kelas</h4>
-            <p class="text-xs text-slate-600">Menyusun matriks rekap kehadiran bulanan utuh (Hadir, Dinas Luar, Ijin, Sakit, Libur) khusus per kelas menggunakan <b>kop_laporanguru1.png</b>.</p>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+        <!-- ========================================================================= -->
+        <!-- TAB 1: PANTAUAN PRESENSI HARIAN, EDIT MANUAL & RESET PRESENSI             -->
+        <!-- ========================================================================= -->
+        <section id="tabPantauan" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          
+          <!-- POIN 4: KARTU STATISTIK BESAR HANYA MUNCUL DI HALAMAN PANTAUAN HARIAN INI -->
+          <div class="grid grid-cols-3 gap-2.5">
+            <button onclick="setFilterPantauanAdmin('SEMUA')" id="btnAdminFilterSEMUA" class="p-3.5 rounded-2xl border-2 text-left transition flex items-center justify-between">
               <div>
-                <label class="block text-[11px] font-bold text-slate-700 mb-1">Pilih Kelas</label>
-                <select id="cetakAdminKelas" onchange="muatRekapKelasAdmin()" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white text-xs font-bold">
+                <p class="text-[10px] font-extrabold uppercase tracking-wider opacity-85">📋 Total Siswa PKL</p>
+                <p id="statAdminTotalSiswa" class="text-xl sm:text-2xl font-extrabold mt-0.5">0</p>
+              </div>
+              <span id="chkAdminSEMUA" class="text-[10px] font-extrabold px-2 py-0.5 rounded-lg bg-white/20">AKTIF ✓</span>
+            </button>
+
+            <button onclick="setFilterPantauanAdmin('SUDAH')" id="btnAdminFilterSUDAH" class="p-3.5 rounded-2xl border-2 text-left transition flex items-center justify-between">
+              <div>
+                <p class="text-[10px] font-extrabold uppercase tracking-wider opacity-85">✅ Sudah Presensi</p>
+                <p id="statAdminSudahAbsen" class="text-xl sm:text-2xl font-extrabold mt-0.5">0</p>
+              </div>
+              <span id="chkAdminSUDAH" class="hidden text-[10px] font-extrabold px-2 py-0.5 rounded-lg bg-white/20">AKTIF ✓</span>
+            </button>
+
+            <button onclick="setFilterPantauanAdmin('BELUM')" id="btnAdminFilterBELUM" class="p-3.5 rounded-2xl border-2 text-left transition flex items-center justify-between">
+              <div>
+                <p class="text-[10px] font-extrabold uppercase tracking-wider opacity-85">⏳ Belum Presensi</p>
+                <p id="statAdminBelumAbsen" class="text-xl sm:text-2xl font-extrabold mt-0.5">0</p>
+              </div>
+              <span id="chkAdminBELUM" class="hidden text-[10px] font-extrabold px-2 py-0.5 rounded-lg bg-white/20">AKTIF ✓</span>
+            </button>
+          </div>
+
+          <!-- Navigasi Tanggal, Filter Kelas & Pencarian Siswa (Poin 1) -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-2.5 bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200">
+            <div class="md:col-span-4 flex items-center gap-1.5">
+              <button onclick="geserTanggalAdmin(-1)" class="px-2.5 py-2 rounded-xl bg-white dark:bg-slate-700 border border-slate-300 font-bold text-xs">◀</button>
+              <input type="date" id="filterTanggalAdmin" onchange="muatDataGlobalAdmin(true)" class="flex-1 p-2 rounded-xl border border-slate-300 bg-white text-xs font-bold">
+              <button onclick="geserTanggalAdmin(1)" class="px-2.5 py-2 rounded-xl bg-white dark:bg-slate-700 border border-slate-300 font-bold text-xs">▶</button>
+            </div>
+            <div class="md:col-span-3">
+              <select id="filterKelasPantauanAdmin" onchange="renderPantauanHarianAdmin()" class="w-full p-2 rounded-xl border border-slate-300 bg-white text-xs font-bold">
+                <option value="ALL">-- Semua Kelas --</option>
+              </select>
+            </div>
+            <div class="md:col-span-5">
+              <input type="text" id="searchPantauanSiswa" oninput="renderPantauanHarianAdmin()" placeholder="🔍 Cari nama siswa, NIS, DUDI, atau nama guru..." class="w-full p-2 rounded-xl border border-slate-300 bg-white text-xs">
+            </div>
+          </div>
+
+          <!-- Animasi Loading Pantauan -->
+          <div id="loadingBoxPantauanAdmin" class="hidden py-10 text-center space-y-2">
+            <svg class="animate-spin h-7 w-7 text-indigo-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="text-xs font-bold text-slate-500 animate-pulse">Memuat data presensi harian seluruh siswa...</p>
+          </div>
+
+          <!-- Daftar Siswa Harian + Tombol Edit & Reset (Poin 2) -->
+          <div id="wadahPantauanHarianAdmin" class="space-y-2.5"></div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 2: KELOLA DATA SISWA & BUKA KUNCI PROFIL PARSIAL                      -->
+        <!-- ========================================================================= -->
+        <section id="tabKelolaSiswa" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <!-- Bar Pencarian & Filter Kelas (Poin 1) -->
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200">
+            <div class="sm:col-span-4">
+              <select id="filterKelasKelolaAdmin" onchange="renderTabelKelolaSiswa()" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white text-xs font-bold">
+                <option value="ALL">-- Semua Kelas --</option>
+              </select>
+            </div>
+            <div class="sm:col-span-8">
+              <input type="text" id="searchKelolaSiswa" oninput="renderTabelKelolaSiswa()" placeholder="🔍 Cari nama siswa, NIS, tempat DUDI, guru pembimbing, atau nomor WA..." class="w-full p-2.5 rounded-xl border border-slate-300 bg-white text-xs">
+            </div>
+          </div>
+
+          <div class="overflow-x-auto rounded-2xl border border-slate-200">
+            <table class="w-full text-xs text-left border-collapse">
+              <thead class="bg-slate-800 text-white">
+                <tr>
+                  <th class="p-3 border-r border-slate-700 w-10 text-center">No</th>
+                  <th class="p-3 border-r border-slate-700">Siswa & Status Profil</th>
+                  <th class="p-3 border-r border-slate-700">Penempatan DUDI & Guru</th>
+                  <th class="p-3 border-r border-slate-700">Kontak WA & Alamat</th>
+                  <th class="p-3 text-center w-44">Aksi Kelola / Buka Kunci</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyKelolaSiswaAdmin" class="divide-y divide-slate-200 bg-white"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 3: REKAPITULASI BULANAN PER KELAS + SEARCH SISWA                      -->
+        <!-- ========================================================================= -->
+        <section id="tabRekapKelas" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <div class="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 p-4 rounded-2xl space-y-3 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+              <div class="sm:col-span-3">
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">🏫 Pilih Kelas</label>
+                <select id="selectRekapKelasAdmin" onchange="muatRekapBulananKelas()" class="w-full p-2.5 rounded-xl border border-indigo-300 bg-white font-bold">
                   <option value="XII DKV 1">XII DKV 1</option>
                   <option value="XII DKV 2">XII DKV 2</option>
+                  <option value="XII DKV 3">XII DKV 3</option>
                 </select>
               </div>
-              <div>
-                <label class="block text-[11px] font-bold text-slate-700 mb-1">Pilih Bulan Laporan</label>
-                <input type="month" id="cetakAdminBulan" onchange="muatRekapKelasAdmin()" class="w-full p-2 rounded-xl border border-slate-300 bg-white text-xs font-bold">
+              <div class="sm:col-span-3">
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">📅 Pilih Bulan</label>
+                <input type="month" id="inputBulanRekapKelasAdmin" onchange="muatRekapBulananKelas()" class="w-full p-2.5 rounded-xl border border-indigo-300 bg-white font-bold">
               </div>
-              <div class="flex items-end">
-                <button onclick="cetakRekapKelasAdminPDF()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow">🖨️ Cetak PDF Kelas Ini</button>
+              <div class="sm:col-span-4">
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">🔍 Cari Siswa di Tabel Rekap</label>
+                <input type="text" id="searchRekapKelasSiswa" oninput="renderTabelRekapBulananKelas()" placeholder="Ketik nama siswa atau DUDI..." class="w-full p-2.5 rounded-xl border border-indigo-300 bg-white">
+              </div>
+              <div class="sm:col-span-2">
+                <button onclick="bukaModalCetakAdmin('REKAP_KELAS')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-3 rounded-xl shadow">🖨️ Cetak PDF</button>
               </div>
             </div>
           </div>
 
-          <div class="overflow-x-auto rounded-xl border border-slate-200">
+          <div id="loadingBoxRekapKelas" class="hidden py-8 text-center space-y-2">
+            <svg class="animate-spin h-6 w-6 text-indigo-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="text-xs font-bold text-slate-500 animate-pulse">Menghitung rekapitulasi kehadiran bulanan kelas...</p>
+          </div>
+
+          <div class="overflow-x-auto rounded-2xl border border-slate-200">
             <table class="w-full text-xs text-left border-collapse">
               <thead class="bg-slate-800 text-white">
                 <tr>
                   <th class="p-2.5 border-r border-slate-700 w-10 text-center">No</th>
-                  <th class="p-2.5 border-r border-slate-700">NIS & Nama Siswa</th>
-                  <th class="p-2.5 border-r border-slate-700">Tempat DUDI & Guru</th>
+                  <th class="p-2.5 border-r border-slate-700">NIS</th>
+                  <th class="p-2.5 border-r border-slate-700">Nama Siswa</th>
+                  <th class="p-2.5 border-r border-slate-700">Tempat PKL (DUDI)</th>
+                  <th class="p-2.5 border-r border-slate-700">Guru Pembimbing</th>
                   <th class="p-2.5 border-r border-slate-700 text-center">Hadir</th>
                   <th class="p-2.5 border-r border-slate-700 text-center">DL</th>
                   <th class="p-2.5 border-r border-slate-700 text-center">Ijin</th>
@@ -225,56 +489,158 @@
                   <th class="p-2.5 text-center">Libur</th>
                 </tr>
               </thead>
-              <tbody id="tabelRekapKelasAdmin" class="divide-y divide-slate-200 bg-white">
-                <tr><td colspan="8" class="p-4 text-center text-slate-400">Pilih bulan untuk melihat rekapitulasi kelas...</td></tr>
+              <tbody id="tbodyRekapKelasAdmin" class="divide-y divide-slate-200 bg-white">
+                <tr><td colspan="10" class="p-4 text-center text-slate-400">Pilih kelas dan bulan untuk menampilkan data...</td></tr>
               </tbody>
             </table>
           </div>
         </section>
 
-        <!-- TAB 4: TAMBAH DATA MASTER LENGKAP & PANTAUAN MONEV GURU -->
-        <section id="tabAdminTambahMaster" class="hidden space-y-5 text-xs">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- ========================================================================= -->
+        <!-- TAB 4: KELOLA MASTER DATA PKL (DIPISAH DARI MONEV GURU SESUAI POIN 6)     -->
+        <!-- ========================================================================= -->
+        <section id="tabMasterData" class="hidden space-y-5">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 text-xs">
+
+            <!-- Form 1: Tambah Siswa Baru -->
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+              <div class="border-b border-slate-100 pb-2.5">
+                <h4 class="font-extrabold text-sm text-indigo-700 dark:text-indigo-400">➕ Tambah Siswa PKL Baru</h4>
+                <p class="text-[11px] text-slate-500">Tambahkan peserta baru ke Master Siswa</p>
+              </div>
+              <div>
+                <label class="block font-bold mb-1">NIS Siswa</label>
+                <input type="text" id="addSiswaNis" placeholder="Contoh: 23001" class="w-full p-2.5 rounded-xl border border-slate-300">
+              </div>
+              <div>
+                <label class="block font-bold mb-1">Nama Lengkap Siswa</label>
+                <input type="text" id="addSiswaNama" placeholder="Nama lengkap huruf kapital" class="w-full p-2.5 rounded-xl border border-slate-300">
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block font-bold mb-1">Kelas</label>
+                  <input type="text" id="addSiswaKelas" value="XII DKV 1" class="w-full p-2.5 rounded-xl border border-slate-300">
+                </div>
+                <div>
+                  <label class="block font-bold mb-1">PIN Awal</label>
+                  <input type="text" id="addSiswaPin" placeholder="Sama dgn NIS" class="w-full p-2.5 rounded-xl border border-slate-300">
+                </div>
+              </div>
+              <div>
+                <label class="block font-bold mb-1">Pilih Tempat DUDI</label>
+                <select id="addSiswaDudi" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white"></select>
+              </div>
+              <div>
+                <label class="block font-bold mb-1">Pilih Guru Pembimbing</label>
+                <select id="addSiswaGuru" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white"></select>
+              </div>
+              <button onclick="tambahDataMaster('SISWA')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl shadow">💾 Simpan Siswa Baru</button>
+            </div>
+
+            <!-- Form 2: Tambah Guru Pembimbing Baru -->
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+              <div class="border-b border-slate-100 pb-2.5">
+                <h4 class="font-extrabold text-sm text-emerald-700 dark:text-emerald-400">➕ Tambah Guru Pembimbing</h4>
+                <p class="text-[11px] text-slate-500">Dilengkapi NIP untuk cetak laporan resmi</p>
+              </div>
+              <div>
+                <label class="block font-bold mb-1">ID Login Guru</label>
+                <input type="text" id="addGuruId" placeholder="Contoh: GURU05" class="w-full p-2.5 rounded-xl border border-slate-300">
+              </div>
+              <div>
+                <label class="block font-bold mb-1">Nama Lengkap & Gelar Guru</label>
+                <input type="text" id="addGuruNama" placeholder="Contoh: Erwan Friyanto, SST" class="w-full p-2.5 rounded-xl border border-slate-300">
+              </div>
+              <div>
+                <label class="block font-bold mb-1">NIP Guru <span class="text-slate-400 font-normal">(Opsional)</span></label>
+                <input type="text" id="addGuruNip" placeholder="Contoh: 198501012010011009" class="w-full p-2.5 rounded-xl border border-slate-300">
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block font-bold mb-1">PIN Login</label>
+                  <input type="text" id="addGuruPin" placeholder="Minimal 4 digit" class="w-full p-2.5 rounded-xl border border-slate-300">
+                </div>
+                <div>
+                  <label class="block font-bold mb-1">Jabatan</label>
+                  <input type="text" id="addGuruJabatan" value="Guru Pembimbing" class="w-full p-2.5 rounded-xl border border-slate-300">
+                </div>
+              </div>
+              <button onclick="tambahDataMaster('GURU')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow">💾 Simpan Guru Baru</button>
+            </div>
+
+            <!-- Form 3: Tambah DUDI Baru -->
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+              <div class="border-b border-slate-100 pb-2.5">
+                <h4 class="font-extrabold text-sm text-amber-700 dark:text-amber-400">➕ Tambah Industri (DUDI)</h4>
+                <p class="text-[11px] text-slate-500">Titik koordinat GPS & batas radius presensi</p>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block font-bold mb-1">ID DUDI</label>
+                  <input type="text" id="addDudiId" placeholder="Contoh: DUDI12" class="w-full p-2.5 rounded-xl border border-slate-300">
+                </div>
+                <div>
+                  <label class="block font-bold mb-1">Radius (Meter)</label>
+                  <input type="number" id="addDudiRadius" value="150" class="w-full p-2.5 rounded-xl border border-slate-300">
+                </div>
+              </div>
+              <div>
+                <label class="block font-bold mb-1">Nama Tempat PKL / Industri</label>
+                <input type="text" id="addDudiNama" placeholder="Contoh: Studio Kreatif Klaten" class="w-full p-2.5 rounded-xl border border-slate-300">
+              </div>
+              <div>
+                <label class="block font-bold mb-1">Alamat Lengkap DUDI</label>
+                <input type="text" id="addDudiAlamat" placeholder="Alamat lengkap lokasi" class="w-full p-2.5 rounded-xl border border-slate-300">
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block font-bold mb-1">Latitude</label>
+                  <input type="text" id="addDudiLat" placeholder="-7.705..." class="w-full p-2.5 rounded-xl border border-slate-300">
+                </div>
+                <div>
+                  <label class="block font-bold mb-1">Longitude</label>
+                  <input type="text" id="addDudiLng" placeholder="110.601..." class="w-full p-2.5 rounded-xl border border-slate-300">
+                </div>
+              </div>
+              <div>
+                <label class="block font-bold mb-1">Nama Instruktur DUDI</label>
+                <input type="text" id="addDudiInstruktur" placeholder="Nama pembimbing lapangan" class="w-full p-2.5 rounded-xl border border-slate-300">
+              </div>
+              <button onclick="tambahDataMaster('DUDI')" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl shadow">💾 Simpan DUDI Baru</button>
+            </div>
+
+          </div>
+
+          <!-- Ringkasan Daftar Master Guru & DUDI Terdaftar -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2.5">
-              <h5 class="font-extrabold text-slate-800 text-sm border-b pb-2">➕ Tambah Siswa Baru</h5>
-              <input type="text" id="addSiswaNis" placeholder="NIS" class="w-full p-2.5 rounded-xl border">
-              <input type="text" id="addSiswaNama" placeholder="Nama Lengkap Siswa" class="w-full p-2.5 rounded-xl border">
-              <select id="addSiswaKelas" class="w-full p-2.5 rounded-xl border bg-white font-semibold">
-                <option value="XII DKV 1">XII DKV 1</option>
-                <option value="XII DKV 2">XII DKV 2</option>
+              <h4 class="font-extrabold text-xs uppercase text-slate-500">👨‍🏫 Daftar Master Guru Pembimbing (<span id="countMasterGuru">0</span>)</h4>
+              <div id="listRingkasMasterGuru" class="space-y-1.5 max-h-60 overflow-y-auto pr-1"></div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2.5">
+              <h4 class="font-extrabold text-xs uppercase text-slate-500">🏢 Daftar Master Industri / DUDI (<span id="countMasterDudi">0</span>)</h4>
+              <div id="listRingkasMasterDudi" class="space-y-1.5 max-h-60 overflow-y-auto pr-1"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 5: PANTAUAN KUNJUNGAN MONEV GURU (HALAMAN MANDIRI SESUAI POIN 6)      -->
+        <!-- ========================================================================= -->
+        <section id="tabMonevGuru" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200 text-xs">
+            <div class="flex flex-1 flex-col sm:flex-row gap-2.5">
+              <select id="filterGuruMonevAdmin" onchange="renderPantauanMonevAdmin()" class="p-2.5 rounded-xl border border-slate-300 bg-white font-bold sm:w-64">
+                <option value="ALL">-- Semua Guru Pembimbing --</option>
               </select>
-              <input type="text" id="addSiswaPin" placeholder="PIN Login Awal" class="w-full p-2.5 rounded-xl border">
-              <input type="text" id="addSiswaDudi" placeholder="ID DUDI" class="w-full p-2.5 rounded-xl border">
-              <input type="text" id="addSiswaGuru" placeholder="ID Guru Pembimbing" class="w-full p-2.5 rounded-xl border">
-              <button onclick="adminSimpanMaster('SISWA')" class="w-full bg-indigo-600 text-white font-bold py-2.5 rounded-xl">Simpan Siswa</button>
+              <input type="text" id="searchMonevAdmin" oninput="renderPantauanMonevAdmin()" placeholder="🔍 Cari nama DUDI, nama guru, atau isi catatan kunjungan..." class="flex-1 p-2.5 rounded-xl border border-slate-300 bg-white">
             </div>
-
-            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2.5">
-              <h5 class="font-extrabold text-slate-800 text-sm border-b pb-2">➕ Tambah Guru Pembimbing</h5>
-              <input type="text" id="addGuruId" placeholder="ID Guru" class="w-full p-2.5 rounded-xl border">
-              <input type="text" id="addGuruNama" placeholder="Nama Lengkap & Gelar" class="w-full p-2.5 rounded-xl border">
-              <input type="text" id="addGuruPin" placeholder="PIN Login Guru" class="w-full p-2.5 rounded-xl border">
-              <input type="text" id="addGuruJabatan" placeholder="Jabatan" class="w-full p-2.5 rounded-xl border">
-              <button onclick="adminSimpanMaster('GURU')" class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-xl">Simpan Guru</button>
-            </div>
-
-            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2.5">
-              <h5 class="font-extrabold text-slate-800 text-sm border-b pb-2">➕ Tambah Tempat DUDI</h5>
-              <input type="text" id="addDudiId" placeholder="ID DUDI" class="w-full p-2.5 rounded-xl border">
-              <input type="text" id="addDudiNama" placeholder="Nama Studio / Industri" class="w-full p-2.5 rounded-xl border">
-              <input type="text" id="addDudiAlamat" placeholder="Alamat Lengkap" class="w-full p-2.5 rounded-xl border">
-              <input type="number" step="any" id="addDudiLat" placeholder="Latitude (Contoh: -7.7058)" class="w-full p-2.5 rounded-xl border">
-              <input type="number" step="any" id="addDudiLng" placeholder="Longitude (Contoh: 110.6012)" class="w-full p-2.5 rounded-xl border">
-              <input type="number" id="addDudiRadius" placeholder="Radius Meter (Default: 150)" class="w-full p-2.5 rounded-xl border">
-              <input type="text" id="addDudiInstruktur" placeholder="Nama Pembimbing DUDI" class="w-full p-2.5 rounded-xl border">
-              <button onclick="adminSimpanMaster('DUDI')" class="w-full bg-amber-600 text-white font-bold py-2.5 rounded-xl">Simpan DUDI</button>
-            </div>
+            <button onclick="bukaModalCetakAdmin('MONEV_GLOBAL')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl shadow shrink-0">
+              🖨️ Cetak PDF Laporan Monev
+            </button>
           </div>
 
-          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-            <h5 class="font-bold text-sm text-slate-800">📋 Pantauan Riwayat Kunjungan Monitoring Seluruh Guru</h5>
-            <div id="listMonevGlobalAdmin" class="space-y-2.5"></div>
-          </div>
+          <div id="wadahPantauanMonevAdmin" class="space-y-2.5"></div>
         </section>
 
       </main>
@@ -283,19 +649,20 @@
 
   <script>
     const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwi7JawplrCbbPJSaWfWsBcH_FfmPV4un5lruxssQqiePZ372172qepYIw163X4PKM-aQ/exec';
-    const KOP_GURU_FILE = 'kop_laporanguru1.png';
-    const LOGO_FILE = 'logo.png';
+    const KOP_ADMIN_FILE = 'kop_laporansiswa1.png';
 
     let currentUser = null;
-    let dataRekapCache = [];
-    let masterDudiCache = [];
-    let masterGuruCache = [];
-    let dataMonevCache = [];
-    let filterKelasAdminAktif = 'SEMUA';
-    let cacheRekapKelasAdmin = [];
-    let currentTab = 'Pantau';
+    let currentTab = 'Pantauan';
+    let filterStatusPantauan = 'SEMUA'; // 'SEMUA' | 'SUDAH' | 'BELUM'
 
-    // ================= TEMA GELAP / TERANG =================
+    let rekapSiswaGlobal = [];
+    let listMonevGlobal = [];
+    let masterDudiGlobal = [];
+    let masterGuruGlobal = [];
+    let cacheRekapBulananKelas = [];
+    let pendingTipeCetakAdmin = '';
+
+    // ================= PENGATURAN TEMA & LOADING =================
     function terapkanTemaAwal() {
       const isDark = localStorage.getItem('pkl_theme') === 'dark';
       document.documentElement.classList.toggle('dark', isDark);
@@ -311,8 +678,16 @@
       localStorage.setItem('pkl_theme', isDark ? 'dark' : 'light');
       terapkanTemaAwal();
     }
-
     terapkanTemaAwal();
+
+    function tampilkanLoadingGlobal(pesan = 'Memproses data ke server...') {
+      document.getElementById('txtGlobalLoading').innerText = pesan;
+      document.getElementById('globalLoadingOverlay').classList.remove('hidden');
+    }
+
+    function sembunyikanLoadingGlobal() {
+      document.getElementById('globalLoadingOverlay').classList.add('hidden');
+    }
 
     function toggleSidebar() {
       document.getElementById('sidebarMenu').classList.toggle('-translate-x-full');
@@ -339,83 +714,66 @@
       return url;
     }
 
-    function formatNomorWA(nomor) {
-      if (!nomor) return '';
-      let clean = String(nomor).replace(/[^0-9]/g, '');
-      if (clean.startsWith('0')) clean = '62' + clean.substring(1);
-      return clean;
+    function bukaModalFoto(url, judul) {
+      const valid = pastikanUrlGambarDriveValid(url);
+      if (!valid) return alert('Foto tidak tersedia.');
+      document.getElementById('judulModalFoto').innerText = judul || '📸 Pratinjau Foto';
+      document.getElementById('imgModalPreview').src = valid;
+      document.getElementById('btnBukaTabBaruFoto').href = url;
+      document.getElementById('modalPreviewFoto').classList.remove('hidden');
     }
 
-    // ================= MANAJEMEN TOMBOL BACK HP & POP-UP KELUAR =================
+    function tutupModalFoto() {
+      document.getElementById('modalPreviewFoto').classList.add('hidden');
+      document.getElementById('imgModalPreview').src = '';
+    }
+
+    // ================= MANAJEMEN TOMBOL BACK HP =================
     function siapkanHistoryAwal() {
       history.replaceState({ tab: 'EXIT_GUARD' }, '', '#guard');
-      history.pushState({ tab: 'Pantau' }, '', '#pantau');
+      history.pushState({ tab: 'Pantauan' }, '', '#pantauan');
     }
 
-    function tampilkanModalKeluar() {
-      document.getElementById('modalExitApp').classList.remove('hidden');
-    }
-
+    function tampilkanModalKeluar() { document.getElementById('modalExitApp').classList.remove('hidden'); }
     function batalKeluarAplikasi() {
       document.getElementById('modalExitApp').classList.add('hidden');
       history.pushState({ tab: currentTab }, '', `#${currentTab.toLowerCase()}`);
     }
 
     window.addEventListener('popstate', (event) => {
-      const modalExit = document.getElementById('modalExitApp');
-      if (modalExit && !modalExit.classList.contains('hidden')) {
-        batalKeluarAplikasi();
-        return;
-      }
-
-      const sb = document.getElementById('sidebarMenu');
-      if (sb && !sb.classList.contains('-translate-x-full') && window.innerWidth < 768) {
-        tutupSidebarMobile();
+      if (!document.getElementById('modalPreviewFoto').classList.contains('hidden')) {
+        tutupModalFoto();
         history.pushState({ tab: currentTab }, '', `#${currentTab.toLowerCase()}`);
         return;
       }
-
+      if (!document.getElementById('modalEditPresensi').classList.contains('hidden')) {
+        tutupModalEditPresensi();
+        history.pushState({ tab: currentTab }, '', `#${currentTab.toLowerCase()}`);
+        return;
+      }
+      if (!document.getElementById('modalKelolaProfilSiswa').classList.contains('hidden')) {
+        tutupModalKelolaSiswa();
+        history.pushState({ tab: currentTab }, '', `#${currentTab.toLowerCase()}`);
+        return;
+      }
+      if (!document.getElementById('modalCetakAdmin').classList.contains('hidden')) {
+        tutupModalCetakAdmin();
+        history.pushState({ tab: currentTab }, '', `#${currentTab.toLowerCase()}`);
+        return;
+      }
+      if (!document.getElementById('modalExitApp').classList.contains('hidden')) {
+        batalKeluarAplikasi();
+        return;
+      }
       if (event.state && event.state.tab && event.state.tab !== 'EXIT_GUARD') {
         pilihMenuAdmin(event.state.tab, false);
         return;
       }
-
-      if (currentTab !== 'Pantau') {
-        pilihMenuAdmin('Pantau', false);
-        history.pushState({ tab: 'Pantau' }, '', '#pantau');
+      if (currentTab !== 'Pantauan') {
+        pilihMenuAdmin('Pantauan', false);
+        history.pushState({ tab: 'Pantauan' }, '', '#pantauan');
       } else {
         tampilkanModalKeluar();
-      }
-    });
-
-    // ================= AUTO-LOGOUT 10 MENIT & CEK SESI ADMIN =================
-    const INACTIVITY_LIMIT_MS = 10 * 60 * 1000;
-    let inactivityTimer = null;
-
-    function resetInactivityTimer() {
-      localStorage.setItem('pkl_last_active', Date.now().toString());
-      if (inactivityTimer) clearTimeout(inactivityTimer);
-      inactivityTimer = setTimeout(() => {
-        alert('Sesi berakhir otomatis karena tidak ada aktivitas selama 10 menit.');
-        logout();
-      }, INACTIVITY_LIMIT_MS);
-    }
-
-    ['click', 'touchstart', 'keydown', 'scroll', 'mousemove'].forEach(evt => {
-      window.addEventListener(evt, resetInactivityTimer, { passive: true });
-    });
-
-    window.addEventListener('DOMContentLoaded', () => {
-      const saved = localStorage.getItem('pkl_user');
-      if (!saved) return window.location.replace('index.html');
-      try {
-        currentUser = JSON.parse(saved);
-        if (!currentUser || currentUser.role !== 'admin') {
-          return window.location.replace('index.html');
-        }
-        inisialisasiHalamanAdmin();
-      } catch (e) {
-        window.location.replace('index.html');
       }
     });
 
@@ -428,410 +786,579 @@
       return await res.json();
     }
 
-    function inisialisasiHalamanAdmin() {
-      resetInactivityTimer();
-      const today = getLocalTodayISO();
-      document.getElementById('txtNamaUserSidebar').innerText = currentUser.user.nama;
-      document.getElementById('txtSubUserSidebar').innerText = currentUser.user.jabatan;
-      document.getElementById('txtNamaAdmin').innerText = currentUser.user.nama;
-      document.getElementById('txtJabatanAdmin').innerText = currentUser.user.jabatan;
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem('pkl_user');
+      if (!saved) return window.location.replace('index.html');
+      try {
+        currentUser = JSON.parse(saved);
+        if (!currentUser || currentUser.role !== 'admin') return window.location.replace('index.html');
+        inisialisasiPortalAdmin();
+      } catch (e) {
+        window.location.replace('index.html');
+      }
+    });
 
-      document.getElementById('filterTanggalAdmin').value = today;
-      document.getElementById('cetakAdminBulan').value = today.substring(0, 7);
+    function inisialisasiPortalAdmin() {
+      document.getElementById('txtNamaAdminSidebar').innerText = currentUser.user.nama;
+      document.getElementById('txtSubAdminSidebar').innerText = `ID: ${currentUser.user.id} • Pokja PKL`;
+
+      const todayIso = getLocalTodayISO();
+      document.getElementById('filterTanggalAdmin').value = todayIso;
+      document.getElementById('inputBulanRekapKelasAdmin').value = todayIso.substring(0, 7);
 
       siapkanHistoryAwal();
-      pilihMenuAdmin('Pantau', false);
-      muatDataAdminGlobal();
+      perbaruiGayaFilterPantauanAdmin();
+      pilihMenuAdmin('Pantauan', false);
+      muatDataGlobalAdmin(true);
     }
 
-    function pilihMenuAdmin(tab, pushHistory = true) {
+    // POIN 3 & 6: NAVIGASI 5 MENU DENGAN JUDUL HALAMAN DINAMIS
+    function pilihMenuAdmin(menu, pushHistory = true) {
       tutupSidebarMobile();
-      if (pushHistory && currentTab !== tab) {
-        history.pushState({ tab }, '', `#${tab.toLowerCase()}`);
+      if (pushHistory && currentTab !== menu) {
+        history.pushState({ tab: menu }, '', `#${menu.toLowerCase()}`);
       }
-      currentTab = tab;
+      currentTab = menu;
 
-      ['Pantau', 'KelolaSiswa', 'CetakKelas', 'TambahMaster'].forEach(t => {
-        document.getElementById('tabAdmin' + t).classList.add('hidden');
-        document.getElementById('btnMenuAdmin' + t).className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 transition';
+      ['Pantauan', 'KelolaSiswa', 'RekapKelas', 'MasterData', 'MonevGuru'].forEach(m => {
+        document.getElementById('tab' + m).classList.add('hidden');
+        document.getElementById('btnMenuAdmin' + m).className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 transition';
       });
-      document.getElementById('tabAdmin' + tab).classList.remove('hidden');
-      document.getElementById('btnMenuAdmin' + tab).className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-indigo-600 text-white transition shadow';
 
-      if (tab === 'CetakKelas') {
-        muatRekapKelasAdmin();
+      document.getElementById('tab' + menu).classList.remove('hidden');
+      document.getElementById('btnMenuAdmin' + menu).className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-indigo-600 text-white transition shadow';
+
+      const judulEl = document.getElementById('txtJudulHalamanAdmin');
+      const subEl = document.getElementById('txtSubJudulHalamanAdmin');
+      const badgeEl = document.getElementById('badgeKategoriHalamanAdmin');
+
+      if (menu === 'Pantauan') {
+        badgeEl.innerText = 'MONITORING & KOREKSI HARIAN';
+        judulEl.innerText = '📍 Pantauan Presensi Harian & Koreksi Data';
+        subEl.innerText = 'Pantau kehadiran seluruh siswa PKL, bantu input/edit presensi, atau reset rekaman harian';
+      } else if (menu === 'KelolaSiswa') {
+        badgeEl.innerText = 'MANAJEMEN PESERTA PKL';
+        judulEl.innerText = '👥 Kelola Data Siswa & Buka Kunci Profil';
+        subEl.innerText = 'Atur penempatan DUDI, Guru Pembimbing, edit kontak WA/Alamat, atau buka kunci foto profil parsial';
+        renderTabelKelolaSiswa();
+      } else if (menu === 'RekapKelas') {
+        badgeEl.innerText = 'LAPORAN REKAPITULASI KELAS';
+        judulEl.innerText = '🖨️ Rekapitulasi Presensi Bulanan Per Kelas';
+        subEl.innerText = 'Rekap kehadiran bulanan per kelas dilengkapi pencarian siswa dan pengesahan Kepala Sekolah';
+        muatRekapBulananKelas();
+      } else if (menu === 'MasterData') {
+        badgeEl.innerText = 'DATABASE UTAMA PKL';
+        judulEl.innerText = '🗂️ Kelola Master Data (Siswa, Guru & DUDI)';
+        subEl.innerText = 'Tambahkan peserta siswa baru, guru pembimbing beserta NIP, dan lokasi industri (DUDI)';
+      } else if (menu === 'MonevGuru') {
+        badgeEl.innerText = 'LAPORAN KUNJUNGAN LAPANGAN';
+        judulEl.innerText = '🚗 Pantauan Kunjungan Monitoring (Monev) Guru';
+        subEl.innerText = 'Daftar riwayat kunjungan Guru Pembimbing ke DUDI beserta foto dokumentasi dan cetak laporan';
+        renderPantauanMonevAdmin();
       }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function setFilterKelasAdmin(kelas) {
-      filterKelasAdminAktif = kelas;
-      document.getElementById('btnKelasAdminSEMUA').className = kelas === 'SEMUA' ? 'px-3 py-1.5 rounded-lg bg-indigo-600 text-white' : 'px-3 py-1.5 rounded-lg text-slate-300 hover:text-white';
-      document.getElementById('btnKelasAdminDKV1').className = kelas === 'XII DKV 1' ? 'px-3 py-1.5 rounded-lg bg-indigo-600 text-white' : 'px-3 py-1.5 rounded-lg text-slate-300 hover:text-white';
-      document.getElementById('btnKelasAdminDKV2').className = kelas === 'XII DKV 2' ? 'px-3 py-1.5 rounded-lg bg-indigo-600 text-white' : 'px-3 py-1.5 rounded-lg text-slate-300 hover:text-white';
-      terapkanRenderFilterKelasAdmin();
-    }
+    async function muatDataGlobalAdmin(tampilkanAnimasi = true) {
+      const tgl = document.getElementById('filterTanggalAdmin').value || getLocalTodayISO();
+      const loadingBox = document.getElementById('loadingBoxPantauanAdmin');
+      const wadah = document.getElementById('wadahPantauanHarianAdmin');
+      const iconRefresh = document.getElementById('iconRefreshAdmin');
 
-    async function muatDataAdminGlobal() {
-      const tanggal = document.getElementById('filterTanggalAdmin').value;
-      document.getElementById('listPantauAdmin').innerHTML = '<p class="text-center text-slate-400 py-6">Memuat seluruh data siswa...</p>';
+      if (tampilkanAnimasi) {
+        loadingBox.classList.remove('hidden');
+        wadah.classList.add('hidden');
+      }
+      iconRefresh.classList.add('animate-spin');
+
       try {
-        const res = await callAPI({ action: 'getMonitoringGuru', idGuru: 'ALL', tanggal });
-        if (res.status === 'success') {
-          dataRekapCache = res.rekapSiswa || [];
-          masterDudiCache = res.masterDudi || [];
-          masterGuruCache = res.masterGuru || [];
-          dataMonevCache = res.listMonev || [];
+        const res = await callAPI({
+          action: 'getMonitoringGuru',
+          idGuru: 'ALL',
+          tanggal: tgl
+        });
 
-          hitungStatistikDuaKelasAdmin();
-          terapkanRenderFilterKelasAdmin();
-          renderRiwayatMonevGlobal(dataMonevCache);
+        if (res.status === 'success') {
+          if (res.kepsek) {
+            currentUser.user.kepsek = res.kepsek;
+            localStorage.setItem('pkl_user', JSON.stringify(currentUser));
+          }
+
+          rekapSiswaGlobal = res.rekapSiswa || [];
+          listMonevGlobal = res.listMonev || [];
+          masterDudiGlobal = res.masterDudi || [];
+          masterGuruGlobal = res.masterGuru || [];
+
+          isiSemuaDropdownMasterAdmin();
+          renderPantauanHarianAdmin();
+          renderTabelKelolaSiswa();
+          renderRingkasanMasterGuruDanDudi();
+          renderPantauanMonevAdmin();
         }
       } catch (e) {
-        alert('Gagal memuat data admin.');
+        console.error('Gagal memuat data admin:', e);
+      } finally {
+        loadingBox.classList.add('hidden');
+        wadah.classList.remove('hidden');
+        iconRefresh.classList.remove('animate-spin');
       }
     }
 
-    function hitungStatistikDuaKelasAdmin() {
-      const dkv1 = dataRekapCache.filter(s => s.kelas.toUpperCase() === 'XII DKV 1');
-      const dkv2 = dataRekapCache.filter(s => s.kelas.toUpperCase() === 'XII DKV 2');
+    function isiSemuaDropdownMasterAdmin() {
+      // Ambil daftar kelas unik dari siswa
+      const kelasSet = new Set(['XII DKV 1', 'XII DKV 2', 'XII DKV 3']);
+      rekapSiswaGlobal.forEach(s => { if (s.kelas) kelasSet.add(s.kelas); });
+      const kelasArr = Array.from(kelasSet).sort();
 
-      const dkv1Sudah = dkv1.filter(s => s.sudahAbsen).length;
-      const dkv2Sudah = dkv2.filter(s => s.sudahAbsen).length;
+      const selKelasPantauan = document.getElementById('filterKelasPantauanAdmin');
+      const valKP = selKelasPantauan.value || 'ALL';
+      selKelasPantauan.innerHTML = '<option value="ALL">-- Semua Kelas --</option>' +
+        kelasArr.map(k => `<option value="${k}">${k}</option>`).join('');
+      selKelasPantauan.value = valKP;
 
-      document.getElementById('statAdminDkv1Total').innerText = `${dkv1Sudah}/${dkv1.length}`;
-      document.getElementById('statAdminDkv1Detail').innerText = `Sudah Presensi: ${dkv1Sudah} • Belum: ${dkv1.length - dkv1Sudah} Siswa`;
+      const selKelasKelola = document.getElementById('filterKelasKelolaAdmin');
+      const valKK = selKelasKelola.value || 'ALL';
+      selKelasKelola.innerHTML = '<option value="ALL">-- Semua Kelas --</option>' +
+        kelasArr.map(k => `<option value="${k}">${k}</option>`).join('');
+      selKelasKelola.value = valKK;
 
-      document.getElementById('statAdminDkv2Total').innerText = `${dkv2Sudah}/${dkv2.length}`;
-      document.getElementById('statAdminDkv2Detail').innerText = `Sudah Presensi: ${dkv2Sudah} • Belum: ${dkv2.length - dkv2Sudah} Siswa`;
+      const selRekapKelas = document.getElementById('selectRekapKelasAdmin');
+      const valRK = selRekapKelas.value || kelasArr[0];
+      selRekapKelas.innerHTML = kelasArr.map(k => `<option value="${k}">${k}</option>`).join('');
+      selRekapKelas.value = valRK;
+
+      // Isi dropdown DUDI & Guru
+      const opsiDudiHtml = masterDudiGlobal.map(d => `<option value="${d.id}">${d.nama} (${d.id})</option>`).join('');
+      const opsiGuruHtml = masterGuruGlobal.map(g => `<option value="${g.id}">${g.nama} (${g.id})</option>`).join('');
+
+      document.getElementById('kelolaDudiSiswa').innerHTML = opsiDudiHtml;
+      document.getElementById('kelolaGuruSiswa').innerHTML = opsiGuruHtml;
+      document.getElementById('addSiswaDudi').innerHTML = opsiDudiHtml;
+      document.getElementById('addSiswaGuru').innerHTML = opsiGuruHtml;
+
+      const selGuruMonev = document.getElementById('filterGuruMonevAdmin');
+      const valGM = selGuruMonev.value || 'ALL';
+      selGuruMonev.innerHTML = '<option value="ALL">-- Semua Guru Pembimbing --</option>' +
+        masterGuruGlobal.map(g => `<option value="${g.id}">${g.nama}</option>`).join('');
+      selGuruMonev.value = valGM;
     }
 
-    function terapkanRenderFilterKelasAdmin() {
-      const filtered = filterKelasAdminAktif === 'SEMUA'
-        ? dataRekapCache
-        : dataRekapCache.filter(s => s.kelas.toUpperCase() === filterKelasAdminAktif.toUpperCase());
-
-      renderDaftarPantauAdmin(filtered);
-      renderKelolaSiswaAdmin(filtered);
+    // =========================================================================
+    // TAB 1: PANTAUAN HARIAN + TOMBOL EDIT PRESENSI MANUAL & RESET
+    // =========================================================================
+    function geserTanggalAdmin(offset) {
+      const el = document.getElementById('filterTanggalAdmin');
+      const [y, m, d] = (el.value || getLocalTodayISO()).split('-').map(Number);
+      const dt = new Date(y, m - 1, d + offset);
+      el.value = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+      muatDataGlobalAdmin(true);
     }
 
-    function renderDaftarPantauAdmin(list) {
-      const container = document.getElementById('listPantauAdmin');
-      if (list.length === 0) {
-        container.innerHTML = '<p class="text-center text-slate-400 py-6">Tidak ada data siswa pada filter ini.</p>';
+    function setFilterPantauanAdmin(status) {
+      filterStatusPantauan = status;
+      perbaruiGayaFilterPantauanAdmin();
+      renderPantauanHarianAdmin();
+    }
+
+    function perbaruiGayaFilterPantauanAdmin() {
+      const bSemua = document.getElementById('btnAdminFilterSEMUA');
+      const bSudah = document.getElementById('btnAdminFilterSUDAH');
+      const bBelum = document.getElementById('btnAdminFilterBELUM');
+
+      const cSemua = document.getElementById('chkAdminSEMUA');
+      const cSudah = document.getElementById('chkAdminSUDAH');
+      const cBelum = document.getElementById('chkAdminBELUM');
+
+      const inactive = 'p-3.5 rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-500 text-left transition flex items-center justify-between opacity-75';
+      bSemua.className = inactive;
+      bSudah.className = inactive;
+      bBelum.className = inactive;
+
+      cSemua.classList.add('hidden');
+      cSudah.classList.add('hidden');
+      cBelum.classList.add('hidden');
+
+      if (filterStatusPantauan === 'SEMUA') {
+        bSemua.className = 'p-3.5 rounded-2xl border-2 border-indigo-600 bg-indigo-600 text-white text-left transition flex items-center justify-between shadow-lg ring-4 ring-indigo-500/20';
+        cSemua.classList.remove('hidden');
+      } else if (filterStatusPantauan === 'SUDAH') {
+        bSudah.className = 'p-3.5 rounded-2xl border-2 border-emerald-600 bg-emerald-600 text-white text-left transition flex items-center justify-between shadow-lg ring-4 ring-emerald-500/20';
+        cSudah.classList.remove('hidden');
+      } else {
+        bBelum.className = 'p-3.5 rounded-2xl border-2 border-rose-600 bg-rose-600 text-white text-left transition flex items-center justify-between shadow-lg ring-4 ring-rose-500/20';
+        cBelum.classList.remove('hidden');
+      }
+    }
+
+    function renderPantauanHarianAdmin() {
+      const wadah = document.getElementById('wadahPantauanHarianAdmin');
+      const filterKelas = document.getElementById('filterKelasPantauanAdmin').value || 'ALL';
+      const kw = (document.getElementById('searchPantauanSiswa').value || '').toLowerCase().trim();
+      const tglAktif = document.getElementById('filterTanggalAdmin').value || getLocalTodayISO();
+
+      const listPerKelas = (filterKelas === 'ALL')
+        ? rekapSiswaGlobal
+        : rekapSiswaGlobal.filter(s => s.kelas === filterKelas);
+
+      const sudahList = listPerKelas.filter(s => s.sudahAbsen);
+      const belumList = listPerKelas.filter(s => !s.sudahAbsen);
+
+      document.getElementById('statAdminTotalSiswa').innerText = listPerKelas.length;
+      document.getElementById('statAdminSudahAbsen').innerText = sudahList.length;
+      document.getElementById('statAdminBelumAbsen').innerText = belumList.length;
+
+      let sumber = listPerKelas;
+      if (filterStatusPantauan === 'SUDAH') sumber = sudahList;
+      else if (filterStatusPantauan === 'BELUM') sumber = belumList;
+
+      const hasil = sumber.filter(s =>
+        s.nama.toLowerCase().includes(kw) ||
+        String(s.nis).toLowerCase().includes(kw) ||
+        s.dudi.toLowerCase().includes(kw) ||
+        (s.namaGuru || '').toLowerCase().includes(kw)
+      );
+
+      if (hasil.length === 0) {
+        wadah.innerHTML = `<div class="p-8 text-center bg-slate-50 rounded-2xl border border-slate-200 text-xs text-slate-400">Tidak ditemukan data siswa yang sesuai dengan pencarian.</div>`;
         return;
       }
-      const defAva = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
-      container.innerHTML = list.map(s => {
-        const badgeClass = s.sudahAbsen ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-rose-100 text-rose-800 border-rose-300';
-        const badgeText = s.sudahAbsen ? `${s.status} (${s.jamMasuk})` : 'Belum Presensi';
-        const avatarSrc = pastikanUrlGambarDriveValid(s.fotoProfil) || defAva;
-        const mapsUrl = s.koordinat ? `https://www.google.com/maps?q=${s.koordinat}` : '';
-        const waSiswaClean = formatNomorWA(s.waSiswa);
-        const waTeguranUrl = waSiswaClean ? `https://wa.me/${waSiswaClean}?text=${encodeURIComponent(`Halo ${s.nama}, pantauan Pokja PKL menunjukkan kamu belum melakukan presensi hari ini di ${s.dudi}.`)}` : '';
+
+      wadah.innerHTML = hasil.map(s => {
+        const avatar = pastikanUrlGambarDriveValid(s.fotoProfil) || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+        let badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-100 text-rose-800">BELUM PRESENSI</span>`;
+        if (s.sudahAbsen) {
+          if (s.status === 'Hadir') badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800">HADIR</span>`;
+          else if (s.status === 'Dinas Luar') badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-purple-100 text-purple-800">DINAS LUAR</span>`;
+          else badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800">${s.status.toUpperCase()}</span>`;
+        }
+
+        const safeNama = s.nama.replace(/'/g, "\\'");
 
         return `
-          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-            <div class="flex justify-between items-start gap-2">
+          <div class="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex flex-col lg:flex-row lg:items-center justify-between gap-3 shadow-2xs">
+            <div class="flex items-start gap-3">
+              <img src="${avatar}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'" class="w-11 h-14 rounded-xl object-cover border border-slate-200 shrink-0 bg-slate-100">
+              <div class="space-y-0.5 text-xs">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="font-extrabold text-sm text-slate-800">${s.nama}</span>
+                  ${badge}
+                </div>
+                <p class="text-[11px] text-slate-500 font-semibold">${s.kelas} • NIS: ${s.nis} • Pembimbing: <b>${s.namaGuru}</b></p>
+                <p class="text-xs font-bold text-indigo-700 dark:text-indigo-400">🏢 ${s.dudi}</p>
+                <p class="text-[11px] text-slate-500">📍 ${s.sudahAbsen ? (s.status === 'Hadir' ? `Jarak: ${s.jarak}m dari DUDI` : `Ket: ${s.status}`) : 'Belum ada titik GPS'}</p>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
+              <!-- Info Jam Masuk & Pulang Vertikal -->
+              <div class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-[11px] min-w-[185px] space-y-0.5">
+                <div class="flex justify-between gap-2">
+                  <span class="text-slate-500 font-semibold">🟢 Masuk:</span>
+                  <span class="font-extrabold ${s.jamMasuk !== '-' ? 'text-emerald-700' : 'text-rose-500'}">${s.jamMasuk !== '-' ? s.jamMasuk + ' WIB' : 'Belum'}</span>
+                </div>
+                <div class="flex justify-between gap-2 border-t border-slate-200/70 pt-0.5">
+                  <span class="text-slate-500 font-semibold">🔵 Pulang:</span>
+                  <span class="font-extrabold ${s.jamPulang !== '-' ? 'text-indigo-700' : 'text-slate-400'}">${s.jamPulang !== '-' ? s.jamPulang + ' WIB' : '-'}</span>
+                </div>
+              </div>
+
+              <!-- Tombol Aksi: Foto, Edit Manual (Poin 2), Reset -->
+              <div class="flex items-center gap-1.5 justify-end">
+                ${s.fotoUrl ? `<button onclick="bukaModalFoto('${s.fotoUrl}', 'Foto Presensi - ${safeNama}')" class="px-2.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs" title="Lihat Foto">📸</button>` : ''}
+                <button onclick="bukaModalEditPresensi('${s.nis}', '${safeNama}', '${tglAktif}', '${s.status}', '${s.jamMasuk}', '${s.jamPulang}')" class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow flex items-center gap-1">
+                  <span>✏️</span> <span>Edit</span>
+                </button>
+                ${s.sudahAbsen ? `
+                  <button onclick="resetPresensiHarianSiswa('${s.nis}', '${safeNama}', '${tglAktif}')" class="px-3 py-2 rounded-xl bg-rose-100 hover:bg-rose-600 text-rose-700 hover:text-white font-bold text-xs transition flex items-center gap-1">
+                    <span>🔄</span> <span>Reset</span>
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // POIN 2: LOGIKA MODAL EDIT / INPUT PRESENSI MANUAL OLEH ADMIN
+    function bukaModalEditPresensi(nis, nama, tanggal, statusSekarang, jamMasuk, jamPulang) {
+      document.getElementById('editPresensiNis').value = nis;
+      document.getElementById('editPresensiNama').value = nama;
+      document.getElementById('editPresensiTanggal').value = tanggal;
+      document.getElementById('subJudulModalEditPresensi').innerText = `${nama} (NIS: ${nis}) • Tanggal: ${tanggal}`;
+
+      const st = (statusSekarang && statusSekarang !== 'Belum Absen') ? statusSekarang : 'Hadir';
+      document.getElementById('editPresensiStatus').value = st;
+      document.getElementById('editPresensiJamMasuk').value = (jamMasuk && jamMasuk !== '-') ? jamMasuk : '07:30';
+      document.getElementById('editPresensiJamPulang').value = (jamPulang && jamPulang !== '-') ? jamPulang : '';
+
+      aturTampilanJamModalPresensi();
+      document.getElementById('modalEditPresensi').classList.remove('hidden');
+    }
+
+    function aturTampilanJamModalPresensi() {
+      const st = document.getElementById('editPresensiStatus').value;
+      const colPulang = document.getElementById('colJamPulangModal');
+      if (st === 'Hadir') {
+        colPulang.classList.remove('hidden');
+      } else {
+        colPulang.classList.add('hidden');
+        document.getElementById('editPresensiJamPulang').value = '';
+      }
+    }
+
+    function tutupModalEditPresensi() {
+      document.getElementById('modalEditPresensi').classList.add('hidden');
+    }
+
+    async function simpanEditPresensiAdmin() {
+      const nis = document.getElementById('editPresensiNis').value;
+      const nama = document.getElementById('editPresensiNama').value;
+      const tanggal = document.getElementById('editPresensiTanggal').value;
+      const statusKehadiran = document.getElementById('editPresensiStatus').value;
+      const jamMasuk = document.getElementById('editPresensiJamMasuk').value || '07:30';
+      const jamPulang = document.getElementById('editPresensiJamPulang').value || '';
+
+      tutupModalEditPresensi();
+      tampilkanLoadingGlobal(`Menyimpan koreksi presensi ${nama}...`);
+
+      try {
+        const res = await callAPI({
+          action: 'adminEditPresensiHarian',
+          nis, nama, tanggal, statusKehadiran, jamMasuk, jamPulang
+        });
+        alert(res.message);
+        if (res.status === 'success') {
+          await muatDataGlobalAdmin(false);
+        }
+      } catch (e) {
+        alert('Gagal menyimpan perubahan presensi.');
+      } finally {
+        sembunyikanLoadingGlobal();
+      }
+    }
+
+    async function resetPresensiHarianSiswa(nis, nama, tanggal) {
+      if (!confirm(`Reset / hapus seluruh rekaman presensi ${nama} pada tanggal ${tanggal} agar siswa dapat absen ulang?`)) return;
+      tampilkanLoadingGlobal(`Mereset presensi ${nama}...`);
+      try {
+        const res = await callAPI({ action: 'adminResetPresensiHarian', nis, tanggal });
+        alert(res.message);
+        if (res.status === 'success') await muatDataGlobalAdmin(false);
+      } catch (e) {
+        alert('Gagal mereset presensi.');
+      } finally {
+        sembunyikanLoadingGlobal();
+      }
+    }
+
+    // =========================================================================
+    // TAB 2 & POIN 5: KELOLA SISWA & BUKA KUNCI PROFIL PARSIAL (GABUNGAN)
+    // =========================================================================
+    function renderTabelKelolaSiswa() {
+      const tbody = document.getElementById('tbodyKelolaSiswaAdmin');
+      const filterKelas = document.getElementById('filterKelasKelolaAdmin').value || 'ALL';
+      const kw = (document.getElementById('searchKelolaSiswa').value || '').toLowerCase().trim();
+
+      const hasil = rekapSiswaGlobal.filter(s => {
+        const cocokKelas = (filterKelas === 'ALL') || s.kelas === filterKelas;
+        const cocokKw =
+          s.nama.toLowerCase().includes(kw) ||
+          String(s.nis).toLowerCase().includes(kw) ||
+          s.dudi.toLowerCase().includes(kw) ||
+          (s.namaGuru || '').toLowerCase().includes(kw) ||
+          (s.waSiswa || '').toLowerCase().includes(kw);
+        return cocokKelas && cocokKw;
+      });
+
+      if (hasil.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">Tidak ada data siswa yang cocok dengan pencarian.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = hasil.map((s, idx) => {
+        const avatar = pastikanUrlGambarDriveValid(s.fotoProfil) || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+        const terkunci = Boolean(s.fotoProfil && s.fotoProfil !== '-');
+
+        return `
+          <tr class="hover:bg-slate-50/80">
+            <td class="p-3 border-r border-slate-100 text-center font-bold">${idx + 1}</td>
+            <td class="p-3 border-r border-slate-100">
               <div class="flex items-center gap-2.5">
-                <img src="${avatarSrc}" onerror="this.src='${defAva}'" class="w-10 h-10 rounded-xl object-cover bg-white border">
+                <img src="${avatar}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'" class="w-9 h-11 rounded-lg object-cover border shrink-0">
                 <div>
-                  <h5 class="font-bold text-slate-800 text-sm">${s.nama} <span class="text-[11px] font-semibold text-indigo-600">(${s.kelas})</span></h5>
-                  <p class="text-[11px] text-slate-500">🏢 ${s.dudi} • 👨‍🏫 ${s.namaGuru}</p>
+                  <p class="font-extrabold text-slate-800">${s.nama}</p>
+                  <p class="text-[11px] text-slate-500">${s.kelas} • NIS: <b>${s.nis}</b> • PIN: <span class="font-mono text-indigo-600 font-bold">${s.pin}</span></p>
+                  <span class="inline-block mt-0.5 px-2 py-0.5 rounded text-[9px] font-extrabold ${terkunci ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                    ${terkunci ? '🔒 Profil Terkunci' : '🔓 Belum Lengkap'}
+                  </span>
                 </div>
               </div>
-              <span class="px-2.5 py-1 rounded-full text-[10px] font-bold border ${badgeClass} shrink-0">${badgeText}</span>
-            </div>
-
-            ${s.sudahAbsen ? `
-              <div class="pt-2 border-t border-slate-200/70 flex flex-wrap justify-between items-center gap-2 text-[11px] text-slate-600">
-                <span>${s.status === 'Dinas Luar' ? '🛰️ <b>Mode Dinas Luar</b>' : `📍 Jarak: <b>${s.jarak}m</b> | Pulang: <b>${s.jamPulang}</b>`}</span>
-                <div class="flex items-center gap-2.5">
-                  ${mapsUrl ? `<a href="${mapsUrl}" target="_blank" class="text-emerald-600 font-bold hover:underline">🗺️ Lokasi Maps</a>` : ''}
-                  ${s.fotoUrl && s.fotoUrl !== '-' ? `<a href="${s.fotoUrl}" target="_blank" class="text-indigo-600 font-bold hover:underline">🖼️ Bukti Foto</a>` : ''}
-                  <button onclick="resetPresensiSiswaHariIni('${s.nis}', '${s.nama}')" class="bg-rose-600 hover:bg-rose-700 text-white px-2.5 py-1 rounded-lg font-bold text-[10px]">🗑️ Reset Presensi</button>
-                </div>
-              </div>
-            ` : `
-              <div class="pt-2 border-t border-slate-200/70 flex justify-between items-center text-[11px]">
-                <span class="text-rose-600 font-medium">Belum ada rekaman presensi pada tanggal ini.</span>
-                ${waTeguranUrl ? `<a href="${waTeguranUrl}" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-lg font-bold text-[10px]">💬 Tegur via WA</a>` : ''}
-              </div>
-            `}
-          </div>
+            </td>
+            <td class="p-3 border-r border-slate-100">
+              <p class="font-bold text-indigo-700 dark:text-indigo-400">🏢 ${s.dudi}</p>
+              <p class="text-[11px] text-slate-500 mt-0.5">👨‍🏫 Guru: <b>${s.namaGuru}</b></p>
+            </td>
+            <td class="p-3 border-r border-slate-100 text-[11px]">
+              <p>📱 Siswa: <b>${s.waSiswa || '-'}</b></p>
+              <p>👪 Ortu: <b>${s.waKeluarga || '-'}</b></p>
+              <p class="text-slate-500 truncate max-w-[200px]" title="${s.alamatSiswa || '-'}">🏠 ${s.alamatSiswa || '-'}</p>
+            </td>
+            <td class="p-3 text-center">
+              <button onclick="bukaModalKelolaSiswa('${s.nis}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 rounded-xl text-xs shadow flex items-center justify-center gap-1.5">
+                <span>⚙️</span> <span>Kelola / Buka Kunci</span>
+              </button>
+            </td>
+          </tr>
         `;
       }).join('');
     }
 
-    async function resetPresensiSiswaHariIni(nis, nama) {
-      const tanggal = document.getElementById('filterTanggalAdmin').value;
-      if (!confirm(`Hapus/Reset rekaman presensi ${nama} (NIS: ${nis}) pada tanggal ${tanggal} agar siswa dapat presensi ulang?`)) return;
-      const res = await callAPI({ action: 'adminResetPresensiHarian', nis, tanggal });
-      alert(res.message);
-      muatDataAdminGlobal();
+    function bukaModalKelolaSiswa(nis) {
+      const s = rekapSiswaGlobal.find(item => String(item.nis) === String(nis));
+      if (!s) return;
+
+      document.getElementById('kelolaNisSiswa').value = s.nis;
+      document.getElementById('judulModalKelolaSiswa').innerText = `Kelola Data: ${s.nama}`;
+      document.getElementById('subJudulModalKelolaSiswa').innerText = `NIS: ${s.nis} • Kelas: ${s.kelas}`;
+
+      document.getElementById('kelolaKelasSiswa').value = s.kelas || '';
+      document.getElementById('kelolaPinSiswa').value = s.pin || s.nis;
+      document.getElementById('kelolaDudiSiswa').value = s.idDudi || '';
+      document.getElementById('kelolaGuruSiswa').value = s.idGuru || '';
+
+      document.getElementById('kelolaWaSiswa').value = s.waSiswa || '';
+      document.getElementById('kelolaWaKeluarga').value = s.waKeluarga || '';
+      document.getElementById('kelolaAlamatSiswa').value = s.alamatSiswa || '';
+
+      document.getElementById('chkResetFotoProfil').checked = false;
+      document.getElementById('chkResetPinDefault').checked = false;
+
+      document.getElementById('modalKelolaProfilSiswa').classList.remove('hidden');
     }
 
-    function renderKelolaSiswaAdmin(list) {
-      const container = document.getElementById('listKelolaSiswaAdmin');
+    function tutupModalKelolaSiswa() {
+      document.getElementById('modalKelolaProfilSiswa').classList.add('hidden');
+    }
+
+    async function simpanKelolaSiswaDanProfil() {
+      const nis = document.getElementById('kelolaNisSiswa').value;
+      const kelas = document.getElementById('kelolaKelasSiswa').value.trim();
+      const pin = document.getElementById('kelolaPinSiswa').value.trim();
+      const idDudi = document.getElementById('kelolaDudiSiswa').value;
+      const idGuru = document.getElementById('kelolaGuruSiswa').value;
+      const waSiswa = document.getElementById('kelolaWaSiswa').value.trim();
+      const waKeluarga = document.getElementById('kelolaWaKeluarga').value.trim();
+      const alamatSiswa = document.getElementById('kelolaAlamatSiswa').value.trim();
+      const resetFoto = document.getElementById('chkResetFotoProfil').checked;
+
+      tutupModalKelolaSiswa();
+      tampilkanLoadingGlobal('Menyimpan perubahan data & profil siswa...');
+
+      try {
+        const res = await callAPI({
+          action: 'adminUpdateSiswa',
+          nis, kelas, pin, idDudi, idGuru,
+          waSiswa, waKeluarga, alamatSiswa,
+          resetFoto
+        });
+        alert(res.message);
+        if (res.status === 'success') {
+          await muatDataGlobalAdmin(false);
+        }
+      } catch (e) {
+        alert('Gagal menyimpan perubahan data siswa.');
+      } finally {
+        sembunyikanLoadingGlobal();
+      }
+    }
+
+    // =========================================================================
+    // TAB 3: REKAP BULANAN KELAS + SEARCH SISWA + CETAK PDF
+    // =========================================================================
+    async function muatRekapBulananKelas() {
+      const kelas = document.getElementById('selectRekapKelasAdmin').value || 'XII DKV 1';
+      const bulan = document.getElementById('inputBulanRekapKelasAdmin').value || getLocalTodayISO().substring(0, 7);
+      const loadingBox = document.getElementById('loadingBoxRekapKelas');
+      const tbody = document.getElementById('tbodyRekapKelasAdmin');
+
+      loadingBox.classList.remove('hidden');
+      tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-slate-400">Memuat rekapitulasi kelas ${kelas}...</td></tr>`;
+
+      try {
+        const res = await callAPI({
+          action: 'getRekapBulananKelasAdmin',
+          kelas,
+          bulan
+        });
+
+        if (res.status === 'success') {
+          if (res.kepsek) {
+            currentUser.user.kepsek = res.kepsek;
+            localStorage.setItem('pkl_user', JSON.stringify(currentUser));
+          }
+          cacheRekapBulananKelas = res.rekapKelas || [];
+          renderTabelRekapBulananKelas();
+        }
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-rose-500">Gagal memuat rekap kelas.</td></tr>`;
+      } finally {
+        loadingBox.classList.add('hidden');
+      }
+    }
+
+    function renderTabelRekapBulananKelas() {
+      const tbody = document.getElementById('tbodyRekapKelasAdmin');
+      const kw = (document.getElementById('searchRekapKelasSiswa')?.value || '').toLowerCase().trim();
+
+      const list = cacheRekapBulananKelas.filter(r =>
+        r.nama.toLowerCase().includes(kw) ||
+        String(r.nis).toLowerCase().includes(kw) ||
+        r.dudi.toLowerCase().includes(kw) ||
+        (r.namaGuru || '').toLowerCase().includes(kw)
+      );
+
       if (list.length === 0) {
-        container.innerHTML = '<p class="text-center text-slate-400 py-6">Tidak ada siswa pada kelas ini.</p>';
+        tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-slate-400">Tidak ada data siswa pada kelas/pencarian ini.</td></tr>`;
         return;
       }
-      const defAva = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
-      container.innerHTML = list.map(s => {
-        const validFoto = pastikanUrlGambarDriveValid(s.fotoProfil);
-        const terkunci = validFoto !== '';
-        const optsDudi = masterDudiCache.map(d => `<option value="${d.id}" ${d.id === s.idDudi ? 'selected' : ''}>${d.nama} (${d.id})</option>`).join('');
-        const optsGuru = masterGuruCache.map(g => `<option value="${g.id}" ${String(g.id).toUpperCase() === s.idGuru ? 'selected' : ''}>${g.nama} (${g.id})</option>`).join('');
 
-        return `
-          <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div class="flex items-center gap-3">
-                <img src="${terkunci ? validFoto : defAva}" onerror="this.src='${defAva}'" class="w-12 h-14 rounded-xl object-cover border bg-white shrink-0">
-                <div>
-                  <h5 class="font-bold text-slate-800 text-sm">${s.nama} <span class="text-xs font-normal text-slate-500">(NIS: ${s.nis})</span></h5>
-                  <p class="text-[11px] text-slate-500">📱 WA Siswa: <b>${s.waSiswa || '-'}</b> • 👪 WA Ortu: <b>${s.waKeluarga || '-'}</b></p>
-                  <p class="text-[11px] text-slate-500">🏠 Alamat Siswa: ${s.alamatSiswa || '-'} • 📍 Alamat DUDI: ${s.alamatDudi || '-'}</p>
-                </div>
-              </div>
-              <div class="flex items-center gap-2 shrink-0">
-                ${terkunci ? `
-                  <button onclick="bukaKunciFotoSiswa('${s.nis}', '${s.nama}')" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-xl font-bold text-[11px]">🔓 Buka Kunci Profil & WA</button>
-                ` : `
-                  <span class="text-[11px] text-slate-400 italic px-2">Profil Terbuka</span>
-                `}
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-5 gap-2 pt-2 border-t border-slate-200/80">
-              <div>
-                <label class="block text-[10px] font-bold text-slate-500">Kelas</label>
-                <select id="editKelas_${s.nis}" class="w-full p-2 rounded-lg border bg-white text-xs">
-                  <option value="XII DKV 1" ${s.kelas === 'XII DKV 1' ? 'selected' : ''}>XII DKV 1</option>
-                  <option value="XII DKV 2" ${s.kelas === 'XII DKV 2' ? 'selected' : ''}>XII DKV 2</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-[10px] font-bold text-slate-500">PIN Login (Bisa Diubah)</label>
-                <input type="text" id="editPin_${s.nis}" value="${s.pin}" class="w-full p-2 rounded-lg border bg-white text-xs font-bold">
-              </div>
-              <div>
-                <label class="block text-[10px] font-bold text-slate-500">Tempat DUDI</label>
-                <select id="editDudi_${s.nis}" class="w-full p-2 rounded-lg border bg-white text-xs">${optsDudi}</select>
-              </div>
-              <div>
-                <label class="block text-[10px] font-bold text-slate-500">Guru Pembimbing</label>
-                <select id="editGuru_${s.nis}" class="w-full p-2 rounded-lg border bg-white text-xs">${optsGuru}</select>
-              </div>
-              <div class="flex items-end">
-                <button onclick="simpanEditSiswaAdmin('${s.nis}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg text-xs">💾 Simpan Perubahan</button>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    async function simpanEditSiswaAdmin(nis) {
-      const kelas = document.getElementById('editKelas_' + nis).value;
-      const pin = document.getElementById('editPin_' + nis).value.trim();
-      const idDudi = document.getElementById('editDudi_' + nis).value;
-      const idGuru = document.getElementById('editGuru_' + nis).value;
-
-      if (!pin) return alert('PIN Login tidak boleh kosong!');
-      const res = await callAPI({ action: 'adminUpdateSiswa', nis, kelas, pin, idDudi, idGuru });
-      alert(res.message);
-      muatDataAdminGlobal();
-    }
-
-    async function bukaKunciFotoSiswa(nis, nama) {
-      if (!confirm(`Buka kunci Foto Profil, Alamat, Nomor WA & Ubah PIN untuk siswa ${nama} (NIS: ${nis})?`)) return;
-      const res = await callAPI({ action: 'adminResetFotoProfil', nis });
-      alert(res.message);
-      muatDataAdminGlobal();
-    }
-
-    function renderRiwayatMonevGlobal(list) {
-      const container = document.getElementById('listMonevGlobalAdmin');
-      if (!list || list.length === 0) {
-        container.innerHTML = '<p class="text-slate-400 italic py-3">Belum ada catatan kunjungan monitoring dari Guru Pembimbing.</p>';
-        return;
-      }
-      container.innerHTML = list.map(m => `
-        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
-          <div class="flex justify-between items-start">
-            <div>
-              <span class="text-[10px] font-bold text-indigo-600">📅 ${m.tanggal} • 👨‍🏫 ${m.namaGuru}</span>
-              <h5 class="font-bold text-slate-800 text-sm">🏢 ${m.namaDudi} <span class="text-xs font-normal text-slate-500">(Instruktur: ${m.instruktur})</span></h5>
-            </div>
-            ${m.fotoUrl ? `<a href="${m.fotoUrl}" target="_blank" class="text-indigo-600 font-bold text-[11px] underline">🖼️ Foto Kunjungan</a>` : ''}
-          </div>
-          <p class="text-slate-700 bg-white p-2.5 rounded-lg border border-slate-200/80">${m.catatan}</p>
-        </div>
+      tbody.innerHTML = list.map((r, i) => `
+        <tr>
+          <td class="p-2.5 border-r border-slate-100 text-center font-bold">${i + 1}</td>
+          <td class="p-2.5 border-r border-slate-100 font-mono">${r.nis}</td>
+          <td class="p-2.5 border-r border-slate-100 font-bold">${r.nama}</td>
+          <td class="p-2.5 border-r border-slate-100">${r.dudi}</td>
+          <td class="p-2.5 border-r border-slate-100">${r.namaGuru}</td>
+          <td class="p-2.5 border-r border-slate-100 text-center font-bold text-emerald-700">${r.hadir}</td>
+          <td class="p-2.5 border-r border-slate-100 text-center font-bold text-purple-700">${r.dl}</td>
+          <td class="p-2.5 border-r border-slate-100 text-center font-bold text-amber-700">${r.ijin}</td>
+          <td class="p-2.5 border-r border-slate-100 text-center font-bold text-rose-700">${r.sakit}</td>
+          <td class="p-2.5 text-center font-bold text-sky-700">${r.libur}</td>
+        </tr>
       `).join('');
     }
 
-    // ================= CETAK REKAP BULANAN PER KELAS (kop_laporanguru1.png) =================
-    function buatKopSuratGuruHTML() {
-      const resolvedImgUrl = new URL(KOP_GURU_FILE, window.location.href).href;
-      const resolvedLogoUrl = new URL(LOGO_FILE, window.location.href).href;
-      return `
-        <div style="width:100%; margin-bottom:14px; text-align:center;">
-          <img id="imgKopCetak" src="${resolvedImgUrl}" style="width:100%; max-height:145px; object-fit:contain; display:block; margin:0 auto;"
-               onerror="this.style.display='none'; document.getElementById('fallbackKopTeks').style.display='table';">
-          <table id="fallbackKopTeks" style="display:none; width:100%; border-collapse:collapse; border:none; border-bottom:3px double #000; padding-bottom:8px;">
-            <tr style="border:none;">
-              <td style="border:none; width:75px; text-align:center; vertical-align:middle;">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Pemerintah_Provinsi_Jawa_Tengah.png/300px-Pemerintah_Provinsi_Jawa_Tengah.png" style="width:65px; height:auto;">
-              </td>
-              <td style="border:none; text-align:center; vertical-align:middle; font-family:'Times New Roman', Times, serif; line-height:1.25;">
-                <div style="font-size:14px;">PEMERINTAH PROVINSI JAWA TENGAH</div>
-                <div style="font-size:15px; font-weight:bold;">DINAS PENDIDIKAN</div>
-                <div style="font-size:16px; font-weight:bold;">SEKOLAH MENENGAH KEJURUAN NEGERI 1 KLATEN</div>
-                <div style="font-size:11px;">Jalan dr. Wahidin Sudiro Husodo Nomor 22, Klaten, Jawa Tengah, Kode Pos 57432</div>
-                <div style="font-size:11px;">Telepon 0272-321266 • Laman www.smkn1klaten.sch.id, Pos-el smkn20309691@gmail.com</div>
-              </td>
-              <td style="border:none; width:75px; text-align:center; vertical-align:middle;">
-                <img src="${resolvedLogoUrl}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135755.png'" style="width:65px; height:auto;">
-              </td>
-            </tr>
-          </table>
-        </div>
-      `;
-    }
-
-    function bukaJendelaCetakDenganKop(htmlContent) {
-      const w = window.open('', '_blank');
-      if (!w) return alert('Izinkan pop-up pada browser Anda untuk mencetak laporan PDF.');
-      w.document.write(htmlContent);
-      w.document.close();
-
-      const imgKop = w.document.getElementById('imgKopCetak');
-      let sudahPrint = false;
-      const jalankanPrint = () => {
-        if (sudahPrint) return;
-        sudahPrint = true;
-        setTimeout(() => { w.focus(); w.print(); }, 300);
-      };
-
-      if (imgKop) {
-        if (imgKop.complete) jalankanPrint();
-        else {
-          imgKop.addEventListener('load', jalankanPrint);
-          imgKop.addEventListener('error', jalankanPrint);
-          setTimeout(jalankanPrint, 1800);
-        }
-      } else jalankanPrint();
-    }
-
-    async function muatRekapKelasAdmin() {
-      const kelas = document.getElementById('cetakAdminKelas').value;
-      const bulan = document.getElementById('cetakAdminBulan').value;
-      if (!bulan) return;
-
-      const tbody = document.getElementById('tabelRekapKelasAdmin');
-      tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-400">Menyusun matriks rekapitulasi kelas...</td></tr>';
-
-      try {
-        const res = await callAPI({ action: 'getRekapBulananKelasAdmin', kelas, bulan });
-        if (res.status === 'success') {
-          cacheRekapKelasAdmin = res.rekapKelas || [];
-          if (cacheRekapKelasAdmin.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-400">Belum ada data siswa di kelas ini.</td></tr>';
-            return;
-          }
-          tbody.innerHTML = cacheRekapKelasAdmin.map((r, i) => `
-            <tr>
-              <td class="p-2.5 border-r border-slate-100 text-center font-bold">${i + 1}</td>
-              <td class="p-2.5 border-r border-slate-100"><b>${r.nama}</b><br><span class="text-[10px] text-slate-500">NIS: ${r.nis}</span></td>
-              <td class="p-2.5 border-r border-slate-100">${r.dudi}<br><span class="text-[10px] text-indigo-600">Pembimbing: ${r.namaGuru}</span></td>
-              <td class="p-2.5 border-r border-slate-100 text-center font-bold text-emerald-700">${r.hadir}</td>
-              <td class="p-2.5 border-r border-slate-100 text-center font-bold text-purple-700">${r.dl}</td>
-              <td class="p-2.5 border-r border-slate-100 text-center font-bold text-amber-700">${r.ijin}</td>
-              <td class="p-2.5 border-r border-slate-100 text-center font-bold text-rose-700">${r.sakit}</td>
-              <td class="p-2.5 text-center font-bold text-sky-700">${r.libur}</td>
-            </tr>
-          `).join('');
-        }
-      } catch (e) {
-        alert('Gagal memuat rekap kelas.');
-      }
-    }
-
-    function cetakRekapKelasAdminPDF() {
-      const kelas = document.getElementById('cetakAdminKelas').value;
-      const bulan = document.getElementById('cetakAdminBulan').value;
-      const tglCetak = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-      const htmlContent = `
-        <html><head><title>Rekap Presensi PKL Kelas ${kelas}</title>
-        <style>
-          @page { size: A4 portrait; margin: 12mm 15mm; }
-          body { font-family: Arial, sans-serif; color: #111; font-size: 11px; margin: 0; padding: 0; }
-          .judul { text-align: center; font-weight: bold; font-size: 13px; margin: 8px 0 14px; text-decoration: underline; }
-          table.data { width: 100%; border-collapse: collapse; font-size: 10.5px; margin-top: 10px; }
-          table.data th, table.data td { border: 1px solid #222; padding: 5px 7px; text-align: center; }
-          table.data th { background: #e2e8f0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-          table.data td.left { text-align: left; }
-        </style></head><body>
-          ${buatKopSuratGuruHTML()}
-          <div class="judul">REKAPITULASI PRESENSI BULANAN PKL • KELAS: ${kelas} • PERIODE: ${bulan}</div>
-          <table class="data">
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>NIS</th>
-                <th>Nama Siswa</th>
-                <th>Tempat PKL (DUDI)</th>
-                <th>Guru Pembimbing</th>
-                <th>Hadir</th>
-                <th>Dinas Luar</th>
-                <th>Ijin</th>
-                <th>Sakit</th>
-                <th>Libur</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${cacheRekapKelasAdmin.map((r, idx) => `
-                <tr>
-                  <td>${idx + 1}</td>
-                  <td>${r.nis}</td>
-                  <td class="left"><b>${r.nama}</b></td>
-                  <td class="left">${r.dudi}</td>
-                  <td class="left">${r.namaGuru}</td>
-                  <td><b>${r.hadir}</b></td>
-                  <td><b>${r.dl}</b></td>
-                  <td>${r.ijin}</td>
-                  <td>${r.sakit}</td>
-                  <td>${r.libur}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-          <div style="margin-top: 30px; float: right; text-align: center; width: 240px; page-break-inside: avoid;">
-            <p>Klaten, ${tglCetak}<br>Koordinator Pokja PKL DKV,</p><br><br><br>
-            <p><b><u>${currentUser.user.nama}</u></b></p>
-          </div>
-        </body></html>
-      `;
-      bukaJendelaCetakDenganKop(htmlContent);
-    }
-
-    async function adminSimpanMaster(jenisData) {
+    // =========================================================================
+    // TAB 4: KELOLA MASTER DATA (SISWA, GURU, DUDI)
+    // =========================================================================
+    async function tambahDataMaster(jenisData) {
       let payload = { action: 'adminTambahData', jenisData };
+
       if (jenisData === 'SISWA') {
         payload.nis = document.getElementById('addSiswaNis').value.trim();
         payload.nama = document.getElementById('addSiswaNama').value.trim();
-        payload.kelas = document.getElementById('addSiswaKelas').value;
-        payload.pin = document.getElementById('addSiswaPin').value.trim();
-        payload.idDudi = document.getElementById('addSiswaDudi').value.trim();
-        payload.idGuru = document.getElementById('addSiswaGuru').value.trim();
-        if (!payload.nis || !payload.nama || !payload.pin) return alert('NIS, Nama, dan PIN Awal wajib diisi!');
+        payload.kelas = document.getElementById('addSiswaKelas').value.trim();
+        payload.pin = document.getElementById('addSiswaPin').value.trim() || payload.nis;
+        payload.idDudi = document.getElementById('addSiswaDudi').value;
+        payload.idGuru = document.getElementById('addSiswaGuru').value;
+        if (!payload.nis || !payload.nama) return alert('NIS dan Nama Siswa wajib diisi!');
       } else if (jenisData === 'GURU') {
         payload.idGuru = document.getElementById('addGuruId').value.trim();
         payload.namaGuru = document.getElementById('addGuruNama').value.trim();
+        payload.nipGuru = document.getElementById('addGuruNip').value.trim();
         payload.pinGuru = document.getElementById('addGuruPin').value.trim();
-        payload.jabatanGuru = document.getElementById('addGuruJabatan').value.trim() || 'Guru Pembimbing';
+        payload.jabatanGuru = document.getElementById('addGuruJabatan').value.trim();
         if (!payload.idGuru || !payload.namaGuru || !payload.pinGuru) return alert('ID Guru, Nama, dan PIN wajib diisi!');
       } else if (jenisData === 'DUDI') {
         payload.idDudi = document.getElementById('addDudiId').value.trim();
@@ -839,14 +1366,230 @@
         payload.alamatDudi = document.getElementById('addDudiAlamat').value.trim();
         payload.latDudi = document.getElementById('addDudiLat').value.trim();
         payload.lngDudi = document.getElementById('addDudiLng').value.trim();
-        payload.radiusDudi = document.getElementById('addDudiRadius').value.trim() || '150';
+        payload.radiusDudi = document.getElementById('addDudiRadius').value.trim() || 150;
         payload.instrukturDudi = document.getElementById('addDudiInstruktur').value.trim();
-        if (!payload.idDudi || !payload.namaDudi || !payload.latDudi || !payload.lngDudi) return alert('ID DUDI, Nama Industri, Latitude, dan Longitude wajib diisi!');
+        if (!payload.idDudi || !payload.namaDudi) return alert('ID DUDI dan Nama Industri wajib diisi!');
       }
 
-      const res = await callAPI(payload);
-      alert(res.message);
-      muatDataAdminGlobal();
+      tampilkanLoadingGlobal(`Menyimpan data master ${jenisData}...`);
+      try {
+        const res = await callAPI(payload);
+        alert(res.message);
+        if (res.status === 'success') {
+          await muatDataGlobalAdmin(false);
+        }
+      } catch (e) {
+        alert('Gagal menambahkan data master.');
+      } finally {
+        sembunyikanLoadingGlobal();
+      }
+    }
+
+    function renderRingkasanMasterGuruDanDudi() {
+      document.getElementById('countMasterGuru').innerText = masterGuruGlobal.length;
+      document.getElementById('countMasterDudi').innerText = masterDudiGlobal.length;
+
+      document.getElementById('listRingkasMasterGuru').innerHTML = masterGuruGlobal.map(g => `
+        <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 flex justify-between items-center">
+          <div>
+            <p class="font-bold text-slate-800">${g.nama}</p>
+            <p class="text-[10px] text-slate-500">ID: ${g.id} ${g.nip ? '• NIP: ' + g.nip : ''}</p>
+          </div>
+          <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">${g.jabatan || 'Pembimbing'}</span>
+        </div>
+      `).join('');
+
+      document.getElementById('listRingkasMasterDudi').innerHTML = masterDudiGlobal.map(d => `
+        <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 flex justify-between items-center">
+          <div>
+            <p class="font-bold text-slate-800">${d.nama} <span class="text-[10px] text-indigo-600">(${d.id})</span></p>
+            <p class="text-[10px] text-slate-500">${d.alamat || '-'} • Instruktur: ${d.instruktur || '-'}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // =========================================================================
+    // TAB 5: PANTAUAN KUNJUNGAN MONEV GURU (HALAMAN MANDIRI)
+    // =========================================================================
+    function renderPantauanMonevAdmin() {
+      const wadah = document.getElementById('wadahPantauanMonevAdmin');
+      const filterGuru = document.getElementById('filterGuruMonevAdmin')?.value || 'ALL';
+      const kw = (document.getElementById('searchMonevAdmin')?.value || '').toLowerCase().trim();
+
+      const hasil = listMonevGlobal.filter(m => {
+        const cocokGuru = (filterGuru === 'ALL') || String(m.idGuru).toUpperCase() === String(filterGuru).toUpperCase();
+        const cocokKw =
+          (m.namaDudi || '').toLowerCase().includes(kw) ||
+          (m.namaGuru || '').toLowerCase().includes(kw) ||
+          (m.catatan || '').toLowerCase().includes(kw);
+        return cocokGuru && cocokKw;
+      });
+
+      if (hasil.length === 0) {
+        wadah.innerHTML = `<div class="p-8 text-center bg-slate-50 rounded-2xl border border-slate-200 text-xs text-slate-400">Belum ada laporan kunjungan monitoring DUDI yang sesuai filter.</div>`;
+        return;
+      }
+
+      wadah.innerHTML = hasil.map(m => `
+        <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div class="space-y-1">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="font-extrabold text-sm text-indigo-700 dark:text-indigo-400">🏢 ${m.namaDudi}</span>
+              <span class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 font-bold text-[10px]">📅 ${m.tanggal}</span>
+              <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-[10px]">👨‍🏫 ${m.namaGuru}</span>
+            </div>
+            <p class="text-[11px] text-slate-600">👔 Pihak DUDI Ditemui: <b>${m.instruktur}</b></p>
+            <p class="text-xs text-slate-800 dark:text-slate-200 leading-relaxed">${m.catatan}</p>
+          </div>
+          ${m.fotoUrl ? `<button onclick="bukaModalFoto('${m.fotoUrl}', 'Monev ${m.namaDudi} - ${m.namaGuru}')" class="px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs shrink-0 self-start sm:self-center">📸 Lihat Foto</button>` : ''}
+        </div>
+      `).join('');
+    }
+
+    // =========================================================================
+    // CETAK PDF ADMIN DENGAN PENGESAHAN KEPALA SEKOLAH
+    // =========================================================================
+    function bukaModalCetakAdmin(tipe) {
+      pendingTipeCetakAdmin = tipe;
+      document.getElementById('inputAdminNamaKepsek').value = currentUser.user.kepsek?.nama || 'Drs. H. Aris Sutrisno, M.Pd.';
+      document.getElementById('inputAdminNipKepsek').value = currentUser.user.kepsek?.nip || '';
+      document.getElementById('modalCetakAdmin').classList.remove('hidden');
+    }
+
+    function tutupModalCetakAdmin() {
+      document.getElementById('modalCetakAdmin').classList.add('hidden');
+    }
+
+    function eksekusiCetakPDFAdminFinal() {
+      currentUser.user.kepsek = {
+        nama: document.getElementById('inputAdminNamaKepsek').value.trim() || 'Kepala SMK Negeri 1 Klaten',
+        nip: document.getElementById('inputAdminNipKepsek').value.trim()
+      };
+      localStorage.setItem('pkl_user', JSON.stringify(currentUser));
+      tutupModalCetakAdmin();
+
+      if (pendingTipeCetakAdmin === 'REKAP_KELAS') cetakPDFRekapKelasAdmin();
+      else if (pendingTipeCetakAdmin === 'MONEV_GLOBAL') cetakPDFMonevGlobalAdmin();
+    }
+
+    function buatKopSuratAdminHTML() {
+      const resolvedImgUrl = new URL(KOP_ADMIN_FILE, window.location.href).href;
+      return `
+        <div style="width:100%; margin-bottom:12px; text-align:center;">
+          <img id="imgKopCetak" src="${resolvedImgUrl}" style="width:100%; max-height:140px; object-fit:contain; display:block; margin:0 auto;" onerror="this.style.display='none';">
+        </div>
+      `;
+    }
+
+    function buatTandaTanganKepsekDanPokjaHTML() {
+      const tglCetak = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+      const namaKepsek = currentUser.user.kepsek?.nama || '....................................';
+      const nipKepsekHtml = currentUser.user.kepsek?.nip ? `<br>NIP. ${currentUser.user.kepsek.nip}` : '';
+
+      return `
+        <div style="page-break-inside:avoid; break-inside:avoid; margin-top:22px;">
+          <table style="width:100%; border:none; border-collapse:collapse; font-size:11px; page-break-inside:avoid;">
+            <tr style="border:none;">
+              <td style="border:none; width:50%; text-align:center; vertical-align:top;">
+                Mengetahui,<br>Kepala SMK Negeri 1 Klaten<br><br><br><br>
+                <b><u>${namaKepsek}</u></b>${nipKepsekHtml}
+              </td>
+              <td style="border:none; width:50%; text-align:center; vertical-align:top;">
+                Klaten, ${tglCetak}<br>Koordinator Pokja PKL,<br><br><br><br>
+                <b><u>${currentUser.user.nama}</u></b>
+              </td>
+            </tr>
+          </table>
+        </div>
+      `;
+    }
+
+    function bukaJendelaCetakAdmin(htmlContent) {
+      const w = window.open('', '_blank');
+      if (!w) return alert('Izinkan pop-up pada browser untuk mencetak PDF.');
+      w.document.write(htmlContent);
+      w.document.close();
+
+      const imgKop = w.document.getElementById('imgKopCetak');
+      let printed = false;
+      const runPrint = () => {
+        if (printed) return;
+        printed = true;
+        setTimeout(() => { w.focus(); w.print(); }, 300);
+      };
+      if (imgKop && !imgKop.complete) {
+        imgKop.addEventListener('load', runPrint);
+        imgKop.addEventListener('error', runPrint);
+        setTimeout(runPrint, 1500);
+      } else runPrint();
+    }
+
+    function cetakPDFRekapKelasAdmin() {
+      const kelas = document.getElementById('selectRekapKelasAdmin').value;
+      const bulan = document.getElementById('inputBulanRekapKelasAdmin').value;
+      const html = `
+        <html><head><title>Rekap Presensi PKL Kelas ${kelas} - ${bulan}</title>
+        <style>
+          @page { size: A4 portrait; margin: 14mm 15mm; }
+          body { font-family: Arial, sans-serif; color: #111; font-size: 11px; margin: 0; }
+          .judul { text-align: center; font-weight: bold; font-size: 13px; margin: 8px 0 12px; text-decoration: underline; }
+          table.data { width: 100%; border-collapse: collapse; font-size: 10.5px; margin-top: 8px; }
+          table.data tr { page-break-inside: avoid; }
+          table.data th, table.data td { border: 1px solid #222; padding: 6px; text-align: center; }
+          table.data th { background: #e2e8f0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        </style></head><body>
+          ${buatKopSuratAdminHTML()}
+          <div class="judul">REKAPITULASI PRESENSI BULANAN PKL KELAS ${kelas} (PERIODE: ${bulan})</div>
+          <table class="data">
+            <thead>
+              <tr><th>No</th><th>NIS</th><th>Nama Siswa</th><th>Tempat PKL (DUDI)</th><th>Guru Pembimbing</th><th>Hadir</th><th>DL</th><th>Ijin</th><th>Sakit</th><th>Libur</th></tr>
+            </thead>
+            <tbody>
+              ${cacheRekapBulananKelas.map((r, i) => `
+                <tr>
+                  <td>${i + 1}</td><td>${r.nis}</td><td style="text-align:left;">${r.nama}</td><td style="text-align:left;">${r.dudi}</td><td style="text-align:left;">${r.namaGuru}</td>
+                  <td>${r.hadir}</td><td>${r.dl}</td><td>${r.ijin}</td><td>${r.sakit}</td><td>${r.libur}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          ${buatTandaTanganKepsekDanPokjaHTML()}
+        </body></html>
+      `;
+      bukaJendelaCetakAdmin(html);
+    }
+
+    function cetakPDFMonevGlobalAdmin() {
+      const html = `
+        <html><head><title>Rekap Kunjungan Monitoring DUDI</title>
+        <style>
+          @page { size: A4 portrait; margin: 14mm 15mm; }
+          body { font-family: Arial, sans-serif; color: #111; font-size: 11px; margin: 0; }
+          .judul { text-align: center; font-weight: bold; font-size: 13px; margin: 8px 0 12px; text-decoration: underline; }
+          table.data { width: 100%; border-collapse: collapse; font-size: 10.5px; margin-top: 8px; }
+          table.data tr { page-break-inside: avoid; }
+          table.data th, table.data td { border: 1px solid #222; padding: 6px; text-align: left; }
+          table.data th { background: #e2e8f0; text-align: center; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        </style></head><body>
+          ${buatKopSuratAdminHTML()}
+          <div class="judul">LAPORAN REKAPITULASI KUNJUNGAN MONITORING DUDI (PKL)</div>
+          <table class="data">
+            <thead>
+              <tr><th style="width:30px;">No</th><th style="width:80px;">Tanggal</th><th style="width:130px;">Guru Pembimbing</th><th style="width:130px;">Tempat DUDI</th><th style="width:110px;">Pihak Ditemui</th><th>Catatan Monitoring</th></tr>
+            </thead>
+            <tbody>
+              ${listMonevGlobal.map((m, i) => `
+                <tr>
+                  <td style="text-align:center;">${i + 1}</td><td style="text-align:center;">${m.tanggal}</td><td>${m.namaGuru}</td><td><b>${m.namaDudi}</b></td><td>${m.instruktur}</td><td>${m.catatan}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          ${buatTandaTanganKepsekDanPokjaHTML()}
+        </body></html>
+      `;
+      bukaJendelaCetakAdmin(html);
     }
 
     function logout() {
