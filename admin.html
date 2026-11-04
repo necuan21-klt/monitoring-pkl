@@ -177,7 +177,7 @@
           </div>
         </div>
 
-        <!-- Bagian B: Edit Langsung Kontak WA & Alamat (Tanpa Perlu Siswa Mengulang) -->
+        <!-- Bagian B: Edit Langsung Kontak WA & Alamat -->
         <div class="bg-slate-50 dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200 space-y-2.5">
           <p class="font-extrabold text-[11px] uppercase tracking-wider text-emerald-600">📱 2. Edit Langsung Nomor WA & Alamat</p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -277,7 +277,7 @@
 
     <div id="sidebarOverlay" onclick="tutupSidebarMobile()" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 hidden md:hidden"></div>
 
-    <!-- SIDEBAR KIRI ADMIN (5 MENU TERPISAH SESUAI POIN 6) -->
+    <!-- SIDEBAR KIRI ADMIN (5 MENU TERPISAH) -->
     <aside id="sidebarMenu" class="fixed md:sticky top-0 left-0 z-50 h-screen w-64 bg-slate-900 text-white flex flex-col justify-between transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shrink-0 shadow-2xl md:shadow-none">
       <div class="overflow-y-auto">
         <div class="p-4 border-b border-slate-800 flex items-center justify-between">
@@ -327,11 +327,11 @@
       </div>
     </aside>
 
-    <!-- AREA KONTEN UTAMA ADMIN -->
-    <div class="flex-1 p-4 md:p-6 max-w-6xl mx-auto w-full">
+    <!-- AREA KONTEN UTAMA ADMIN (DITAMBAH pb-24 AGAR TIDAK TERTUTUP BAR BAWAH) -->
+    <div class="flex-1 p-4 md:p-6 pb-24 max-w-6xl mx-auto w-full">
       <main class="space-y-4">
 
-        <!-- POIN 3: HEADER JUDUL HALAMAN DINAMIS (MENGGANTIKAN TULISAN KOORDINATOR PKL) -->
+        <!-- HEADER JUDUL HALAMAN DINAMIS -->
         <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-900 text-white p-5 rounded-3xl shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <span id="badgeKategoriHalamanAdmin" class="inline-block text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 mb-1">PANEL KENDALI ADMIN</span>
@@ -344,11 +344,11 @@
         </div>
 
         <!-- ========================================================================= -->
-        <!-- TAB 1: PANTAUAN PRESENSI HARIAN, EDIT MANUAL & RESET PRESENSI             -->
+        <!-- TAB 1: PANTAUAN PRESENSI HARIAN, EDIT MANUAL & RESET                      -->
         <!-- ========================================================================= -->
         <section id="tabPantauan" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
           
-          <!-- POIN 4: KARTU STATISTIK BESAR HANYA MUNCUL DI HALAMAN PANTAUAN HARIAN INI -->
+          <!-- KARTU STATISTIK BESAR HANYA DI PANTAUAN HARIAN -->
           <div class="grid grid-cols-3 gap-2.5">
             <button onclick="setFilterPantauanAdmin('SEMUA')" id="btnAdminFilterSEMUA" class="p-3.5 rounded-2xl border-2 text-left transition flex items-center justify-between">
               <div>
@@ -375,7 +375,7 @@
             </button>
           </div>
 
-          <!-- Navigasi Tanggal, Filter Kelas & Pencarian Siswa (Poin 1) -->
+          <!-- Navigasi Tanggal, Filter Kelas & Pencarian -->
           <div class="grid grid-cols-1 md:grid-cols-12 gap-2.5 bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200">
             <div class="md:col-span-4 flex items-center gap-1.5">
               <button onclick="geserTanggalAdmin(-1)" class="px-2.5 py-2 rounded-xl bg-white dark:bg-slate-700 border border-slate-300 font-bold text-xs">◀</button>
@@ -392,7 +392,6 @@
             </div>
           </div>
 
-          <!-- Animasi Loading Pantauan -->
           <div id="loadingBoxPantauanAdmin" class="hidden py-10 text-center space-y-2">
             <svg class="animate-spin h-7 w-7 text-indigo-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -401,7 +400,6 @@
             <p class="text-xs font-bold text-slate-500 animate-pulse">Memuat data presensi harian seluruh siswa...</p>
           </div>
 
-          <!-- Daftar Siswa Harian + Tombol Edit & Reset (Poin 2) -->
           <div id="wadahPantauanHarianAdmin" class="space-y-2.5"></div>
         </section>
 
@@ -409,7 +407,6 @@
         <!-- TAB 2: KELOLA DATA SISWA & BUKA KUNCI PROFIL PARSIAL                      -->
         <!-- ========================================================================= -->
         <section id="tabKelolaSiswa" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-          <!-- Bar Pencarian & Filter Kelas (Poin 1) -->
           <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200">
             <div class="sm:col-span-4">
               <select id="filterKelasKelolaAdmin" onchange="renderTabelKelolaSiswa()" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white text-xs font-bold">
@@ -438,7 +435,7 @@
         </section>
 
         <!-- ========================================================================= -->
-        <!-- TAB 3: REKAPITULASI BULANAN PER KELAS + SEARCH SISWA                      -->
+        <!-- TAB 3: REKAPITULASI BULANAN KELAS (DENGAN KOLOM ALPHA MERAH)              -->
         <!-- ========================================================================= -->
         <section id="tabRekapKelas" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
           <div class="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 p-4 rounded-2xl space-y-3 text-xs">
@@ -486,7 +483,7 @@
                   <th class="p-2.5 border-r border-slate-700 text-center">DL</th>
                   <th class="p-2.5 border-r border-slate-700 text-center">Ijin</th>
                   <th class="p-2.5 border-r border-slate-700 text-center">Sakit</th>
-                  <th class="p-2.5 text-center">Libur</th>
+                  <th class="p-2.5 border-r border-slate-700 text-center bg-rose-900/70">Alpha</th>
                 </tr>
               </thead>
               <tbody id="tbodyRekapKelasAdmin" class="divide-y divide-slate-200 bg-white">
@@ -497,12 +494,11 @@
         </section>
 
         <!-- ========================================================================= -->
-        <!-- TAB 4: KELOLA MASTER DATA PKL (DIPISAH DARI MONEV GURU SESUAI POIN 6)     -->
+        <!-- TAB 4: KELOLA MASTER DATA PKL                                             -->
         <!-- ========================================================================= -->
         <section id="tabMasterData" class="hidden space-y-5">
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 text-xs">
 
-            <!-- Form 1: Tambah Siswa Baru -->
             <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
               <div class="border-b border-slate-100 pb-2.5">
                 <h4 class="font-extrabold text-sm text-indigo-700 dark:text-indigo-400">➕ Tambah Siswa PKL Baru</h4>
@@ -537,7 +533,6 @@
               <button onclick="tambahDataMaster('SISWA')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl shadow">💾 Simpan Siswa Baru</button>
             </div>
 
-            <!-- Form 2: Tambah Guru Pembimbing Baru -->
             <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
               <div class="border-b border-slate-100 pb-2.5">
                 <h4 class="font-extrabold text-sm text-emerald-700 dark:text-emerald-400">➕ Tambah Guru Pembimbing</h4>
@@ -568,7 +563,6 @@
               <button onclick="tambahDataMaster('GURU')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow">💾 Simpan Guru Baru</button>
             </div>
 
-            <!-- Form 3: Tambah DUDI Baru -->
             <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
               <div class="border-b border-slate-100 pb-2.5">
                 <h4 class="font-extrabold text-sm text-amber-700 dark:text-amber-400">➕ Tambah Industri (DUDI)</h4>
@@ -611,7 +605,6 @@
 
           </div>
 
-          <!-- Ringkasan Daftar Master Guru & DUDI Terdaftar -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2.5">
               <h4 class="font-extrabold text-xs uppercase text-slate-500">👨‍🏫 Daftar Master Guru Pembimbing (<span id="countMasterGuru">0</span>)</h4>
@@ -625,7 +618,7 @@
         </section>
 
         <!-- ========================================================================= -->
-        <!-- TAB 5: PANTAUAN KUNJUNGAN MONEV GURU (HALAMAN MANDIRI SESUAI POIN 6)      -->
+        <!-- TAB 5: PANTAUAN KUNJUNGAN MONEV GURU                                      -->
         <!-- ========================================================================= -->
         <section id="tabMonevGuru" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200 text-xs">
@@ -644,12 +637,47 @@
         </section>
 
       </main>
+
+      <!-- NAVIGASI SLIDE KIRI-KANAN MODERN & ELEGAN DI BAGIAN BAWAH (ADMIN) -->
+      <div class="fixed bottom-4 left-1/2 md:left-[calc(50%+8rem)] -translate-x-1/2 z-20 w-[92%] max-w-xs">
+        <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/90 dark:border-slate-700 shadow-xl rounded-full px-2 py-1.5 flex items-center justify-between">
+          <button type="button" onclick="navigasiTabAdminSebelah(-1)" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold text-xs active:scale-90 transition shadow-2xs" title="Halaman Sebelumnya">
+            ◀
+          </button>
+
+          <div class="flex flex-col items-center px-2">
+            <span id="txtNavigasiBawahAdmin" class="text-[11px] font-extrabold text-slate-800 dark:text-white tracking-tight">1/5 • Pantauan Harian</span>
+            <div class="flex items-center gap-1 mt-1" id="dotsNavigasiBawahAdmin">
+              <span class="w-4 h-1.5 rounded-full bg-indigo-600 transition-all"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 transition-all"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 transition-all"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 transition-all"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 transition-all"></span>
+            </div>
+          </div>
+
+          <button type="button" onclick="navigasiTabAdminSebelah(1)" class="w-8 h-8 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center font-bold text-xs active:scale-90 transition shadow-xs" title="Halaman Berikutnya">
+            ▶
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
 
   <script>
     const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwi7JawplrCbbPJSaWfWsBcH_FfmPV4un5lruxssQqiePZ372172qepYIw163X4PKM-aQ/exec';
     const KOP_ADMIN_FILE = 'kop_laporansiswa1.png';
+    const LOGO_FILE = 'logo.png';
+
+    const URUTAN_TAB_ADMIN = ['Pantauan', 'KelolaSiswa', 'RekapKelas', 'MasterData', 'MonevGuru'];
+    const LABEL_TAB_ADMIN = {
+      Pantauan: 'Pantauan Harian',
+      KelolaSiswa: 'Kelola Siswa',
+      RekapKelas: 'Rekap Kelas',
+      MasterData: 'Master Data',
+      MonevGuru: 'Pantauan Monev'
+    };
 
     let currentUser = null;
     let currentTab = 'Pantauan';
@@ -689,6 +717,27 @@
       document.getElementById('globalLoadingOverlay').classList.add('hidden');
     }
 
+    function navigasiTabAdminSebelah(arah) {
+      const idxSekarang = URUTAN_TAB_ADMIN.indexOf(currentTab);
+      const idxBerikut = (idxSekarang + arah + URUTAN_TAB_ADMIN.length) % URUTAN_TAB_ADMIN.length;
+      pilihMenuAdmin(URUTAN_TAB_ADMIN[idxBerikut]);
+    }
+
+    function perbaruiIndikatorSlideAdmin(menuAktif) {
+      const idx = URUTAN_TAB_ADMIN.indexOf(menuAktif);
+      const label = LABEL_TAB_ADMIN[menuAktif] || menuAktif;
+      const elTxt = document.getElementById('txtNavigasiBawahAdmin');
+      const elDots = document.getElementById('dotsNavigasiBawahAdmin');
+      if (elTxt) elTxt.innerText = `${idx + 1}/${URUTAN_TAB_ADMIN.length} • ${label}`;
+      if (elDots) {
+        elDots.innerHTML = URUTAN_TAB_ADMIN.map((m, i) =>
+          i === idx
+            ? `<span class="w-4 h-1.5 rounded-full bg-indigo-600 transition-all"></span>`
+            : `<span onclick="pilihMenuAdmin('${m}')" class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 cursor-pointer transition-all"></span>`
+        ).join('');
+      }
+    }
+
     function toggleSidebar() {
       document.getElementById('sidebarMenu').classList.toggle('-translate-x-full');
       document.getElementById('sidebarOverlay').classList.toggle('hidden');
@@ -712,6 +761,10 @@
         return 'https://drive.google.com/thumbnail?id=' + matchId[0] + '&sz=w600';
       }
       return url;
+    }
+
+    function amankanKutipan(teks) {
+      return String(teks || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
     }
 
     function bukaModalFoto(url, judul) {
@@ -812,7 +865,6 @@
       muatDataGlobalAdmin(true);
     }
 
-    // POIN 3 & 6: NAVIGASI 5 MENU DENGAN JUDUL HALAMAN DINAMIS
     function pilihMenuAdmin(menu, pushHistory = true) {
       tutupSidebarMobile();
       if (pushHistory && currentTab !== menu) {
@@ -820,13 +872,15 @@
       }
       currentTab = menu;
 
-      ['Pantauan', 'KelolaSiswa', 'RekapKelas', 'MasterData', 'MonevGuru'].forEach(m => {
+      URUTAN_TAB_ADMIN.forEach(m => {
         document.getElementById('tab' + m).classList.add('hidden');
         document.getElementById('btnMenuAdmin' + m).className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 transition';
       });
 
       document.getElementById('tab' + menu).classList.remove('hidden');
       document.getElementById('btnMenuAdmin' + menu).className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-indigo-600 text-white transition shadow';
+
+      perbaruiIndikatorSlideAdmin(menu);
 
       const judulEl = document.getElementById('txtJudulHalamanAdmin');
       const subEl = document.getElementById('txtSubJudulHalamanAdmin');
@@ -905,7 +959,6 @@
     }
 
     function isiSemuaDropdownMasterAdmin() {
-      // Ambil daftar kelas unik dari siswa
       const kelasSet = new Set(['XII DKV 1', 'XII DKV 2', 'XII DKV 3']);
       rekapSiswaGlobal.forEach(s => { if (s.kelas) kelasSet.add(s.kelas); });
       const kelasArr = Array.from(kelasSet).sort();
@@ -927,7 +980,6 @@
       selRekapKelas.innerHTML = kelasArr.map(k => `<option value="${k}">${k}</option>`).join('');
       selRekapKelas.value = valRK;
 
-      // Isi dropdown DUDI & Guru
       const opsiDudiHtml = masterDudiGlobal.map(d => `<option value="${d.id}">${d.nama} (${d.id})</option>`).join('');
       const opsiGuruHtml = masterGuruGlobal.map(g => `<option value="${g.id}">${g.nama} (${g.id})</option>`).join('');
 
@@ -1032,7 +1084,7 @@
           else badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800">${s.status.toUpperCase()}</span>`;
         }
 
-        const safeNama = s.nama.replace(/'/g, "\\'");
+        const safeNama = amankanKutipan(s.nama);
 
         return `
           <div class="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex flex-col lg:flex-row lg:items-center justify-between gap-3 shadow-2xs">
@@ -1050,7 +1102,6 @@
             </div>
 
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
-              <!-- Info Jam Masuk & Pulang Vertikal -->
               <div class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-[11px] min-w-[185px] space-y-0.5">
                 <div class="flex justify-between gap-2">
                   <span class="text-slate-500 font-semibold">🟢 Masuk:</span>
@@ -1062,7 +1113,6 @@
                 </div>
               </div>
 
-              <!-- Tombol Aksi: Foto, Edit Manual (Poin 2), Reset -->
               <div class="flex items-center gap-1.5 justify-end">
                 ${s.fotoUrl ? `<button onclick="bukaModalFoto('${s.fotoUrl}', 'Foto Presensi - ${safeNama}')" class="px-2.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs" title="Lihat Foto">📸</button>` : ''}
                 <button onclick="bukaModalEditPresensi('${s.nis}', '${safeNama}', '${tglAktif}', '${s.status}', '${s.jamMasuk}', '${s.jamPulang}')" class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow flex items-center gap-1">
@@ -1080,7 +1130,6 @@
       }).join('');
     }
 
-    // POIN 2: LOGIKA MODAL EDIT / INPUT PRESENSI MANUAL OLEH ADMIN
     function bukaModalEditPresensi(nis, nama, tanggal, statusSekarang, jamMasuk, jamPulang) {
       document.getElementById('editPresensiNis').value = nis;
       document.getElementById('editPresensiNama').value = nama;
@@ -1153,7 +1202,7 @@
     }
 
     // =========================================================================
-    // TAB 2 & POIN 5: KELOLA SISWA & BUKA KUNCI PROFIL PARSIAL (GABUNGAN)
+    // TAB 2 & POIN 5: KELOLA SISWA & BUKA KUNCI PROFIL PARSIAL
     // =========================================================================
     function renderTabelKelolaSiswa() {
       const tbody = document.getElementById('tbodyKelolaSiswaAdmin');
@@ -1274,7 +1323,7 @@
     }
 
     // =========================================================================
-    // TAB 3: REKAP BULANAN KELAS + SEARCH SISWA + CETAK PDF
+    // TAB 3: REKAP BULANAN KELAS (DENGAN KOLOM ALPHA MERAH)
     // =========================================================================
     async function muatRekapBulananKelas() {
       const kelas = document.getElementById('selectRekapKelasAdmin').value || 'XII DKV 1';
@@ -1333,8 +1382,8 @@
           <td class="p-2.5 border-r border-slate-100 text-center font-bold text-emerald-700">${r.hadir}</td>
           <td class="p-2.5 border-r border-slate-100 text-center font-bold text-purple-700">${r.dl}</td>
           <td class="p-2.5 border-r border-slate-100 text-center font-bold text-amber-700">${r.ijin}</td>
-          <td class="p-2.5 border-r border-slate-100 text-center font-bold text-rose-700">${r.sakit}</td>
-          <td class="p-2.5 text-center font-bold text-sky-700">${r.libur}</td>
+          <td class="p-2.5 border-r border-slate-100 text-center font-bold text-sky-700">${r.sakit}</td>
+          <td class="p-2.5 text-center font-extrabold text-rose-700 bg-rose-50/70">${r.alpha !== undefined ? r.alpha : (r.libur || 0)}</td>
         </tr>
       `).join('');
     }
@@ -1410,7 +1459,7 @@
     }
 
     // =========================================================================
-    // TAB 5: PANTAUAN KUNJUNGAN MONEV GURU (HALAMAN MANDIRI)
+    // TAB 5: PANTAUAN KUNJUNGAN MONEV GURU
     // =========================================================================
     function renderPantauanMonevAdmin() {
       const wadah = document.getElementById('wadahPantauanMonevAdmin');
@@ -1431,20 +1480,23 @@
         return;
       }
 
-      wadah.innerHTML = hasil.map(m => `
-        <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-          <div class="space-y-1">
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="font-extrabold text-sm text-indigo-700 dark:text-indigo-400">🏢 ${m.namaDudi}</span>
-              <span class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 font-bold text-[10px]">📅 ${m.tanggal}</span>
-              <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-[10px]">👨‍🏫 ${m.namaGuru}</span>
+      wadah.innerHTML = hasil.map(m => {
+        const dudiAman = amankanKutipan(m.namaDudi);
+        return `
+          <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div class="space-y-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="font-extrabold text-sm text-indigo-700 dark:text-indigo-400">🏢 ${m.namaDudi}</span>
+                <span class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 font-bold text-[10px]">📅 ${m.tanggal}</span>
+                <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-[10px]">👨‍🏫 ${m.namaGuru}</span>
+              </div>
+              <p class="text-[11px] text-slate-600">👔 Pihak DUDI Ditemui: <b>${m.instruktur}</b></p>
+              <p class="text-xs text-slate-800 dark:text-slate-200 leading-relaxed">${m.catatan}</p>
             </div>
-            <p class="text-[11px] text-slate-600">👔 Pihak DUDI Ditemui: <b>${m.instruktur}</b></p>
-            <p class="text-xs text-slate-800 dark:text-slate-200 leading-relaxed">${m.catatan}</p>
+            ${m.fotoUrl ? `<button onclick="bukaModalFoto('${m.fotoUrl}', 'Monev ${dudiAman} - ${m.namaGuru}')" class="px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs shrink-0 self-start sm:self-center">📸 Lihat Foto</button>` : ''}
           </div>
-          ${m.fotoUrl ? `<button onclick="bukaModalFoto('${m.fotoUrl}', 'Monev ${m.namaDudi} - ${m.namaGuru}')" class="px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs shrink-0 self-start sm:self-center">📸 Lihat Foto</button>` : ''}
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     // =========================================================================
@@ -1475,9 +1527,28 @@
 
     function buatKopSuratAdminHTML() {
       const resolvedImgUrl = new URL(KOP_ADMIN_FILE, window.location.href).href;
+      const resolvedLogoUrl = new URL(LOGO_FILE, window.location.href).href;
       return `
-        <div style="width:100%; margin-bottom:12px; text-align:center;">
-          <img id="imgKopCetak" src="${resolvedImgUrl}" style="width:100%; max-height:140px; object-fit:contain; display:block; margin:0 auto;" onerror="this.style.display='none';">
+        <div style="width:100%; margin-bottom:14px; text-align:center;">
+          <img id="imgKopCetak" src="${resolvedImgUrl}" style="width:100%; max-height:145px; object-fit:contain; display:block; margin:0 auto;"
+               onerror="this.style.display='none'; document.getElementById('fallbackKopTeks').style.display='table';">
+          <table id="fallbackKopTeks" style="display:none; width:100%; border-collapse:collapse; border:none; border-bottom:3px double #000; padding-bottom:8px;">
+            <tr style="border:none;">
+              <td style="border:none; width:75px; text-align:center; vertical-align:middle;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Pemerintah_Provinsi_Jawa_Tengah.png/300px-Pemerintah_Provinsi_Jawa_Tengah.png" style="width:65px; height:auto;">
+              </td>
+              <td style="border:none; text-align:center; vertical-align:middle; font-family:'Times New Roman', Times, serif; line-height:1.25;">
+                <div style="font-size:14px;">PEMERINTAH PROVINSI JAWA TENGAH</div>
+                <div style="font-size:15px; font-weight:bold;">DINAS PENDIDIKAN</div>
+                <div style="font-size:16px; font-weight:bold;">SEKOLAH MENENGAH KEJURUAN NEGERI 1 KLATEN</div>
+                <div style="font-size:11px;">Jalan dr. Wahidin Sudiro Husodo Nomor 22, Klaten, Jawa Tengah, Kode Pos 57432</div>
+                <div style="font-size:11px;">Telepon 0272-321266 • Laman www.smkn1klaten.sch.id, Pos-el smkn20309691@gmail.com</div>
+              </td>
+              <td style="border:none; width:75px; text-align:center; vertical-align:middle;">
+                <img src="${resolvedLogoUrl}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135755.png'" style="width:65px; height:auto;">
+              </td>
+            </tr>
+          </table>
         </div>
       `;
     }
@@ -1543,13 +1614,13 @@
           <div class="judul">REKAPITULASI PRESENSI BULANAN PKL KELAS ${kelas} (PERIODE: ${bulan})</div>
           <table class="data">
             <thead>
-              <tr><th>No</th><th>NIS</th><th>Nama Siswa</th><th>Tempat PKL (DUDI)</th><th>Guru Pembimbing</th><th>Hadir</th><th>DL</th><th>Ijin</th><th>Sakit</th><th>Libur</th></tr>
+              <tr><th>No</th><th>NIS</th><th>Nama Siswa</th><th>Tempat PKL (DUDI)</th><th>Guru Pembimbing</th><th>Hadir</th><th>DL</th><th>Ijin</th><th>Sakit</th><th>Alpha</th></tr>
             </thead>
             <tbody>
               ${cacheRekapBulananKelas.map((r, i) => `
                 <tr>
                   <td>${i + 1}</td><td>${r.nis}</td><td style="text-align:left;">${r.nama}</td><td style="text-align:left;">${r.dudi}</td><td style="text-align:left;">${r.namaGuru}</td>
-                  <td>${r.hadir}</td><td>${r.dl}</td><td>${r.ijin}</td><td>${r.sakit}</td><td>${r.libur}</td>
+                  <td>${r.hadir}</td><td>${r.dl}</td><td>${r.ijin}</td><td>${r.sakit}</td><td><b>${r.alpha !== undefined ? r.alpha : (r.libur || 0)}</b></td>
                 </tr>
               `).join('')}
             </tbody>
