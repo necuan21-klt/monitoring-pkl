@@ -22,12 +22,10 @@
       to { opacity: 1; transform: translateY(0); }
     }
     .animate-login-card {
-      animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
-    body {
-      overflow: hidden;
-      height: 100dvh;
-      touch-action: none;
+    body, div, main, input, button {
+      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
     }
     html.dark body { background-color: #0f172a; color: #f1f5f9; }
     html.dark .bg-white { background-color: #1e293b !important; color: #f1f5f9; }
@@ -41,15 +39,17 @@
     }
   </style>
 </head>
-<body class="bg-slate-100 font-sans text-slate-800">
+<body class="bg-slate-100 font-sans text-slate-800 min-h-[100dvh] overflow-x-hidden overflow-y-auto">
 
-  <main class="w-full h-[100dvh] flex items-center justify-center p-5 bg-gradient-to-br from-slate-100 via-indigo-50/50 to-blue-100/60 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950 select-none relative">
+  <main class="w-full min-h-[100dvh] flex flex-col items-center justify-center p-5 py-14 bg-gradient-to-br from-slate-100 via-indigo-50/50 to-blue-100/60 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950 select-none relative">
     
-    <button onclick="toggleDarkMode()" class="absolute top-5 right-5 p-2.5 rounded-2xl bg-white dark:bg-slate-800 shadow-md border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-1.5">
+    <!-- TOMBOL MODE GELAP / TERANG -->
+    <button type="button" onclick="toggleDarkMode()" class="fixed top-4 right-4 z-20 p-2.5 rounded-2xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-xs shadow-md border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-1.5 active:scale-95 transition">
       <span id="iconDarkLogin">🌙</span> <span id="txtDarkLogin" class="text-slate-700 dark:text-slate-200">Mode Gelap</span>
     </button>
 
-    <div class="w-full max-w-sm bg-white p-6 rounded-3xl shadow-xl border border-slate-200/80 animate-login-card">
+    <!-- KARTU LOGIN UTAMA -->
+    <div class="w-full max-w-sm bg-white p-6 rounded-3xl shadow-xl border border-slate-200/80 animate-login-card my-auto">
       <div class="text-center mb-5">
         <img src="logo.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135755.png'" alt="Logo Sekolah" class="w-20 h-20 mx-auto mb-2.5 object-contain drop-shadow-md">
         <h1 class="text-lg font-extrabold text-slate-800 tracking-tight">SMK NEGERI 1 KLATEN</h1>
@@ -57,19 +57,25 @@
         <p class="text-[11px] text-slate-400 mt-1">Portal Presensi, Jurnal & Monitoring PKL</p>
       </div>
 
-      <form onsubmit=" event.preventDefault(); prosesLogin(); " class="space-y-3.5">
+      <!-- BANNER NOTIFIKASI ERROR / STATUS INLINE -->
+      <div id="boxAlertLogin" class="hidden mb-3.5 p-3 rounded-xl text-xs font-semibold border flex items-start gap-2 leading-relaxed">
+        <span id="iconAlertLogin" class="shrink-0">⚠️</span>
+        <span id="txtAlertLogin" class="flex-1">-</span>
+      </div>
+
+      <form onsubmit="event.preventDefault(); prosesLogin();" class="space-y-3.5">
         <div>
-          <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1">ID Pengguna(NIS/ID GURU)</label>
-          <input type="text" id="inputNis" autocomplete="off" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition">
+          <label for="inputNis" class="block text-[11px] font-bold uppercase text-slate-600 mb-1">ID Pengguna (NIS / ID Guru)</label>
+          <input type="text" id="inputNis" autocomplete="username" oninput="sembunyikanAlert()" placeholder="Masukkan NIS atau ID Guru" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition">
         </div>
         <div>
-          <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1">PIN Keamanan</label>
+          <label for="inputPin" class="block text-[11px] font-bold uppercase text-slate-600 mb-1">PIN Keamanan</label>
           <div class="relative">
-            <input type="password" id="inputPin" autocomplete="off" class="w-full px-4 py-2.5 pr-11 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition">
+            <input type="password" id="inputPin" autocomplete="current-password" oninput="sembunyikanAlert()" placeholder="Masukkan PIN Anda" class="w-full px-4 py-2.5 pr-11 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition">
             <button type="button" onclick="toggleShowPin('inputPin', 'btnEyeLogin')" id="btnEyeLogin" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-indigo-600 text-sm px-1" title="Lihat / Sembunyikan PIN">👁️</button>
           </div>
         </div>
-        <button type="submit" id="btnLogin" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-200/50 transition flex items-center justify-center gap-2">
+        <button type="submit" id="btnLogin" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-200/50 dark:shadow-none transition flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
           <span id="txtBtnLogin">Masuk Aplikasi</span>
           <svg id="spinnerLogin" class="hidden animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -103,8 +109,7 @@
     function toggleDarkMode() {
       const isDark = document.documentElement.classList.toggle('dark');
       localStorage.setItem('pkl_theme', isDark ? 'dark' : 'light');
-      document.getElementById('iconDarkLogin').innerText = isDark ? '☀️' : '🌙';
-      document.getElementById('txtDarkLogin').innerText = isDark ? 'Mode Terang' : 'Mode Gelap';
+      terapkanTemaAwal();
     }
 
     terapkanTemaAwal();
@@ -118,6 +123,30 @@
       } else {
         el.type = 'password';
         btn.innerText = '👁️';
+      }
+    }
+
+    function tampilkanAlert(pesan, tipe = 'error') {
+      const box = document.getElementById('boxAlertLogin');
+      const icon = document.getElementById('iconAlertLogin');
+      const txt = document.getElementById('txtAlertLogin');
+
+      box.classList.remove('hidden');
+      txt.innerText = pesan;
+
+      if (tipe === 'success') {
+        icon.innerText = '✅';
+        box.className = 'mb-3.5 p-3 rounded-xl text-xs font-semibold border flex items-start gap-2 leading-relaxed bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800';
+      } else {
+        icon.innerText = '⚠️';
+        box.className = 'mb-3.5 p-3 rounded-xl text-xs font-semibold border flex items-start gap-2 leading-relaxed bg-rose-50 dark:bg-rose-950/50 text-rose-800 dark:text-rose-300 border-rose-200 dark:border-rose-800';
+      }
+    }
+
+    function sembunyikanAlert() {
+      const box = document.getElementById('boxAlertLogin');
+      if (box && !box.classList.contains('hidden')) {
+        box.classList.add('hidden');
       }
     }
 
@@ -135,6 +164,7 @@
         if (lastActive && (Date.now() - lastActive > INACTIVITY_LIMIT_MS)) {
           localStorage.removeItem('pkl_user');
           localStorage.removeItem('pkl_last_active');
+          tampilkanAlert('Sesi Anda sebelumnya telah berakhir. Silakan masuk kembali.');
         } else {
           try {
             const parsed = JSON.parse(savedUser);
@@ -149,9 +179,14 @@
     });
 
     async function prosesLogin() {
+      sembunyikanAlert();
       const nis = document.getElementById('inputNis').value.trim();
       const pin = document.getElementById('inputPin').value.trim();
-      if (!nis || !pin) return alert('Masukkan ID Pengguna dan PIN Keamanan terlebih dahulu!');
+      
+      if (!nis || !pin) {
+        tampilkanAlert('Masukkan ID Pengguna dan PIN Keamanan terlebih dahulu!');
+        return;
+      }
 
       const btn = document.getElementById('btnLogin');
       const txtBtn = document.getElementById('txtBtnLogin');
@@ -160,6 +195,8 @@
       btn.disabled = true;
       txtBtn.innerText = 'Memverifikasi...';
       spinner.classList.remove('hidden');
+
+      let loginSukses = false;
 
       try {
         const res = await fetch(GAS_API_URL, {
@@ -170,18 +207,24 @@
         const result = await res.json();
 
         if (result.status === 'success') {
+          loginSukses = true;
+          txtBtn.innerText = 'Mengalihkan...';
+          tampilkanAlert('Login berhasil! Membuka halaman dashboard...', 'success');
           localStorage.setItem('pkl_user', JSON.stringify(result));
           localStorage.setItem('pkl_last_active', Date.now().toString());
           arahkanSesuaiRole(result.role);
         } else {
-          alert(result.message);
+          tampilkanAlert(result.message || 'ID Pengguna atau PIN tidak sesuai.');
         }
       } catch (e) {
-        alert('Gagal terhubung ke server. Pastikan koneksi internet stabil.');
+        tampilkanAlert('Gagal terhubung ke server. Pastikan koneksi internet stabil.');
       } finally {
-        btn.disabled = false;
-        txtBtn.innerText = 'Masuk Aplikasi';
-        spinner.classList.add('hidden');
+        // Hanya aktifkan tombol kembali jika login gagal
+        if (!loginSukses) {
+          btn.disabled = false;
+          txtBtn.innerText = 'Masuk Aplikasi';
+          spinner.classList.add('hidden');
+        }
       }
     }
   </script>
