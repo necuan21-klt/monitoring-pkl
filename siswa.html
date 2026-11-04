@@ -171,7 +171,7 @@
     </aside>
 
     <!-- AREA KONTEN UTAMA SISWA -->
-    <div class="flex-1 p-4 md:p-6 max-w-5xl mx-auto w-full">
+    <div class="flex-1 p-4 md:p-6 pb-24 max-w-5xl mx-auto w-full">
       <main class="space-y-4">
 
         <!-- BANNER SAMBUTAN EKSKLUSIF DI HALAMAN PROFIL (3 BARIS BERTINGKAT) -->
@@ -293,7 +293,7 @@
           </div>
         </section>
 
-        <!-- TAB 1: PRESENSI KEHADIRAN -->
+        <!-- TAB 1: PRESENSI KEHADIRAN (STATUS & SESI PRESENSI DI ATAS LAYAR KAMERA) -->
         <section id="tabAbsen" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
           <div class="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 p-3.5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
             <div>
@@ -310,6 +310,28 @@
             <span id="badgeStatusAbsen" class="px-2 py-1 bg-amber-200 text-amber-900 rounded font-bold text-[10px] shrink-0">CEK</span>
           </div>
 
+          <!-- PILIHAN STATUS PRESENSI & SESI PRESENSI (DILETAKKAN DI ATAS LAYAR FOTO) -->
+          <div class="grid grid-cols-2 gap-3 bg-slate-50 dark:bg-slate-800/70 p-3.5 rounded-2xl border border-slate-200">
+            <div>
+              <label class="block text-xs font-extrabold text-slate-700 dark:text-slate-200 mb-1">📋 Status Presensi</label>
+              <select id="selStatusHadir" onchange="handleStatusChange()" class="w-full p-2.5 text-xs sm:text-sm font-semibold rounded-xl border border-slate-300 bg-white">
+                <option value="Hadir">Hadir (Di DUDI)</option>
+                <option value="Dinas Luar">Dinas Luar (DL)</option>
+                <option value="Ijin">Ijin</option>
+                <option value="Sakit">Sakit</option>
+                <option value="Libur">Libur</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-extrabold text-slate-700 dark:text-slate-200 mb-1">🕒 Sesi Presensi</label>
+              <select id="selJenisAbsen" class="w-full p-2.5 text-xs sm:text-sm font-semibold rounded-xl border border-slate-300 bg-white">
+                <option value="Masuk">Absen Masuk (Pagi)</option>
+                <option value="Pulang">Absen Pulang (Sore)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- LAYAR KAMERA BUKTI KEHADIRAN -->
           <div id="boxKameraPresensi" class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
             <div class="flex justify-between items-center mb-2.5">
               <div>
@@ -351,27 +373,7 @@
           </div>
 
           <div id="boxInfoLibur" class="hidden bg-sky-50 dark:bg-slate-800 border border-sky-200 p-3.5 rounded-2xl text-xs text-sky-900 dark:text-sky-300 font-medium">
-            ℹ️ <b>Status Libur:</b> Tidak memerlukan foto bukti kehadiran. Silakan langsung klik tombol Kirim Presensi.
-          </div>
-
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">Status Presensi</label>
-              <select id="selStatusHadir" onchange="handleStatusChange()" class="w-full p-2.5 text-sm rounded-xl border border-slate-300 bg-white">
-                <option value="Hadir">Hadir (Di DUDI)</option>
-                <option value="Dinas Luar">Dinas Luar (DL)</option>
-                <option value="Ijin">Ijin</option>
-                <option value="Sakit">Sakit</option>
-                <option value="Libur">Libur</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">Sesi Presensi</label>
-              <select id="selJenisAbsen" class="w-full p-2.5 text-sm rounded-xl border border-slate-300 bg-white">
-                <option value="Masuk">Absen Masuk (Pagi)</option>
-                <option value="Pulang">Absen Pulang (Sore)</option>
-              </select>
-            </div>
+            ℹ️ <b>Status Libur:</b> Tidak memerlukan foto bukti kehadiran. Silakan langsung klik tombol Kirim Presensi di bawah.
           </div>
 
           <button onclick="kirimAbsensi()" id="btnSubmitAbsen" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl shadow-md transition opacity-50 cursor-not-allowed flex items-center justify-center gap-2" disabled>
@@ -450,7 +452,7 @@
           </div>
         </section>
 
-        <!-- TAB 3: REKAP PRESENSI BULANAN -->
+        <!-- TAB 3: REKAP PRESENSI BULANAN (KOTAK ALPHA MERAH MENGGANTIKAN LIBUR) -->
         <section id="tabRekap" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
           <div class="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 p-3.5 rounded-2xl space-y-3">
             <div class="flex justify-between items-center">
@@ -471,13 +473,14 @@
                 <p class="text-[9px] font-bold text-amber-800 uppercase">Ijin</p>
                 <p id="statIjinBulan" class="text-base font-extrabold text-amber-900">0</p>
               </div>
-              <div class="bg-rose-100 p-2 rounded-xl border border-rose-200">
-                <p class="text-[9px] font-bold text-rose-800 uppercase">Sakit</p>
-                <p id="statSakitBulan" class="text-base font-extrabold text-rose-900">0</p>
-              </div>
               <div class="bg-sky-100 p-2 rounded-xl border border-sky-200">
-                <p class="text-[9px] font-bold text-sky-800 uppercase">Libur</p>
-                <p id="statLiburBulan" class="text-base font-extrabold text-sky-900">0</p>
+                <p class="text-[9px] font-bold text-sky-800 uppercase">Sakit</p>
+                <p id="statSakitBulan" class="text-base font-extrabold text-sky-900">0</p>
+              </div>
+              <!-- Kotak Alpha dengan Background Merah Tegas -->
+              <div class="bg-rose-100 p-2 rounded-xl border border-rose-300">
+                <p class="text-[9px] font-extrabold text-rose-800 uppercase">Alpha</p>
+                <p id="statAlphaBulan" class="text-base font-extrabold text-rose-900">0</p>
               </div>
             </div>
 
@@ -538,6 +541,31 @@
         </section>
 
       </main>
+
+      <!-- NAVIGASI SLIDE KIRI-KANAN MODERN & ELEGAN DI BAGIAN BAWAH -->
+      <div class="fixed bottom-4 left-1/2 md:left-[calc(50%+8rem)] -translate-x-1/2 z-20 w-[92%] max-w-xs">
+        <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/90 dark:border-slate-700 shadow-xl rounded-full px-2 py-1.5 flex items-center justify-between">
+          <button onclick="geserHalamanSiswa(-1)" id="btnSlidePrev" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold text-xs active:scale-90 transition shadow-2xs" title="Halaman Sebelumnya">
+            ◀
+          </button>
+
+          <div class="flex flex-col items-center px-2">
+            <span id="txtNavigasiBawahJudul" class="text-[11px] font-extrabold text-slate-800 dark:text-white tracking-tight">1/5 • Profil Siswa</span>
+            <div class="flex items-center gap-1 mt-1" id="dotsNavigasiBawah">
+              <span class="w-4 h-1.5 rounded-full bg-indigo-600 transition-all"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 transition-all"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 transition-all"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 transition-all"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 transition-all"></span>
+            </div>
+          </div>
+
+          <button onclick="geserHalamanSiswa(1)" id="btnSlideNext" class="w-8 h-8 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center font-bold text-xs active:scale-90 transition shadow-xs" title="Halaman Berikutnya">
+            ▶
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -545,6 +573,15 @@
     const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwi7JawplrCbbPJSaWfWsBcH_FfmPV4un5lruxssQqiePZ372172qepYIw163X4PKM-aQ/exec';
     const KOP_SISWA_FILE = 'kop_laporansiswa1.png';
     const LOGO_FILE = 'logo.png';
+
+    const URUTAN_MENU_SISWA = ['Profil', 'Absen', 'Jurnal', 'Rekap', 'RekapJurnal'];
+    const LABEL_MENU_SISWA = {
+      Profil: 'Profil Siswa',
+      Absen: 'Presensi Harian',
+      Jurnal: 'Isi Jurnal',
+      Rekap: 'Rekap Presensi',
+      RekapJurnal: 'Rekap Jurnal'
+    };
 
     let currentUser = null;
     let currentCoords = { lat: 0, lng: 0, jarak: 9999, gpsAktif: false };
@@ -817,6 +854,28 @@
       }
     }
 
+    // ================= FUNGSI SLIDE KANAN-KIRI ANTAR HALAMAN =================
+    function geserHalamanSiswa(arah) {
+      const idxSekarang = URUTAN_MENU_SISWA.indexOf(currentTab);
+      let idxBaru = idxSekarang + arah;
+      if (idxBaru < 0) idxBaru = URUTAN_MENU_SISWA.length - 1;
+      if (idxBaru >= URUTAN_MENU_SISWA.length) idxBaru = 0;
+      pilihMenuSiswa(URUTAN_MENU_SISWA[idxBaru], true);
+    }
+
+    function perbaruiIndikatorSlideBawah(menuAktif) {
+      const idx = URUTAN_MENU_SISWA.indexOf(menuAktif);
+      const label = LABEL_MENU_SISWA[menuAktif] || menuAktif;
+      document.getElementById('txtNavigasiBawahJudul').innerText = `${idx + 1}/${URUTAN_MENU_SISWA.length} • ${label}`;
+
+      const dotsHtml = URUTAN_MENU_SISWA.map((m, i) =>
+        i === idx
+          ? `<span class="w-4 h-1.5 rounded-full bg-indigo-600 transition-all"></span>`
+          : `<span onclick="pilihMenuSiswa('${m}')" class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 cursor-pointer transition-all"></span>`
+      ).join('');
+      document.getElementById('dotsNavigasiBawah').innerHTML = dotsHtml;
+    }
+
     function pilihMenuSiswa(menu, pushHistory = true) {
       if (menu !== 'Absen') matikanKamera();
       tutupSidebarMobile();
@@ -826,13 +885,15 @@
       }
       currentTab = menu;
 
-      ['Profil', 'Absen', 'Jurnal', 'Rekap', 'RekapJurnal'].forEach(m => {
+      URUTAN_MENU_SISWA.forEach(m => {
         document.getElementById('tab' + m).classList.add('hidden');
         document.getElementById('btnMenuSiswa' + m).className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 transition';
       });
 
       document.getElementById('tab' + menu).classList.remove('hidden');
       document.getElementById('btnMenuSiswa' + menu).className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-indigo-600 text-white transition shadow';
+
+      perbaruiIndikatorSlideBawah(menu);
 
       // Pengaturan Tampilan Banner Profil vs Header Judul Tab Lain
       const bannerProfil = document.getElementById('bannerProfilSiswa');
@@ -850,7 +911,7 @@
 
         if (menu === 'Absen') {
           txtJudulUtama.innerText = '📸 Presensi Kehadiran Harian';
-          txtSubJudul.innerText = 'Pastikan GPS aktif dan wajah terlihat jelas pada kamera';
+          txtSubJudul.innerText = 'Pilih status & sesi presensi, lalu ambil foto bukti kehadiran';
           iconTab.innerText = '📍';
         } else if (menu === 'Jurnal') {
           txtJudulUtama.innerText = '📝 Jurnal Kegiatan Harian';
@@ -858,7 +919,7 @@
           iconTab.innerText = '✍️';
         } else if (menu === 'Rekap') {
           txtJudulUtama.innerText = '📅 Rekapitulasi Presensi Bulanan';
-          txtSubJudul.innerText = 'Pantau riwayat kehadiran dan cetak laporan presensi';
+          txtSubJudul.innerText = 'Pantau riwayat kehadiran, alpha, dan cetak laporan presensi';
           iconTab.innerText = '📊';
         } else if (menu === 'RekapJurnal') {
           txtJudulUtama.innerText = '📖 Rekapitulasi Jurnal Bulanan';
@@ -940,7 +1001,6 @@
     function mulaiKamera() {
       hentikanStreamVideo();
       const video = document.getElementById('videoCam');
-      // Meminta sudut tangkapan asli sensor kamera (tanpa paksaan rasio sempit)
       navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: useFrontCamera ? 'user' : 'environment',
@@ -950,7 +1010,6 @@
         audio: false
       }).then(async stream => {
         videoStream = stream;
-        // Pastikan kamera berada di zoom paling lebar (1.0 / minimum) jika didukung perangkat
         try {
           const track = stream.getVideoTracks()[0];
           const caps = track.getCapabilities ? track.getCapabilities() : {};
@@ -1003,7 +1062,6 @@
       const canvas = document.getElementById('canvasCam');
       const preview = document.getElementById('previewFoto');
 
-      // Ambil 100% bingkai asli kamera (Wide / Tidak di-crop) dan Tidak Mirror
       const vw = video.videoWidth || 640;
       const vh = video.videoHeight || 480;
       const maxDim = 640;
@@ -1491,7 +1549,6 @@
       `;
     }
 
-    // Identitas Siswa Sederhana 3 Baris (Tanpa Alamat & Tanpa Guru Pembimbing di Atas)
     function buatIdentitasSiswaCetakHTML() {
       return `
         <table style="border:none; border-collapse:collapse; margin-bottom:12px; font-size:11.5px; line-height:1.5;">
@@ -1568,6 +1625,7 @@
       } else jalankanPrint();
     }
 
+    // ================= REKAP PRESENSI BULANAN DENGAN PERHITUNGAN ALPHA OTOMATIS =================
     async function muatRekapAbsenSiswa() {
       const bulanFilter = document.getElementById('filterBulanSiswa').value;
       if (!bulanFilter) return;
@@ -1580,6 +1638,7 @@
       const year = Number(yearStr), month = Number(monthStr);
       const daysInMonth = new Date(year, month, 0).getDate();
       const namaHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const todayIso = getLocalTodayISO();
 
       const mapTanggal = {};
       riwayatAbsenGlobal.filter(a => a.rawTanggal && a.rawTanggal.startsWith(bulanFilter)).forEach(a => {
@@ -1597,20 +1656,32 @@
         }
       });
 
-      let countHadir = 0, countDL = 0, countIjin = 0, countSakit = 0, countLibur = 0;
+      let countHadir = 0, countDL = 0, countIjin = 0, countSakit = 0, countAlpha = 0;
       cacheKalenderPresensi = [];
 
       for (let d = 1; d <= daysInMonth; d++) {
         const dayStr = String(d).padStart(2, '0');
         const fullIso = `${yearStr}-${monthStr}-${dayStr}`;
-        const hari = namaHari[new Date(year, month - 1, d).getDay()];
-        const rec = mapTanggal[fullIso] || { masuk: '-', pulang: '-', ket: '-' };
+        const dayIndex = new Date(year, month - 1, d).getDay();
+        const hari = namaHari[dayIndex];
+        let rec = mapTanggal[fullIso] ? { ...mapTanggal[fullIso] } : { masuk: '-', pulang: '-', ket: '-' };
+
+        // Jika belum ada presensi pada tanggal tersebut:
+        if (rec.ket === '-') {
+          if (dayIndex === 0) {
+            // Hari Minggu otomatis dikecualikan dari Alpha (dianggap Libur)
+            rec.ket = 'Libur';
+          } else if (fullIso <= todayIso) {
+            // Tanggal sudah lewat atau hari ini (Selain Minggu) dan tidak absen -> Alpha
+            rec.ket = 'Alpha';
+          }
+        }
 
         if (rec.ket === 'Hadir') countHadir++;
         else if (rec.ket === 'Dinas Luar') countDL++;
         else if (rec.ket === 'Ijin') countIjin++;
         else if (rec.ket === 'Sakit') countSakit++;
-        else if (rec.ket === 'Libur') countLibur++;
+        else if (rec.ket === 'Alpha') countAlpha++;
 
         cacheKalenderPresensi.push({ tglFormatted: `${dayStr}/${monthStr}/${yearStr}`, hari, masuk: rec.masuk, pulang: rec.pulang, ket: rec.ket });
       }
@@ -1619,20 +1690,21 @@
       document.getElementById('statDLBulan').innerText = countDL;
       document.getElementById('statIjinBulan').innerText = countIjin;
       document.getElementById('statSakitBulan').innerText = countSakit;
-      document.getElementById('statLiburBulan').innerText = countLibur;
+      document.getElementById('statAlphaBulan').innerText = countAlpha;
 
       tbody.innerHTML = cacheKalenderPresensi.map(row => {
         let badge = 'text-slate-400';
         if (row.ket === 'Hadir') badge = 'text-emerald-700 font-bold bg-emerald-50';
         else if (row.ket === 'Dinas Luar') badge = 'text-purple-700 font-bold bg-purple-50';
         else if (row.ket === 'Ijin') badge = 'text-amber-700 font-bold bg-amber-50';
-        else if (row.ket === 'Sakit') badge = 'text-rose-700 font-bold bg-rose-50';
-        else if (row.ket === 'Libur') badge = 'text-sky-700 font-bold bg-sky-50';
+        else if (row.ket === 'Sakit') badge = 'text-sky-700 font-bold bg-sky-50';
+        else if (row.ket === 'Libur') badge = 'text-slate-500 font-semibold bg-slate-100';
+        else if (row.ket === 'Alpha') badge = 'text-rose-800 font-extrabold bg-rose-100';
 
         return `
           <tr>
             <td class="p-2 border-r border-slate-100 font-medium">${row.tglFormatted}</td>
-            <td class="p-2 border-r border-slate-100">${row.hari}</td>
+            <td class="p-2 border-r border-slate-100 ${row.hari === 'Minggu' ? 'text-rose-500 font-semibold' : ''}">${row.hari}</td>
             <td class="p-2 border-r border-slate-100 text-center">${row.masuk}</td>
             <td class="p-2 border-r border-slate-100 text-center">${row.pulang}</td>
             <td class="p-2 text-center ${badge}">${row.ket}</td>
@@ -1641,7 +1713,6 @@
       }).join('');
     }
 
-    // Cetak Presensi: Tabel Ditinggikan (Padding 7.5px) Agar Sebagian Baris Turun ke Halaman 2 Bersama Tanda Tangan
     function cetakRekapPresensiSiswaPDF() {
       const bulan = document.getElementById('filterBulanSiswa').value;
       const htmlContent = `
