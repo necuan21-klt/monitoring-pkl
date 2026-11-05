@@ -406,9 +406,16 @@
               </div>
             </div>
 
-            <button onclick="kirimLaporanMonev()" id="btnSubmitMonev" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow flex items-center justify-center gap-2">
-              <span id="txtBtnMonev">💾 Simpan Laporan Kunjungan Monev</span>
-            </button>
+            <!-- TOMBOL SIMPAN & TOMBOL CETAK PDF LAPORAN MONEV DI BAWAHNYA -->
+            <div class="space-y-2.5 pt-1">
+              <button onclick="kirimLaporanMonev()" id="btnSubmitMonev" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow flex items-center justify-center gap-2 transition active:scale-[0.99]">
+                <span id="txtBtnMonev">💾 Simpan Laporan Kunjungan Monev</span>
+              </button>
+
+              <button onclick="bukaModalCetakGuru('MONEV')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow flex items-center justify-center gap-2 transition active:scale-[0.99]">
+                <span>🖨️</span> <span>Cetak PDF Laporan Monev DUDI</span>
+              </button>
+            </div>
           </div>
 
           <div class="space-y-2.5">
@@ -440,9 +447,6 @@
               <div class="flex flex-wrap gap-2">
                 <button onclick="bukaModalCetakGuru('PRESENSI_BULANAN')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl shadow flex items-center gap-1.5">
                   <span>🖨️</span> <span>Cetak PDF Rekap Presensi & Jurnal</span>
-                </button>
-                <button onclick="bukaModalCetakGuru('MONEV')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl shadow flex items-center gap-1.5">
-                  <span>🚗</span> <span>Cetak PDF Laporan Monev DUDI</span>
                 </button>
               </div>
             </div>
@@ -1541,7 +1545,7 @@
 
             let hadir = 0, dl = 0, ijin = 0, sakit = 0, alpha = 0;
 
-          for (let d = 1; d <= daysInMonth; d++) {
+            for (let d = 1; d <= daysInMonth; d++) {
               const dayStr = String(d).padStart(2, '0');
               const fullIso = `${yearStr}-${monthStr}-${dayStr}`;
               const dayIndex = new Date(year, month - 1, d).getDay(); // 0 = Minggu
