@@ -114,12 +114,13 @@
             <option value="Ijin">Ijin</option>
             <option value="Sakit">Sakit</option>
             <option value="Libur">Libur</option>
+            <option value="Alpha">Alpha (Tanpa Keterangan)</option>
           </select>
         </div>
 
         <div id="boxJamModalPresensi" class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">🟢 Jam Masuk (WIB)</label>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">🟢 Jam Masuk / Catat (WIB)</label>
             <input type="time" id="editPresensiJamMasuk" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white font-bold">
           </div>
           <div id="colJamPulangModal">
@@ -227,13 +228,16 @@
         <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-lg font-bold">🖨️</div>
         <div>
           <h4 class="font-extrabold text-sm text-slate-800 dark:text-white">Konfirmasi Pengesahan Kepala Sekolah</h4>
-          <p class="text-[11px] text-slate-500">Pastikan Nama & NIP Kepala Sekolah sudah sesuai sebelum mencetak PDF.</p>
+          <p class="text-[11px] text-slate-500">Data diambil otomatis dari 6_Master_Admin.</p>
         </div>
       </div>
 
       <div class="space-y-3 text-xs">
         <div>
-          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Kepala Sekolah</label>
+          <div class="flex justify-between items-center mb-1">
+            <label class="block font-bold text-slate-700 dark:text-slate-300">Nama Kepala Sekolah</label>
+            <span id="statusSumberKepsekAdmin" class="text-[10px] font-bold text-emerald-600">✔ 6_Master_Admin</span>
+          </div>
           <input type="text" id="inputAdminNamaKepsek" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white dark:bg-slate-900">
         </div>
         <div>
@@ -327,7 +331,7 @@
       </div>
     </aside>
 
-    <!-- AREA KONTEN UTAMA ADMIN (DITAMBAH pb-24 AGAR TIDAK TERTUTUP BAR BAWAH) -->
+    <!-- AREA KONTEN UTAMA ADMIN -->
     <div class="flex-1 p-4 md:p-6 pb-24 max-w-6xl mx-auto w-full">
       <main class="space-y-4">
 
@@ -348,30 +352,21 @@
         <!-- ========================================================================= -->
         <section id="tabPantauan" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
           
-          <!-- KARTU STATISTIK BESAR HANYA DI PANTAUAN HARIAN -->
+          <!-- KARTU STATISTIK RATA TENGAH SEJAJAR (TANPA IKON & TANPA TEKS AKTIF) -->
           <div class="grid grid-cols-3 gap-2.5">
-            <button onclick="setFilterPantauanAdmin('SEMUA')" id="btnAdminFilterSEMUA" class="p-3.5 rounded-2xl border-2 text-left transition flex items-center justify-between">
-              <div>
-                <p class="text-[10px] font-extrabold uppercase tracking-wider opacity-85">📋 Total Siswa PKL</p>
-                <p id="statAdminTotalSiswa" class="text-xl sm:text-2xl font-extrabold mt-0.5">0</p>
-              </div>
-              <span id="chkAdminSEMUA" class="text-[10px] font-extrabold px-2 py-0.5 rounded-lg bg-white/20">AKTIF ✓</span>
+            <button onclick="setFilterPantauanAdmin('SEMUA')" id="btnAdminFilterSEMUA" class="p-3 rounded-2xl border-2 text-center transition flex flex-col justify-between items-center h-24">
+              <span class="text-[11px] font-bold uppercase tracking-wider leading-tight flex items-center justify-center min-h-[28px]">Total Siswa PKL</span>
+              <span id="statAdminTotalSiswa" class="text-2xl font-extrabold leading-none">0</span>
             </button>
 
-            <button onclick="setFilterPantauanAdmin('SUDAH')" id="btnAdminFilterSUDAH" class="p-3.5 rounded-2xl border-2 text-left transition flex items-center justify-between">
-              <div>
-                <p class="text-[10px] font-extrabold uppercase tracking-wider opacity-85">✅ Sudah Presensi</p>
-                <p id="statAdminSudahAbsen" class="text-xl sm:text-2xl font-extrabold mt-0.5">0</p>
-              </div>
-              <span id="chkAdminSUDAH" class="hidden text-[10px] font-extrabold px-2 py-0.5 rounded-lg bg-white/20">AKTIF ✓</span>
+            <button onclick="setFilterPantauanAdmin('SUDAH')" id="btnAdminFilterSUDAH" class="p-3 rounded-2xl border-2 text-center transition flex flex-col justify-between items-center h-24">
+              <span class="text-[11px] font-bold uppercase tracking-wider leading-tight flex items-center justify-center min-h-[28px]">Sudah Presensi</span>
+              <span id="statAdminSudahAbsen" class="text-2xl font-extrabold leading-none">0</span>
             </button>
 
-            <button onclick="setFilterPantauanAdmin('BELUM')" id="btnAdminFilterBELUM" class="p-3.5 rounded-2xl border-2 text-left transition flex items-center justify-between">
-              <div>
-                <p class="text-[10px] font-extrabold uppercase tracking-wider opacity-85">⏳ Belum Presensi</p>
-                <p id="statAdminBelumAbsen" class="text-xl sm:text-2xl font-extrabold mt-0.5">0</p>
-              </div>
-              <span id="chkAdminBELUM" class="hidden text-[10px] font-extrabold px-2 py-0.5 rounded-lg bg-white/20">AKTIF ✓</span>
+            <button onclick="setFilterPantauanAdmin('BELUM')" id="btnAdminFilterBELUM" class="p-3 rounded-2xl border-2 text-center transition flex flex-col justify-between items-center h-24">
+              <span class="text-[11px] font-bold uppercase tracking-wider leading-tight flex items-center justify-center min-h-[28px]">Belum / Alpha</span>
+              <span id="statAdminBelumAbsen" class="text-2xl font-extrabold leading-none">0</span>
             </button>
           </div>
 
@@ -435,7 +430,7 @@
         </section>
 
         <!-- ========================================================================= -->
-        <!-- TAB 3: REKAPITULASI BULANAN KELAS (DENGAN KOLOM ALPHA MERAH)              -->
+        <!-- TAB 3: REKAPITULASI BULANAN KELAS (DENGAN KOLOM ALPHA MERAH MURNI)        -->
         <!-- ========================================================================= -->
         <section id="tabRekapKelas" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
           <div class="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 p-4 rounded-2xl space-y-3 text-xs">
@@ -689,6 +684,7 @@
     let masterGuruGlobal = [];
     let cacheRekapBulananKelas = [];
     let pendingTipeCetakAdmin = '';
+    let kepsekTerbaruAdmin = { nama: '', nip: '' };
 
     // ================= PENGATURAN TEMA & LOADING =================
     function terapkanTemaAwal() {
@@ -715,6 +711,20 @@
 
     function sembunyikanLoadingGlobal() {
       document.getElementById('globalLoadingOverlay').classList.add('hidden');
+    }
+
+    function ekstrakKepsekDariResponseAdmin(res) {
+      if (!res) return;
+      const k = res.kepsek || res.infoKepsek;
+      if (k && typeof k === 'object') {
+        const nm = k.nama || k.Nama_Kepala_Sekolah || '';
+        const np = k.nip  || k.NIP_Kepala_Sekolah  || '';
+        if (nm && String(nm).trim() !== '') {
+          kepsekTerbaruAdmin = { nama: String(nm).trim(), nip: String(np || '').trim() };
+          currentUser.user.kepsek = kepsekTerbaruAdmin;
+          localStorage.setItem('pkl_user', JSON.stringify(currentUser));
+        }
+      }
     }
 
     function navigasiTabAdminSebelah(arah) {
@@ -818,6 +828,12 @@
         batalKeluarAplikasi();
         return;
       }
+      const sb = document.getElementById('sidebarMenu');
+      if (sb && !sb.classList.contains('-translate-x-full') && window.innerWidth < 768) {
+        tutupSidebarMobile();
+        history.pushState({ tab: currentTab }, '', `#${currentTab.toLowerCase()}`);
+        return;
+      }
       if (event.state && event.state.tab && event.state.tab !== 'EXIT_GUARD') {
         pilihMenuAdmin(event.state.tab, false);
         return;
@@ -845,6 +861,8 @@
       try {
         currentUser = JSON.parse(saved);
         if (!currentUser || currentUser.role !== 'admin') return window.location.replace('index.html');
+        localStorage.removeItem('pkl_last_active');
+        if (currentUser.user) ekstrakKepsekDariResponseAdmin(currentUser.user);
         inisialisasiPortalAdmin();
       } catch (e) {
         window.location.replace('index.html');
@@ -933,10 +951,7 @@
         });
 
         if (res.status === 'success') {
-          if (res.kepsek) {
-            currentUser.user.kepsek = res.kepsek;
-            localStorage.setItem('pkl_user', JSON.stringify(currentUser));
-          }
+          ekstrakKepsekDariResponseAdmin(res);
 
           rekapSiswaGlobal = res.rekapSiswa || [];
           listMonevGlobal = res.listMonev || [];
@@ -1017,28 +1032,17 @@
       const bSudah = document.getElementById('btnAdminFilterSUDAH');
       const bBelum = document.getElementById('btnAdminFilterBELUM');
 
-      const cSemua = document.getElementById('chkAdminSEMUA');
-      const cSudah = document.getElementById('chkAdminSUDAH');
-      const cBelum = document.getElementById('chkAdminBELUM');
-
-      const inactive = 'p-3.5 rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-500 text-left transition flex items-center justify-between opacity-75';
+      const inactive = 'p-3 rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 text-center transition flex flex-col justify-between items-center h-24 hover:border-slate-300 opacity-80';
       bSemua.className = inactive;
       bSudah.className = inactive;
       bBelum.className = inactive;
 
-      cSemua.classList.add('hidden');
-      cSudah.classList.add('hidden');
-      cBelum.classList.add('hidden');
-
       if (filterStatusPantauan === 'SEMUA') {
-        bSemua.className = 'p-3.5 rounded-2xl border-2 border-indigo-600 bg-indigo-600 text-white text-left transition flex items-center justify-between shadow-lg ring-4 ring-indigo-500/20';
-        cSemua.classList.remove('hidden');
+        bSemua.className = 'p-3 rounded-2xl border-2 border-indigo-600 bg-indigo-600 text-white text-center transition flex flex-col justify-between items-center h-24 shadow-md';
       } else if (filterStatusPantauan === 'SUDAH') {
-        bSudah.className = 'p-3.5 rounded-2xl border-2 border-emerald-600 bg-emerald-600 text-white text-left transition flex items-center justify-between shadow-lg ring-4 ring-emerald-500/20';
-        cSudah.classList.remove('hidden');
+        bSudah.className = 'p-3 rounded-2xl border-2 border-emerald-600 bg-emerald-600 text-white text-center transition flex flex-col justify-between items-center h-24 shadow-md';
       } else {
-        bBelum.className = 'p-3.5 rounded-2xl border-2 border-rose-600 bg-rose-600 text-white text-left transition flex items-center justify-between shadow-lg ring-4 ring-rose-500/20';
-        cBelum.classList.remove('hidden');
+        bBelum.className = 'p-3 rounded-2xl border-2 border-rose-600 bg-rose-600 text-white text-center transition flex flex-col justify-between items-center h-24 shadow-md';
       }
     }
 
@@ -1047,13 +1051,18 @@
       const filterKelas = document.getElementById('filterKelasPantauanAdmin').value || 'ALL';
       const kw = (document.getElementById('searchPantauanSiswa').value || '').toLowerCase().trim();
       const tglAktif = document.getElementById('filterTanggalAdmin').value || getLocalTodayISO();
+      const todayIso = getLocalTodayISO();
+
+      const [yP, mP, dP] = tglAktif.split('-').map(Number);
+      const isHariMinggu = new Date(yP, mP - 1, dP).getDay() === 0;
+      const isTanggalMasaLalu = tglAktif < todayIso;
 
       const listPerKelas = (filterKelas === 'ALL')
         ? rekapSiswaGlobal
         : rekapSiswaGlobal.filter(s => s.kelas === filterKelas);
 
-      const sudahList = listPerKelas.filter(s => s.sudahAbsen);
-      const belumList = listPerKelas.filter(s => !s.sudahAbsen);
+      const sudahList = listPerKelas.filter(s => s.sudahAbsen && s.status !== 'Alpha');
+      const belumList = listPerKelas.filter(s => !s.sudahAbsen || s.status === 'Alpha');
 
       document.getElementById('statAdminTotalSiswa').innerText = listPerKelas.length;
       document.getElementById('statAdminSudahAbsen').innerText = sudahList.length;
@@ -1077,17 +1086,25 @@
 
       wadah.innerHTML = hasil.map(s => {
         const avatar = pastikanUrlGambarDriveValid(s.fotoProfil) || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+        const isAlphaOtomatis = !s.sudahAbsen && isTanggalMasaLalu && !isHariMinggu;
+        const isAlphaTercatat = s.sudahAbsen && s.status === 'Alpha';
+        const isAlpha = isAlphaOtomatis || isAlphaTercatat;
+
         let badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-100 text-rose-800">BELUM PRESENSI</span>`;
-        if (s.sudahAbsen) {
+        if (isAlpha) {
+          badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-red-600 text-white">ALPHA</span>`;
+        } else if (s.sudahAbsen) {
           if (s.status === 'Hadir') badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800">HADIR</span>`;
           else if (s.status === 'Dinas Luar') badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-purple-100 text-purple-800">DINAS LUAR</span>`;
+          else if (s.status === 'Libur') badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-200 text-slate-700">LIBUR</span>`;
           else badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800">${s.status.toUpperCase()}</span>`;
         }
 
         const safeNama = amankanKutipan(s.nama);
+        const statusUntukModal = isAlpha ? 'Alpha' : s.status;
 
         return `
-          <div class="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex flex-col lg:flex-row lg:items-center justify-between gap-3 shadow-2xs">
+          <div class="p-3.5 rounded-2xl border ${isAlpha ? 'border-red-300 bg-red-50/20' : 'border-slate-200 bg-white'} dark:border-slate-700 dark:bg-slate-900 flex flex-col lg:flex-row lg:items-center justify-between gap-3 shadow-2xs">
             <div class="flex items-start gap-3">
               <img src="${avatar}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'" class="w-11 h-14 rounded-xl object-cover border border-slate-200 shrink-0 bg-slate-100">
               <div class="space-y-0.5 text-xs">
@@ -1097,7 +1114,7 @@
                 </div>
                 <p class="text-[11px] text-slate-500 font-semibold">${s.kelas} • NIS: ${s.nis} • Pembimbing: <b>${s.namaGuru}</b></p>
                 <p class="text-xs font-bold text-indigo-700 dark:text-indigo-400">🏢 ${s.dudi}</p>
-                <p class="text-[11px] text-slate-500">📍 ${s.sudahAbsen ? (s.status === 'Hadir' ? `Jarak: ${s.jarak}m dari DUDI` : `Ket: ${s.status}`) : 'Belum ada titik GPS'}</p>
+                <p class="text-[11px] text-slate-500">📍 ${s.sudahAbsen ? (s.status === 'Hadir' ? `Jarak: ${s.jarak}m dari DUDI` : `Ket: ${s.status}`) : (isAlpha ? 'Alpha (Tanpa Keterangan)' : 'Belum ada titik GPS')}</p>
               </div>
             </div>
 
@@ -1115,7 +1132,7 @@
 
               <div class="flex items-center gap-1.5 justify-end">
                 ${s.fotoUrl ? `<button onclick="bukaModalFoto('${s.fotoUrl}', 'Foto Presensi - ${safeNama}')" class="px-2.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs" title="Lihat Foto">📸</button>` : ''}
-                <button onclick="bukaModalEditPresensi('${s.nis}', '${safeNama}', '${tglAktif}', '${s.status}', '${s.jamMasuk}', '${s.jamPulang}')" class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow flex items-center gap-1">
+                <button onclick="bukaModalEditPresensi('${s.nis}', '${safeNama}', '${tglAktif}', '${statusUntukModal}', '${s.jamMasuk}', '${s.jamPulang}')" class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow flex items-center gap-1">
                   <span>✏️</span> <span>Edit</span>
                 </button>
                 ${s.sudahAbsen ? `
@@ -1181,7 +1198,7 @@
           await muatDataGlobalAdmin(false);
         }
       } catch (e) {
-        alert('Gagal menyimpan perubahan presensi.');
+        alert('Gagal menyimpan perubahan presensi. Pastikan Code.gs sudah di-deploy versi terbaru.');
       } finally {
         sembunyikanLoadingGlobal();
       }
@@ -1323,7 +1340,7 @@
     }
 
     // =========================================================================
-    // TAB 3: REKAP BULANAN KELAS (DENGAN KOLOM ALPHA MERAH)
+    // TAB 3: REKAP BULANAN KELAS (MURNI MENGGUNAKAN NILAI ALPHA, BUKAN LIBUR)
     // =========================================================================
     async function muatRekapBulananKelas() {
       const kelas = document.getElementById('selectRekapKelasAdmin').value || 'XII DKV 1';
@@ -1342,10 +1359,7 @@
         });
 
         if (res.status === 'success') {
-          if (res.kepsek) {
-            currentUser.user.kepsek = res.kepsek;
-            localStorage.setItem('pkl_user', JSON.stringify(currentUser));
-          }
+          ekstrakKepsekDariResponseAdmin(res);
           cacheRekapBulananKelas = res.rekapKelas || [];
           renderTabelRekapBulananKelas();
         }
@@ -1372,20 +1386,23 @@
         return;
       }
 
-      tbody.innerHTML = list.map((r, i) => `
-        <tr>
-          <td class="p-2.5 border-r border-slate-100 text-center font-bold">${i + 1}</td>
-          <td class="p-2.5 border-r border-slate-100 font-mono">${r.nis}</td>
-          <td class="p-2.5 border-r border-slate-100 font-bold">${r.nama}</td>
-          <td class="p-2.5 border-r border-slate-100">${r.dudi}</td>
-          <td class="p-2.5 border-r border-slate-100">${r.namaGuru}</td>
-          <td class="p-2.5 border-r border-slate-100 text-center font-bold text-emerald-700">${r.hadir}</td>
-          <td class="p-2.5 border-r border-slate-100 text-center font-bold text-purple-700">${r.dl}</td>
-          <td class="p-2.5 border-r border-slate-100 text-center font-bold text-amber-700">${r.ijin}</td>
-          <td class="p-2.5 border-r border-slate-100 text-center font-bold text-sky-700">${r.sakit}</td>
-          <td class="p-2.5 text-center font-extrabold text-rose-700 bg-rose-50/70">${r.alpha !== undefined ? r.alpha : (r.libur || 0)}</td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = list.map((r, i) => {
+        const jmlAlpha = r.alpha !== undefined ? r.alpha : 0;
+        return `
+          <tr class="${jmlAlpha > 0 ? 'bg-rose-50/30 dark:bg-rose-950/20' : ''}">
+            <td class="p-2.5 border-r border-slate-100 text-center font-bold">${i + 1}</td>
+            <td class="p-2.5 border-r border-slate-100 font-mono">${r.nis}</td>
+            <td class="p-2.5 border-r border-slate-100 font-bold">${r.nama}</td>
+            <td class="p-2.5 border-r border-slate-100">${r.dudi}</td>
+            <td class="p-2.5 border-r border-slate-100">${r.namaGuru}</td>
+            <td class="p-2.5 border-r border-slate-100 text-center font-bold text-emerald-700">${r.hadir}</td>
+            <td class="p-2.5 border-r border-slate-100 text-center font-bold text-purple-700">${r.dl}</td>
+            <td class="p-2.5 border-r border-slate-100 text-center font-bold text-amber-700">${r.ijin}</td>
+            <td class="p-2.5 border-r border-slate-100 text-center font-bold text-sky-700">${r.sakit}</td>
+            <td class="p-2.5 text-center font-extrabold ${jmlAlpha > 0 ? 'text-rose-700 bg-rose-100/70' : 'text-slate-400'}">${jmlAlpha}</td>
+          </tr>
+        `;
+      }).join('');
     }
 
     // =========================================================================
@@ -1500,12 +1517,14 @@
     }
 
     // =========================================================================
-    // CETAK PDF ADMIN DENGAN PENGESAHAN KEPALA SEKOLAH
+    // CETAK PDF ADMIN DENGAN PENGESAHAN KEPALA SEKOLAH DARI 6_MASTER_ADMIN
     // =========================================================================
     function bukaModalCetakAdmin(tipe) {
       pendingTipeCetakAdmin = tipe;
-      document.getElementById('inputAdminNamaKepsek').value = currentUser.user.kepsek?.nama || 'Drs. H. Aris Sutrisno, M.Pd.';
-      document.getElementById('inputAdminNipKepsek').value = currentUser.user.kepsek?.nip || '';
+      const namaK = kepsekTerbaruAdmin.nama || currentUser.user.kepsek?.nama || 'Dra. Is Hardewi, M.pd.';
+      const nipK  = kepsekTerbaruAdmin.nip  || currentUser.user.kepsek?.nip  || '196910011994122004';
+      document.getElementById('inputAdminNamaKepsek').value = namaK;
+      document.getElementById('inputAdminNipKepsek').value = nipK;
       document.getElementById('modalCetakAdmin').classList.remove('hidden');
     }
 
@@ -1514,10 +1533,11 @@
     }
 
     function eksekusiCetakPDFAdminFinal() {
-      currentUser.user.kepsek = {
-        nama: document.getElementById('inputAdminNamaKepsek').value.trim() || 'Kepala SMK Negeri 1 Klaten',
-        nip: document.getElementById('inputAdminNipKepsek').value.trim()
-      };
+      const namaInput = document.getElementById('inputAdminNamaKepsek').value.trim() || 'Dra. Is Hardewi, M.pd.';
+      const nipInput  = document.getElementById('inputAdminNipKepsek').value.trim();
+
+      kepsekTerbaruAdmin = { nama: namaInput, nip: nipInput };
+      currentUser.user.kepsek = kepsekTerbaruAdmin;
       localStorage.setItem('pkl_user', JSON.stringify(currentUser));
       tutupModalCetakAdmin();
 
@@ -1555,7 +1575,7 @@
 
     function buatTandaTanganKepsekDanPokjaHTML() {
       const tglCetak = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-      const namaKepsek = currentUser.user.kepsek?.nama || '....................................';
+      const namaKepsek = currentUser.user.kepsek?.nama || 'Dra. Is Hardewi, M.pd.';
       const nipKepsekHtml = currentUser.user.kepsek?.nip ? `<br>NIP. ${currentUser.user.kepsek.nip}` : '';
 
       return `
@@ -1620,7 +1640,7 @@
               ${cacheRekapBulananKelas.map((r, i) => `
                 <tr>
                   <td>${i + 1}</td><td>${r.nis}</td><td style="text-align:left;">${r.nama}</td><td style="text-align:left;">${r.dudi}</td><td style="text-align:left;">${r.namaGuru}</td>
-                  <td>${r.hadir}</td><td>${r.dl}</td><td>${r.ijin}</td><td>${r.sakit}</td><td><b>${r.alpha !== undefined ? r.alpha : (r.libur || 0)}</b></td>
+                  <td>${r.hadir}</td><td>${r.dl}</td><td>${r.ijin}</td><td>${r.sakit}</td><td><b>${r.alpha !== undefined ? r.alpha : 0}</b></td>
                 </tr>
               `).join('')}
             </tbody>
