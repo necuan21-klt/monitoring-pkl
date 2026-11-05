@@ -487,9 +487,11 @@
 
       <!-- NAVIGASI SLIDE KIRI-KANAN MODERN & ELEGAN DI BAGIAN BAWAH (GURU) -->
       <div class="fixed bottom-4 left-1/2 md:left-[calc(50%+8rem)] -translate-x-1/2 z-20 w-[92%] max-w-xs">
-        <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/90 dark:border-slate-700 shadow-xl rounded-full px-2 py-1.5 flex items-center justify-between">
-          <button type="button" onclick="navigasiTabSebelah(-1)" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold text-xs active:scale-90 transition shadow-2xs" title="Halaman Sebelumnya">
-            ◀
+        <div class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/90 dark:border-slate-700 shadow-xl rounded-full px-2 py-1.5 flex items-center justify-between">
+          <button type="button" onclick="navigasiTabSebelah(-1)" class="w-8 h-8 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center active:scale-90 transition shadow-xs shrink-0" title="Halaman Sebelumnya">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+            </svg>
           </button>
 
           <div class="flex flex-col items-center px-2">
@@ -503,8 +505,10 @@
             </div>
           </div>
 
-          <button type="button" onclick="navigasiTabSebelah(1)" class="w-8 h-8 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center font-bold text-xs active:scale-90 transition shadow-xs" title="Halaman Berikutnya">
-            ▶
+          <button type="button" onclick="navigasiTabSebelah(1)" class="w-8 h-8 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center active:scale-90 transition shadow-xs shrink-0" title="Halaman Berikutnya">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
+            </svg>
           </button>
         </div>
       </div>
