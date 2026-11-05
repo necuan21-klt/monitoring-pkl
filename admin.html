@@ -1089,6 +1089,7 @@
         const isAlphaOtomatis = !s.sudahAbsen && isTanggalMasaLalu && !isHariMinggu;
         const isAlphaTercatat = s.sudahAbsen && s.status === 'Alpha';
         const isAlpha = isAlphaOtomatis || isAlphaTercatat;
+        const isTanpaJam = isAlpha || s.status === 'Libur';
 
         let badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-100 text-rose-800">BELUM PRESENSI</span>`;
         if (isAlpha) {
@@ -1103,6 +1104,11 @@
         const safeNama = amankanKutipan(s.nama);
         const statusUntukModal = isAlpha ? 'Alpha' : s.status;
 
+        // Jika Alpha atau Libur, paksa tampilan jam masuk & pulang menjadi '-'
+        const tampilJamMasuk = (!isTanpaJam && s.jamMasuk && s.jamMasuk !== '-') ? (s.jamMasuk + ' WIB') : '-';
+        const tampilJamPulang = (!isTanpaJam && s.jamPulang && s.jamPulang !== '-') ? (s.jamPulang + ' WIB') : '-';
+        const warnaJamMasuk = tampilJamMasuk !== '-' ? 'text-emerald-700' : 'text-slate-400';
+
         return `
           <div class="p-3.5 rounded-2xl border ${isAlpha ? 'border-red-300 bg-red-50/20' : 'border-slate-200 bg-white'} dark:border-slate-700 dark:bg-slate-900 flex flex-col lg:flex-row lg:items-center justify-between gap-3 shadow-2xs">
             <div class="flex items-start gap-3">
@@ -1114,7 +1120,7 @@
                 </div>
                 <p class="text-[11px] text-slate-500 font-semibold">${s.kelas} • NIS: ${s.nis} • Pembimbing: <b>${s.namaGuru}</b></p>
                 <p class="text-xs font-bold text-indigo-700 dark:text-indigo-400">🏢 ${s.dudi}</p>
-                <p class="text-[11px] text-slate-500">📍 ${s.sudahAbsen ? (s.status === 'Hadir' ? `Jarak: ${s.jarak}m dari DUDI` : `Ket: ${s.status}`) : (isAlpha ? 'Alpha (Tanpa Keterangan)' : 'Belum ada titik GPS')}</p>
+                <p class="text-[11px] text-slate-500">📍 ${s.sudahAbsen ? (s.status === 'Hadir' ? `Jarak: ${s.jarak}m dari DUDI` : `Ket: ${s.status}`) : (isAlpha ? 'Ket: Alpha (Tanpa Keterangan)' : 'Belum ada titik GPS')}</p>
               </div>
             </div>
 
@@ -1122,17 +1128,17 @@
               <div class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-[11px] min-w-[185px] space-y-0.5">
                 <div class="flex justify-between gap-2">
                   <span class="text-slate-500 font-semibold">🟢 Masuk:</span>
-                  <span class="font-extrabold ${s.jamMasuk !== '-' ? 'text-emerald-700' : 'text-rose-500'}">${s.jamMasuk !== '-' ? s.jamMasuk + ' WIB' : 'Belum'}</span>
+                  <span class="font-extrabold ${warnaJamMasuk}">${tampilJamMasuk}</span>
                 </div>
                 <div class="flex justify-between gap-2 border-t border-slate-200/70 pt-0.5">
                   <span class="text-slate-500 font-semibold">🔵 Pulang:</span>
-                  <span class="font-extrabold ${s.jamPulang !== '-' ? 'text-indigo-700' : 'text-slate-400'}">${s.jamPulang !== '-' ? s.jamPulang + ' WIB' : '-'}</span>
+                  <span class="font-extrabold ${tampilJamPulang !== '-' ? 'text-indigo-700' : 'text-slate-400'}">${tampilJamPulang}</span>
                 </div>
               </div>
 
               <div class="flex items-center gap-1.5 justify-end">
                 ${s.fotoUrl ? `<button onclick="bukaModalFoto('${s.fotoUrl}', 'Foto Presensi - ${safeNama}')" class="px-2.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs" title="Lihat Foto">📸</button>` : ''}
-                <button onclick="bukaModalEditPresensi('${s.nis}', '${safeNama}', '${tglAktif}', '${statusUntukModal}', '${s.jamMasuk}', '${s.jamPulang}')" class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow flex items-center gap-1">
+                <button onclick="bukaModalEditPresensi('${s.nis}', '${safeNama}', '${tglAktif}', '${statusUntukModal}', '${isTanpaJam ? '-' : s.jamMasuk}', '${isTanpaJam ? '-' : s.jamPulang}')" class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow flex items-center gap-1">
                   <span>✏️</span> <span>Edit</span>
                 </button>
                 ${s.sudahAbsen ? `
@@ -1155,8 +1161,11 @@
 
       const st = (statusSekarang && statusSekarang !== 'Belum Absen') ? statusSekarang : 'Hadir';
       document.getElementById('editPresensiStatus').value = st;
-      document.getElementById('editPresensiJamMasuk').value = (jamMasuk && jamMasuk !== '-') ? jamMasuk : '07:30';
-      document.getElementById('editPresensiJamPulang').value = (jamPulang && jamPulang !== '-') ? jamPulang : '';
+
+      // Jangan beri nilai default 07:30; kosongkan jika belum ada jam atau jika statusnya Alpha/Libur
+      const tidakPerluJam = (st === 'Alpha' || st === 'Libur');
+      document.getElementById('editPresensiJamMasuk').value = (!tidakPerluJam && jamMasuk && jamMasuk !== '-') ? jamMasuk : '';
+      document.getElementById('editPresensiJamPulang').value = (!tidakPerluJam && jamPulang && jamPulang !== '-') ? jamPulang : '';
 
       aturTampilanJamModalPresensi();
       document.getElementById('modalEditPresensi').classList.remove('hidden');
@@ -1164,10 +1173,20 @@
 
     function aturTampilanJamModalPresensi() {
       const st = document.getElementById('editPresensiStatus').value;
+      const boxJam = document.getElementById('boxJamModalPresensi');
       const colPulang = document.getElementById('colJamPulangModal');
-      if (st === 'Hadir') {
+
+      if (st === 'Alpha' || st === 'Libur') {
+        // Sembunyikan & kosongkan seluruh input jam jika dipilih Alpha atau Libur
+        boxJam.classList.add('hidden');
+        document.getElementById('editPresensiJamMasuk').value = '';
+        document.getElementById('editPresensiJamPulang').value = '';
+      } else if (st === 'Hadir') {
+        boxJam.classList.remove('hidden');
         colPulang.classList.remove('hidden');
       } else {
+        // Dinas Luar, Ijin, Sakit -> hanya tampilkan jam catat/masuk tanpa jam pulang
+        boxJam.classList.remove('hidden');
         colPulang.classList.add('hidden');
         document.getElementById('editPresensiJamPulang').value = '';
       }
@@ -1182,8 +1201,14 @@
       const nama = document.getElementById('editPresensiNama').value;
       const tanggal = document.getElementById('editPresensiTanggal').value;
       const statusKehadiran = document.getElementById('editPresensiStatus').value;
-      const jamMasuk = document.getElementById('editPresensiJamMasuk').value || '07:30';
-      const jamPulang = document.getElementById('editPresensiJamPulang').value || '';
+      const tidakPerluJam = (statusKehadiran === 'Alpha' || statusKehadiran === 'Libur');
+
+      const jamMasuk = tidakPerluJam ? '-' : (document.getElementById('editPresensiJamMasuk').value || '-');
+      const jamPulang = (statusKehadiran === 'Hadir') ? (document.getElementById('editPresensiJamPulang').value || '-') : '-';
+
+      if (statusKehadiran === 'Hadir' && jamMasuk === '-') {
+        return alert('Untuk status Hadir, silakan isi Jam Masuk terlebih dahulu!');
+      }
 
       tutupModalEditPresensi();
       tampilkanLoadingGlobal(`Menyimpan koreksi presensi ${nama}...`);
