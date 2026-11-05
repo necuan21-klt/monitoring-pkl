@@ -1666,13 +1666,13 @@
         const hari = namaHari[dayIndex];
         let rec = mapTanggal[fullIso] ? { ...mapTanggal[fullIso] } : { masuk: '-', pulang: '-', ket: '-' };
 
-        // Jika belum ada presensi pada tanggal tersebut:
+     // Jika belum ada presensi pada tanggal tersebut:
         if (rec.ket === '-') {
           if (dayIndex === 0) {
             // Hari Minggu otomatis dikecualikan dari Alpha (dianggap Libur)
             rec.ket = 'Libur';
-          } else if (fullIso <= todayIso) {
-            // Tanggal sudah lewat atau hari ini (Selain Minggu) dan tidak absen -> Alpha
+          } else if (fullIso < todayIso) {
+            // Tanggal sudah lewat (sebelum hari ini, selain Minggu) dan tidak absen -> Alpha
             rec.ket = 'Alpha';
           }
         }
