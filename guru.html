@@ -1541,19 +1541,22 @@
 
             let hadir = 0, dl = 0, ijin = 0, sakit = 0, alpha = 0;
 
-            for (let d = 1; d <= daysInMonth; d++) {
+          for (let d = 1; d <= daysInMonth; d++) {
               const dayStr = String(d).padStart(2, '0');
               const fullIso = `${yearStr}-${monthStr}-${dayStr}`;
-              const dayIndex = new Date(year, month - 1, d).getDay();
+              const dayIndex = new Date(year, month - 1, d).getDay(); // 0 = Minggu
               const st = mapTglStatus[fullIso];
 
-              // Prioritaskan data presensi yang masuk (termasuk jika masuk di hari Minggu)
               if (st === 'Hadir') hadir++;
               else if (st === 'Dinas Luar') dl++;
               else if (st === 'Ijin') ijin++;
               else if (st === 'Sakit') sakit++;
-              else if (!st && dayIndex !== 0 && fullIso <= todayIso) {
-                // Tanggal sudah lewat/hari ini, bukan hari Minggu, dan tidak ada presensi -> Alpha
+              else if (st === 'Libur') {
+                // Jika siswa mengisi Libur, jangan dihitung sebagai Alpha
+              } else if (st === 'Alpha') {
+                alpha++;
+              } else if (!st && dayIndex !== 0 && fullIso < todayIso) {
+                // Tanggal sudah terlewat (sebelum hari ini), bukan hari Minggu, dan tidak ada presensi -> Alpha
                 alpha++;
               }
             }
@@ -1602,11 +1605,11 @@
       pendingTipeCetakGuru = tipe;
       document.getElementById('inputCetakNamaGuru').value = currentUser.user.nama || '';
       document.getElementById('inputCetakNipGuru').value = currentUser.user.nip || '';
-      document.getElementById('inputCetakNamaKepsek').value = currentUser.user.kepsek?.nama || 'Drs. H. Aris Sutrisno, M.Pd.';
-      document.getElementById('inputCetakNipKepsek').value = currentUser.user.kepsek?.nip || '';
+      document.getElementById('inputCetakNamaKepsek').value = currentUser.user.kepsek?.nama || 'Dra. Is Hardewi, M.pd.';
+      document.getElementById('inputCetakNipKepsek').value = currentUser.user.kepsek?.nip || '196910011994122004';
       document.getElementById('modalCetakGuru').classList.remove('hidden');
     }
-
+    
     function tutupModalCetakGuru() {
       document.getElementById('modalCetakGuru').classList.add('hidden');
     }
