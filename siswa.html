@@ -293,16 +293,17 @@
           </div>
         </section>
 
-        <!-- TAB 1: PRESENSI KEHADIRAN (STATUS & SESI PRESENSI DI ATAS LAYAR KAMERA) -->
+        <!-- TAB 1: PRESENSI KEHADIRAN (MENDUKUNG MULTI-TEMPAT DUDI OTOMATIS) -->
         <section id="tabAbsen" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
           <div class="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 p-3.5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-            <div>
+            <div class="space-y-0.5">
               <p class="font-bold text-indigo-950 dark:text-indigo-200">🏢 Tempat PKL: <span id="absenNamaDudi" class="text-indigo-600 dark:text-indigo-400">-</span></p>
-              <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">🗺️ Koordinat DUDI: <span id="absenKoordinatDudi" class="font-mono font-semibold text-slate-700 dark:text-slate-300">-</span></p>
-              <p id="rowInfoJarakDudi" class="text-slate-600 mt-0.5">📍 Jarak GPS: <span id="txtJarakGps" class="font-bold text-amber-600">Mendeteksi...</span></p>
-              <p id="rowInfoKoordinatDL" class="hidden text-indigo-600 dark:text-indigo-400 font-bold mt-0.5">🛰️ GPS Dinas Luar: <span id="txtKoordinatDL">Mendeteksi titik...</span></p>
+              <p id="rowInfoMultiDudi" class="hidden text-[11px] font-bold text-emerald-700 dark:text-emerald-400">🔄 Mode Multi-Lokasi Aktif: Otomatis memilih cabang DUDI terdekat dari posisi Anda</p>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">🗺️ Koordinat Target: <span id="absenKoordinatDudi" class="font-mono font-semibold text-slate-700 dark:text-slate-300">-</span></p>
+              <p id="rowInfoJarakDudi" class="text-slate-600">📍 Jarak GPS: <span id="txtJarakGps" class="font-bold text-amber-600">Mendeteksi...</span></p>
+              <p id="rowInfoKoordinatDL" class="hidden text-indigo-600 dark:text-indigo-400 font-bold">🛰️ GPS Dinas Luar: <span id="txtKoordinatDL">Mendeteksi titik...</span></p>
             </div>
-            <span class="text-[10px] bg-indigo-600 text-white font-bold px-2.5 py-1 rounded-xl self-start sm:self-auto">LOKASI GPS</span>
+            <span id="badgeMultiLokasiGps" class="text-[10px] bg-indigo-600 text-white font-bold px-2.5 py-1 rounded-xl self-start sm:self-auto shrink-0">LOKASI GPS</span>
           </div>
 
           <div id="bannerStatusAbsen" class="bg-amber-50 dark:bg-slate-800 border border-amber-200 dark:border-slate-700 p-3 rounded-xl text-xs flex items-center justify-between">
@@ -310,7 +311,7 @@
             <span id="badgeStatusAbsen" class="px-2 py-1 bg-amber-200 text-amber-900 rounded font-bold text-[10px] shrink-0">CEK</span>
           </div>
 
-          <!-- PILIHAN STATUS PRESENSI & SESI PRESENSI (DILETAKKAN DI ATAS LAYAR FOTO) -->
+          <!-- PILIHAN STATUS PRESENSI & SESI PRESENSI -->
           <div class="grid grid-cols-2 gap-3 bg-slate-50 dark:bg-slate-800/70 p-3.5 rounded-2xl border border-slate-200">
             <div>
               <label class="block text-xs font-extrabold text-slate-700 dark:text-slate-200 mb-1">📋 Status Presensi</label>
@@ -344,7 +345,6 @@
               </div>
             </div>
 
-            <!-- Bingkai Kamera Lebih Lebar (Wide) & Tidak Mirror -->
             <div class="relative rounded-2xl overflow-hidden bg-slate-950 min-h-[260px] max-w-[330px] mx-auto flex items-center justify-center shadow-inner border-2 border-slate-800">
               <div id="placeholderKamera" class="text-center p-5 flex flex-col items-center justify-center">
                 <div class="w-14 h-14 rounded-full bg-slate-800 text-indigo-400 flex items-center justify-center mb-2.5 text-2xl">📱</div>
@@ -477,7 +477,6 @@
                 <p class="text-[9px] font-bold text-sky-800 uppercase">Sakit</p>
                 <p id="statSakitBulan" class="text-base font-extrabold text-sky-900">0</p>
               </div>
-              <!-- Kotak Alpha dengan Background Merah Tegas -->
               <div class="bg-rose-100 p-2 rounded-xl border border-rose-300">
                 <p class="text-[9px] font-extrabold text-rose-800 uppercase">Alpha</p>
                 <p id="statAlphaBulan" class="text-base font-extrabold text-rose-900">0</p>
@@ -542,7 +541,7 @@
 
       </main>
 
-    <!-- NAVIGASI SLIDE KIRI-KANAN MODERN & ELEGAN DI BAGIAN BAWAH (SISWA) -->
+      <!-- NAVIGASI SLIDE KIRI-KANAN MODERN & ELEGAN DI BAGIAN BAWAH (SISWA) -->
       <div class="fixed bottom-4 left-1/2 md:left-[calc(50%+8rem)] -translate-x-1/2 z-20 w-[92%] max-w-xs">
         <div class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/90 dark:border-slate-700 shadow-xl rounded-full px-2 py-1.5 flex items-center justify-between">
           <button type="button" onclick="geserHalamanSiswa(-1)" id="btnSlidePrev" class="w-8 h-8 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center active:scale-90 transition shadow-xs shrink-0" title="Halaman Sebelumnya">
@@ -577,6 +576,8 @@
     const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwi7JawplrCbbPJSaWfWsBcH_FfmPV4un5lruxssQqiePZ372172qepYIw163X4PKM-aQ/exec';
     const KOP_SISWA_FILE = 'kop_laporansiswa1.png';
     const LOGO_FILE = 'logo.png';
+    const TGL_MULAI_PKL = '2026-11-16';
+    const TGL_SELESAI_PKL = '2027-03-27';
 
     const URUTAN_MENU_SISWA = ['Profil', 'Absen', 'Jurnal', 'Rekap', 'RekapJurnal'];
     const LABEL_MENU_SISWA = {
@@ -588,7 +589,7 @@
     };
 
     let currentUser = null;
-    let currentCoords = { lat: 0, lng: 0, jarak: 9999, gpsAktif: false };
+    let currentCoords = { lat: 0, lng: 0, jarak: 9999, gpsAktif: false, dudiTerdekat: null };
     let capturedImageBase64 = '';
     let buktiJurnalBase64 = '';
     let fotoProfilBase64 = '';
@@ -654,6 +655,44 @@
         return 'https://drive.google.com/thumbnail?id=' + matchId[0] + '&sz=w600';
       }
       return url;
+    }
+
+    /**
+     * Mengambil daftar lokasi DUDI yang terdaftar pada siswa (mendukung 1 atau banyak DUDI)
+     */
+    function ambilDaftarDudiSiswa() {
+      if (currentUser?.user?.dudiList && Array.isArray(currentUser.user.dudiList) && currentUser.user.dudiList.length > 0) {
+        return currentUser.user.dudiList;
+      }
+      if (currentUser?.user?.dudi) {
+        return [currentUser.user.dudi];
+      }
+      return [];
+    }
+
+    function perbaruiTampilanInfoDudiSiswa() {
+      const dudiUtama = currentUser.user.dudi || { nama: '-', alamat: '-', lat: 0, lng: 0, radius: 100, instruktur: '-' };
+      const daftarDudi = ambilDaftarDudiSiswa();
+
+      document.getElementById('txtBannerDudi').innerText = `🏢 Tempat DUDI: ${dudiUtama.nama}`;
+      document.getElementById('profDudi').innerText = `${dudiUtama.nama} (${dudiUtama.instruktur || 'Instruktur DUDI'})`;
+      document.getElementById('profAlamatDudi').innerText = dudiUtama.alamat || '-';
+
+      const rowMulti = document.getElementById('rowInfoMultiDudi');
+      const badgeMulti = document.getElementById('badgeMultiLokasiGps');
+      if (daftarDudi.length > 1) {
+        rowMulti.classList.remove('hidden');
+        badgeMulti.innerText = `${daftarDudi.length} LOKASI DUDI`;
+      } else {
+        rowMulti.classList.add('hidden');
+        badgeMulti.innerText = 'LOKASI GPS';
+      }
+
+      const targetAktif = currentCoords.dudiTerdekat || daftarDudi[0] || dudiUtama;
+      document.getElementById('absenNamaDudi').innerText = daftarDudi.length > 1
+        ? `${dudiUtama.nama} (Terdekat: ${targetAktif.nama})`
+        : dudiUtama.nama;
+      document.getElementById('absenKoordinatDudi').innerText = `${targetAktif.lat || 0}, ${targetAktif.lng || 0} (Radius: ${targetAktif.radius || 100}m)`;
     }
 
     // ================= MANAJEMEN BACK & POP-UP KELUAR =================
@@ -741,18 +780,12 @@
       document.getElementById('txtNamaUserSidebar').innerText = currentUser.user.nama;
       document.getElementById('txtSubUserSidebar').innerText = `${currentUser.user.kelas} • NIS: ${currentUser.user.nis}`;
 
-      document.getElementById('absenNamaDudi').innerText = currentUser.user.dudi.nama;
-      document.getElementById('absenKoordinatDudi').innerText = `${currentUser.user.dudi.lat || 0}, ${currentUser.user.dudi.lng || 0} (Radius: ${currentUser.user.dudi.radius || 100}m)`;
-
-      // Isi Teks Banner 3 Baris Khusus Profil
       document.getElementById('txtBannerNamaKelas').innerText = `${currentUser.user.nama} • ${currentUser.user.kelas}`;
-      document.getElementById('txtBannerDudi').innerText = `🏢 Tempat DUDI: ${currentUser.user.dudi.nama}`;
-
       document.getElementById('profNama').innerText = currentUser.user.nama;
       document.getElementById('profNisKelas').innerText = `${currentUser.user.nis} / ${currentUser.user.kelas}`;
       document.getElementById('profGuru').innerText = currentUser.user.namaGuru || currentUser.user.idGuru || '-';
-      document.getElementById('profDudi').innerText = `${currentUser.user.dudi.nama} (${currentUser.user.dudi.instruktur || 'Instruktur DUDI'})`;
-      document.getElementById('profAlamatDudi').innerText = currentUser.user.dudi.alamat || '-';
+
+      perbaruiTampilanInfoDudiSiswa();
 
       const cachedAvatar = localStorage.getItem('avatar_cache_' + currentUser.user.nis);
       terapkanUIProfilFoto(currentUser.user.fotoProfil || cachedAvatar, currentUser.user.waSiswa, currentUser.user.waKeluarga, currentUser.user.alamatSiswa);
@@ -899,7 +932,6 @@
 
       perbaruiIndikatorSlideBawah(menu);
 
-      // Pengaturan Tampilan Banner Profil vs Header Judul Tab Lain
       const bannerProfil = document.getElementById('bannerProfilSiswa');
       const headerTabLain = document.getElementById('headerJudulTabLain');
       const txtJudulUtama = document.getElementById('txtJudulTabUtama');
@@ -1175,6 +1207,10 @@
           riwayatAbsenGlobal = res.absen || [];
           riwayatJurnalGlobal = res.jurnal || [];
 
+          if (res.dudi) currentUser.user.dudi = res.dudi;
+          if (res.dudiList && res.dudiList.length > 0) currentUser.user.dudiList = res.dudiList;
+          perbaruiTampilanInfoDudiSiswa();
+
           if (res.linkFolderAbsen) document.getElementById('btnDriveAbsenBulan').href = res.linkFolderAbsen;
           if (res.linkFolderJurnal) document.getElementById('btnDriveJurnalBulan').href = res.linkFolderJurnal;
 
@@ -1299,6 +1335,15 @@
       const badge = document.getElementById('badgeStatusAbsen');
       const statusPresensi = document.getElementById('selStatusHadir').value;
       const jenisAbsen = document.getElementById('selJenisAbsen').value;
+      const todayIso = getLocalTodayISO();
+
+      if (todayIso < TGL_MULAI_PKL || todayIso > TGL_SELESAI_PKL) {
+        txtStatus.innerText = `Di luar periode PKL aktif (16 Nov 2026 s.d. 27 Mar 2027).`;
+        badge.innerText = 'BELUM DIBUKA';
+        badge.className = 'px-2 py-1 bg-slate-200 text-slate-800 rounded font-bold text-[10px] shrink-0';
+        cekValidasiAbsen();
+        return;
+      }
 
       const sudahHadir = statusAbsenHariIni.masuk || statusAbsenHariIni.pulang;
       const sudahNonHadir = statusAbsenHariIni.nonHadirStatus !== null;
@@ -1329,18 +1374,41 @@
 
     document.getElementById('selJenisAbsen').addEventListener('change', updateBannerStatusAbsen);
 
+    // ================= DETEKSI GPS MULTI-DUDI (OTOMATIS PILIH CABANG TERDEKAT) =================
     function deteksiGPS() {
       if (!navigator.geolocation) return;
       navigator.geolocation.watchPosition(pos => {
         currentCoords.lat = pos.coords.latitude;
         currentCoords.lng = pos.coords.longitude;
         currentCoords.gpsAktif = true;
-        currentCoords.jarak = hitungJarak(currentCoords.lat, currentCoords.lng, currentUser.user.dudi.lat, currentUser.user.dudi.lng);
 
+        const daftarDudi = ambilDaftarDudiSiswa();
+        let terdekat = null;
+        let jarakMin = 999999;
+
+        daftarDudi.forEach(d => {
+          const jrk = hitungJarak(currentCoords.lat, currentCoords.lng, Number(d.lat) || 0, Number(d.lng) || 0);
+          if (jrk < jarakMin) {
+            jarakMin = jrk;
+            terdekat = { ...d, jarakHitung: jrk };
+          }
+        });
+
+        currentCoords.dudiTerdekat = terdekat;
+        currentCoords.jarak = terdekat ? terdekat.jarakHitung : 9999;
+
+        const maxRadius = (terdekat && terdekat.radius) ? Number(terdekat.radius) : (currentUser.user.dudi.radius || 100);
         const elJarak = document.getElementById('txtJarakGps');
-        elJarak.innerText = `${currentCoords.jarak} Meter dari DUDI`;
-        const maxRadius = currentUser.user.dudi.radius || 100;
+        const infoCabang = (daftarDudi.length > 1 && terdekat) ? ` ke ${terdekat.nama}` : ' dari DUDI';
+        elJarak.innerText = `${currentCoords.jarak} Meter${infoCabang}`;
         elJarak.className = currentCoords.jarak <= maxRadius ? 'font-bold text-emerald-600' : 'font-bold text-rose-600';
+
+        if (terdekat) {
+          document.getElementById('absenNamaDudi').innerText = daftarDudi.length > 1
+            ? `${currentUser.user.dudi.nama} (Aktif: ${terdekat.nama})`
+            : terdekat.nama;
+          document.getElementById('absenKoordinatDudi').innerText = `${terdekat.lat || 0}, ${terdekat.lng || 0} (Radius: ${maxRadius}m)`;
+        }
 
         document.getElementById('txtKoordinatDL').innerText = `${currentCoords.lat.toFixed(5)}, ${currentCoords.lng.toFixed(5)}`;
         cekValidasiAbsen();
@@ -1358,15 +1426,19 @@
     }
 
     function cekValidasiAbsen() {
+      const todayIso = getLocalTodayISO();
+      const dalamPeriodePKL = (todayIso >= TGL_MULAI_PKL && todayIso <= TGL_SELESAI_PKL);
+
       const statusPresensi = document.getElementById('selStatusHadir').value;
       const jenisAbsen = document.getElementById('selJenisAbsen').value;
-      const maxRadius = currentUser.user.dudi.radius || 100;
+      const targetDudi = currentCoords.dudiTerdekat || currentUser.user.dudi;
+      const maxRadius = (targetDudi && targetDudi.radius) ? Number(targetDudi.radius) : 100;
       const isRadiusValid = currentCoords.jarak <= maxRadius;
 
       const sudahHadir = statusAbsenHariIni.masuk || statusAbsenHariIni.pulang;
       const sudahNonHadir = statusAbsenHariIni.nonHadirStatus !== null;
 
-      let isLocked = false;
+      let isLocked = !dalamPeriodePKL;
       if (sudahNonHadir) isLocked = true;
       if (sudahHadir && statusPresensi !== 'Hadir') isLocked = true;
       if (statusPresensi === 'Hadir' && ((jenisAbsen === 'Masuk' && statusAbsenHariIni.masuk) || (jenisAbsen === 'Pulang' && statusAbsenHariIni.pulang))) {
@@ -1389,12 +1461,20 @@
     }
 
     async function kirimAbsensi() {
+      const todayIso = getLocalTodayISO();
+      if (todayIso < TGL_MULAI_PKL || todayIso > TGL_SELESAI_PKL) {
+        return alert('Presensi hanya dapat dilakukan pada masa aktif PKL (16 November 2026 s.d. 27 Maret 2027).');
+      }
+
       const statusPresensi = document.getElementById('selStatusHadir').value;
       const jenisAbsen = document.getElementById('selJenisAbsen').value;
-      const maxRadius = currentUser.user.dudi.radius || 100;
+      const targetDudi = currentCoords.dudiTerdekat || currentUser.user.dudi;
+      const maxRadius = (targetDudi && targetDudi.radius) ? Number(targetDudi.radius) : 100;
 
       if (statusPresensi !== 'Libur' && !isPhotoConfirmed) return alert('Ambil dan konfirmasi foto terlebih dahulu!');
-      if (statusPresensi === 'Hadir' && currentCoords.jarak > maxRadius) return alert(`Jarak Anda (${currentCoords.jarak}m) di luar radius DUDI (${maxRadius}m).`);
+      if (statusPresensi === 'Hadir' && currentCoords.jarak > maxRadius) {
+        return alert(`Jarak Anda (${currentCoords.jarak}m) di luar radius ${targetDudi.nama || 'DUDI'} (${maxRadius}m).`);
+      }
       if (statusPresensi === 'Dinas Luar' && !currentCoords.gpsAktif) return alert('Pastikan GPS HP Anda aktif!');
 
       const btn = document.getElementById('btnSubmitAbsen');
@@ -1414,6 +1494,7 @@
           statusKehadiran: statusPresensi,
           jarak: (statusPresensi === 'Hadir') ? currentCoords.jarak : '-',
           koordinat: `${currentCoords.lat},${currentCoords.lng}`,
+          namaDudiAktif: targetDudi ? targetDudi.nama : '',
           imageBase64: statusPresensi === 'Libur' ? '' : capturedImageBase64
         });
         alert(res.message);
@@ -1454,6 +1535,11 @@
     }
 
     async function kirimJurnal() {
+      const todayIso = getLocalTodayISO();
+      if (todayIso < TGL_MULAI_PKL || todayIso > TGL_SELESAI_PKL) {
+        return alert('Pengisian jurnal hanya dibuka pada masa aktif PKL (16 November 2026 s.d. 27 Maret 2027).');
+      }
+
       const uraian = document.getElementById('txtUraianJurnal').value.trim();
       if (!uraian) return alert('Uraian kegiatan wajib diisi!');
 
@@ -1466,12 +1552,13 @@
       spinner.classList.remove('hidden');
 
       try {
+        const targetDudi = currentCoords.dudiTerdekat || currentUser.user.dudi;
         const res = await callAPI({
           action: 'submitJurnal',
           idJurnal: editingJurnalId,
           nis: currentUser.user.nis,
           nama: currentUser.user.nama,
-          idDudi: currentUser.user.dudi.id,
+          idDudi: targetDudi ? targetDudi.id : currentUser.user.dudi.id,
           uraian,
           linkKarya: document.getElementById('txtLinkKarya').value.trim(),
           imageBase64: buktiJurnalBase64
@@ -1629,7 +1716,7 @@
       } else jalankanPrint();
     }
 
-    // ================= REKAP PRESENSI BULANAN DENGAN PERHITUNGAN ALPHA OTOMATIS =================
+    // ================= REKAP PRESENSI BULANAN (DIBATASI 16 NOV 2026 - 27 MAR 2027) =================
     async function muatRekapAbsenSiswa() {
       const bulanFilter = document.getElementById('filterBulanSiswa').value;
       if (!bulanFilter) return;
@@ -1668,24 +1755,28 @@
         const fullIso = `${yearStr}-${monthStr}-${dayStr}`;
         const dayIndex = new Date(year, month - 1, d).getDay();
         const hari = namaHari[dayIndex];
+        const dalamPeriodePKL = (fullIso >= TGL_MULAI_PKL && fullIso <= TGL_SELESAI_PKL);
+
         let rec = mapTanggal[fullIso] ? { ...mapTanggal[fullIso] } : { masuk: '-', pulang: '-', ket: '-' };
 
-     // Jika belum ada presensi pada tanggal tersebut:
-        if (rec.ket === '-') {
-          if (dayIndex === 0) {
-            // Hari Minggu otomatis dikecualikan dari Alpha (dianggap Libur)
-            rec.ket = 'Libur';
-          } else if (fullIso < todayIso) {
-            // Tanggal sudah lewat (sebelum hari ini, selain Minggu) dan tidak absen -> Alpha
-            rec.ket = 'Alpha';
+        if (!dalamPeriodePKL) {
+          // Tanggal sebelum 16 Nov 2026 atau sesudah 27 Mar 2027 tidak dihitung dalam absen
+          rec = { masuk: '-', pulang: '-', ket: '-' };
+        } else {
+          if (rec.ket === '-') {
+            if (dayIndex === 0) {
+              rec.ket = 'Libur';
+            } else if (fullIso < todayIso) {
+              rec.ket = 'Alpha';
+            }
           }
-        }
 
-        if (rec.ket === 'Hadir') countHadir++;
-        else if (rec.ket === 'Dinas Luar') countDL++;
-        else if (rec.ket === 'Ijin') countIjin++;
-        else if (rec.ket === 'Sakit') countSakit++;
-        else if (rec.ket === 'Alpha') countAlpha++;
+          if (rec.ket === 'Hadir') countHadir++;
+          else if (rec.ket === 'Dinas Luar') countDL++;
+          else if (rec.ket === 'Ijin') countIjin++;
+          else if (rec.ket === 'Sakit') countSakit++;
+          else if (rec.ket === 'Alpha') countAlpha++;
+        }
 
         cacheKalenderPresensi.push({ tglFormatted: `${dayStr}/${monthStr}/${yearStr}`, hari, masuk: rec.masuk, pulang: rec.pulang, ket: rec.ket });
       }
