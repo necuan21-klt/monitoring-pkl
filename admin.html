@@ -138,7 +138,7 @@
     </div>
   </div>
 
-  <!-- MODAL POIN 5: KELOLA SISWA & BUKA KUNCI PROFIL PARSIAL (GABUNGAN) -->
+  <!-- MODAL POIN 5: KELOLA SISWA & BUKA KUNCI PROFIL PARSIAL (MENDUKUNG MULTI-DUDI) -->
   <div id="modalKelolaProfilSiswa" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[75] hidden flex items-center justify-center p-4 overflow-y-auto">
     <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700 space-y-4 animate-pop my-auto">
       <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-3">
@@ -146,7 +146,7 @@
           <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-lg font-bold">👤</div>
           <div>
             <h4 id="judulModalKelolaSiswa" class="font-extrabold text-sm text-slate-800 dark:text-white">Kelola Data & Profil Siswa</h4>
-            <p id="subJudulModalKelolaSiswa" class="text-[11px] text-slate-500">Edit langsung data siswa atau buka kunci bagian tertentu saja</p>
+            <p id="subJudulModalKelolaSiswa" class="text-[11px] text-slate-500">Edit langsung data siswa, multi-lokasi DUDI, atau buka kunci bagian tertentu</p>
           </div>
         </div>
         <button onclick="tutupModalKelolaSiswa()" class="text-slate-400 hover:text-rose-500 font-bold">✕</button>
@@ -169,8 +169,15 @@
             </div>
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Tempat PKL (DUDI)</label>
-            <select id="kelolaDudiSiswa" class="w-full p-2 rounded-xl border border-slate-300 bg-white font-semibold"></select>
+            <label class="block font-bold text-slate-700 mb-1">Pilih Tempat PKL (DUDI)</label>
+            <div class="flex gap-1.5">
+              <select id="kelolaDudiSiswa" onchange="document.getElementById('kelolaIdDudiManual').value = this.value;" class="flex-1 p-2 rounded-xl border border-slate-300 bg-white font-semibold"></select>
+              <button type="button" onclick="tambahCabangDudiKeInput()" class="px-2.5 py-2 rounded-xl bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-bold text-[11px] shrink-0" title="Tambahkan sebagai lokasi DUDI ke-2">+ Cabang</button>
+            </div>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">ID DUDI Aktif <span class="font-normal text-slate-400">(Pisahkan koma jika >1 lokasi, misal: DUDI01, DUDI02)</span></label>
+            <input type="text" id="kelolaIdDudiManual" placeholder="Contoh: DUDI01, DUDI02" class="w-full p-2 rounded-xl border border-slate-300 bg-white font-mono font-bold text-indigo-700">
           </div>
           <div>
             <label class="block font-bold text-slate-700 mb-1">Guru Pembimbing Sekolah</label>
@@ -178,9 +185,9 @@
           </div>
         </div>
 
-        <!-- Bagian B: Edit Langsung Kontak WA & Alamat -->
+        <!-- Bagian B: Edit Langsung Kontak WA & Alamat Rumah -->
         <div class="bg-slate-50 dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200 space-y-2.5">
-          <p class="font-extrabold text-[11px] uppercase tracking-wider text-emerald-600">📱 2. Edit Langsung Nomor WA & Alamat</p>
+          <p class="font-extrabold text-[11px] uppercase tracking-wider text-emerald-600">📱 2. Edit Langsung Nomor WA & Alamat Rumah Siswa</p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <div>
               <label class="block font-bold text-slate-700 mb-1">No. WhatsApp Siswa</label>
@@ -192,7 +199,7 @@
             </div>
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Alamat Domisili Siswa</label>
+            <label class="block font-bold text-slate-700 mb-1">🏠 Alamat Rumah Siswa (Domisili)</label>
             <input type="text" id="kelolaAlamatSiswa" placeholder="Belum diisi" class="w-full p-2 rounded-xl border border-slate-300 bg-white">
           </div>
         </div>
@@ -204,7 +211,7 @@
 
           <label class="flex items-start gap-2.5 pt-1 cursor-pointer">
             <input type="checkbox" id="chkResetFotoProfil" class="mt-0.5 rounded text-indigo-600">
-            <span class="text-[11px] font-bold text-slate-700">📸 Buka Kunci & Kosongkan Foto Profil <span class="font-normal text-slate-500">(Siswa dapat mengunggah foto baru; data WA & Alamat di atas tetap tersimpan)</span></span>
+            <span class="text-[11px] font-bold text-slate-700">📸 Buka Kunci & Kosongkan Foto Profil <span class="font-normal text-slate-500">(Siswa dapat mengunggah foto baru; data WA & Alamat Rumah di atas tetap tersimpan)</span></span>
           </label>
 
           <label class="flex items-start gap-2.5 pt-1 cursor-pointer">
@@ -370,12 +377,16 @@
             </button>
           </div>
 
-          <!-- Navigasi Tanggal, Filter Kelas & Pencarian -->
+          <!-- Navigasi Tanggal (DENGAN PANAH SVG BIRU), Filter Kelas & Pencarian -->
           <div class="grid grid-cols-1 md:grid-cols-12 gap-2.5 bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200">
             <div class="md:col-span-4 flex items-center gap-1.5">
-              <button onclick="geserTanggalAdmin(-1)" class="px-2.5 py-2 rounded-xl bg-white dark:bg-slate-700 border border-slate-300 font-bold text-xs">◀</button>
+              <button type="button" onclick="geserTanggalAdmin(-1)" class="w-9 h-9 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center shrink-0 active:scale-95 transition shadow-2xs" title="Tanggal Sebelumnya">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
+              </button>
               <input type="date" id="filterTanggalAdmin" onchange="muatDataGlobalAdmin(true)" class="flex-1 p-2 rounded-xl border border-slate-300 bg-white text-xs font-bold">
-              <button onclick="geserTanggalAdmin(1)" class="px-2.5 py-2 rounded-xl bg-white dark:bg-slate-700 border border-slate-300 font-bold text-xs">▶</button>
+              <button type="button" onclick="geserTanggalAdmin(1)" class="w-9 h-9 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center shrink-0 active:scale-95 transition shadow-2xs" title="Tanggal Berikutnya">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
+              </button>
             </div>
             <div class="md:col-span-3">
               <select id="filterKelasPantauanAdmin" onchange="renderPantauanHarianAdmin()" class="w-full p-2 rounded-xl border border-slate-300 bg-white text-xs font-bold">
@@ -409,7 +420,7 @@
               </select>
             </div>
             <div class="sm:col-span-8">
-              <input type="text" id="searchKelolaSiswa" oninput="renderTabelKelolaSiswa()" placeholder="🔍 Cari nama siswa, NIS, tempat DUDI, guru pembimbing, atau nomor WA..." class="w-full p-2.5 rounded-xl border border-slate-300 bg-white text-xs">
+              <input type="text" id="searchKelolaSiswa" oninput="renderTabelKelolaSiswa()" placeholder="🔍 Cari nama siswa, NIS, tempat DUDI, alamat PKL, alamat rumah, atau nomor WA..." class="w-full p-2.5 rounded-xl border border-slate-300 bg-white text-xs">
             </div>
           </div>
 
@@ -419,8 +430,8 @@
                 <tr>
                   <th class="p-3 border-r border-slate-700 w-10 text-center">No</th>
                   <th class="p-3 border-r border-slate-700">Siswa & Status Profil</th>
-                  <th class="p-3 border-r border-slate-700">Penempatan DUDI & Guru</th>
-                  <th class="p-3 border-r border-slate-700">Kontak WA & Alamat</th>
+                  <th class="p-3 border-r border-slate-700">Tempat PKL (DUDI), Alamat PKL & Guru</th>
+                  <th class="p-3 border-r border-slate-700">Kontak WA & Alamat Rumah Siswa</th>
                   <th class="p-3 text-center w-44">Aksi Kelola / Buka Kunci</th>
                 </tr>
               </thead>
@@ -633,11 +644,13 @@
 
       </main>
 
-      <!-- NAVIGASI SLIDE KIRI-KANAN MODERN & ELEGAN DI BAGIAN BAWAH (ADMIN) -->
+      <!-- NAVIGASI SLIDE KIRI-KANAN MODERN & ELEGAN DI BAGIAN BAWAH (ADMIN - IKON SVG BIRU SERAGAM) -->
       <div class="fixed bottom-4 left-1/2 md:left-[calc(50%+8rem)] -translate-x-1/2 z-20 w-[92%] max-w-xs">
-        <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/90 dark:border-slate-700 shadow-xl rounded-full px-2 py-1.5 flex items-center justify-between">
-          <button type="button" onclick="navigasiTabAdminSebelah(-1)" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold text-xs active:scale-90 transition shadow-2xs" title="Halaman Sebelumnya">
-            ◀
+        <div class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/90 dark:border-slate-700 shadow-xl rounded-full px-2 py-1.5 flex items-center justify-between">
+          <button type="button" onclick="navigasiTabAdminSebelah(-1)" class="w-8 h-8 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center active:scale-90 transition shadow-xs shrink-0" title="Halaman Sebelumnya">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+            </svg>
           </button>
 
           <div class="flex flex-col items-center px-2">
@@ -651,8 +664,10 @@
             </div>
           </div>
 
-          <button type="button" onclick="navigasiTabAdminSebelah(1)" class="w-8 h-8 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center font-bold text-xs active:scale-90 transition shadow-xs" title="Halaman Berikutnya">
-            ▶
+          <button type="button" onclick="navigasiTabAdminSebelah(1)" class="w-8 h-8 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center active:scale-90 transition shadow-xs shrink-0" title="Halaman Berikutnya">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
+            </svg>
           </button>
         </div>
       </div>
@@ -664,6 +679,8 @@
     const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwi7JawplrCbbPJSaWfWsBcH_FfmPV4un5lruxssQqiePZ372172qepYIw163X4PKM-aQ/exec';
     const KOP_ADMIN_FILE = 'kop_laporanguru1.png';
     const LOGO_FILE = 'logo.png';
+    const TGL_MULAI_PKL = '2026-11-16';
+    const TGL_SELESAI_PKL = '2027-03-27';
 
     const URUTAN_TAB_ADMIN = ['Pantauan', 'KelolaSiswa', 'RekapKelas', 'MasterData', 'MonevGuru'];
     const LABEL_TAB_ADMIN = {
@@ -911,12 +928,12 @@
       } else if (menu === 'KelolaSiswa') {
         badgeEl.innerText = 'MANAJEMEN PESERTA PKL';
         judulEl.innerText = '👥 Kelola Data Siswa & Buka Kunci Profil';
-        subEl.innerText = 'Atur penempatan DUDI, Guru Pembimbing, edit kontak WA/Alamat, atau buka kunci foto profil parsial';
+        subEl.innerText = 'Atur penempatan DUDI (mendukung multi-lokasi), Guru Pembimbing, edit kontak WA/Alamat Rumah, atau buka kunci foto profil';
         renderTabelKelolaSiswa();
       } else if (menu === 'RekapKelas') {
         badgeEl.innerText = 'LAPORAN REKAPITULASI KELAS';
         judulEl.innerText = '🖨️ Rekapitulasi Presensi Bulanan Per Kelas';
-        subEl.innerText = 'Rekap kehadiran bulanan per kelas dilengkapi pencarian siswa dan pengesahan Kepala Sekolah';
+        subEl.innerText = 'Rekap kehadiran bulanan per kelas (16 Nov 2026 - 27 Mar 2027) dilengkapi pengesahan Kepala Sekolah';
         muatRekapBulananKelas();
       } else if (menu === 'MasterData') {
         badgeEl.innerText = 'DATABASE UTAMA PKL';
@@ -1055,7 +1072,8 @@
 
       const [yP, mP, dP] = tglAktif.split('-').map(Number);
       const isHariMinggu = new Date(yP, mP - 1, dP).getDay() === 0;
-      const isTanggalMasaLalu = tglAktif < todayIso;
+      const isDalamPeriodePKL = (tglAktif >= TGL_MULAI_PKL && tglAktif <= TGL_SELESAI_PKL);
+      const isTanggalMasaLalu = isDalamPeriodePKL && (tglAktif < todayIso);
 
       const listPerKelas = (filterKelas === 'ALL')
         ? rekapSiswaGlobal
@@ -1092,7 +1110,9 @@
         const isTanpaJam = isAlpha || s.status === 'Libur';
 
         let badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-100 text-rose-800">BELUM PRESENSI</span>`;
-        if (isAlpha) {
+        if (!isDalamPeriodePKL && !s.sudahAbsen) {
+          badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-200 text-slate-600">DI LUAR PERIODE PKL</span>`;
+        } else if (isAlpha) {
           badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-red-600 text-white">ALPHA</span>`;
         } else if (s.sudahAbsen) {
           if (s.status === 'Hadir') badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800">HADIR</span>`;
@@ -1104,7 +1124,6 @@
         const safeNama = amankanKutipan(s.nama);
         const statusUntukModal = isAlpha ? 'Alpha' : s.status;
 
-        // Jika Alpha atau Libur, paksa tampilan jam masuk & pulang menjadi '-'
         const tampilJamMasuk = (!isTanpaJam && s.jamMasuk && s.jamMasuk !== '-') ? (s.jamMasuk + ' WIB') : '-';
         const tampilJamPulang = (!isTanpaJam && s.jamPulang && s.jamPulang !== '-') ? (s.jamPulang + ' WIB') : '-';
         const warnaJamMasuk = tampilJamMasuk !== '-' ? 'text-emerald-700' : 'text-slate-400';
@@ -1162,7 +1181,6 @@
       const st = (statusSekarang && statusSekarang !== 'Belum Absen') ? statusSekarang : 'Hadir';
       document.getElementById('editPresensiStatus').value = st;
 
-      // Jangan beri nilai default 07:30; kosongkan jika belum ada jam atau jika statusnya Alpha/Libur
       const tidakPerluJam = (st === 'Alpha' || st === 'Libur');
       document.getElementById('editPresensiJamMasuk').value = (!tidakPerluJam && jamMasuk && jamMasuk !== '-') ? jamMasuk : '';
       document.getElementById('editPresensiJamPulang').value = (!tidakPerluJam && jamPulang && jamPulang !== '-') ? jamPulang : '';
@@ -1177,7 +1195,6 @@
       const colPulang = document.getElementById('colJamPulangModal');
 
       if (st === 'Alpha' || st === 'Libur') {
-        // Sembunyikan & kosongkan seluruh input jam jika dipilih Alpha atau Libur
         boxJam.classList.add('hidden');
         document.getElementById('editPresensiJamMasuk').value = '';
         document.getElementById('editPresensiJamPulang').value = '';
@@ -1185,7 +1202,6 @@
         boxJam.classList.remove('hidden');
         colPulang.classList.remove('hidden');
       } else {
-        // Dinas Luar, Ijin, Sakit -> hanya tampilkan jam catat/masuk tanpa jam pulang
         boxJam.classList.remove('hidden');
         colPulang.classList.add('hidden');
         document.getElementById('editPresensiJamPulang').value = '';
@@ -1244,7 +1260,7 @@
     }
 
     // =========================================================================
-    // TAB 2 & POIN 5: KELOLA SISWA & BUKA KUNCI PROFIL PARSIAL
+    // TAB 2 & POIN 5: KELOLA SISWA (DILENGKAPI ALAMAT PKL & ALAMAT RUMAH SISWA)
     // =========================================================================
     function renderTabelKelolaSiswa() {
       const tbody = document.getElementById('tbodyKelolaSiswaAdmin');
@@ -1257,6 +1273,8 @@
           s.nama.toLowerCase().includes(kw) ||
           String(s.nis).toLowerCase().includes(kw) ||
           s.dudi.toLowerCase().includes(kw) ||
+          (s.alamatDudi || '').toLowerCase().includes(kw) ||
+          (s.alamatSiswa || '').toLowerCase().includes(kw) ||
           (s.namaGuru || '').toLowerCase().includes(kw) ||
           (s.waSiswa || '').toLowerCase().includes(kw);
         return cocokKelas && cocokKw;
@@ -1270,6 +1288,8 @@
       tbody.innerHTML = hasil.map((s, idx) => {
         const avatar = pastikanUrlGambarDriveValid(s.fotoProfil) || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
         const terkunci = Boolean(s.fotoProfil && s.fotoProfil !== '-');
+        const alamatRumahAman = amankanKutipan(s.alamatSiswa || '-');
+        const alamatDudiAman = amankanKutipan(s.alamatDudi || '-');
 
         return `
           <tr class="hover:bg-slate-50/80">
@@ -1286,14 +1306,15 @@
                 </div>
               </div>
             </td>
-            <td class="p-3 border-r border-slate-100">
-              <p class="font-bold text-indigo-700 dark:text-indigo-400">🏢 ${s.dudi}</p>
-              <p class="text-[11px] text-slate-500 mt-0.5">👨‍🏫 Guru: <b>${s.namaGuru}</b></p>
+            <td class="p-3 border-r border-slate-100 text-[11px] space-y-0.5">
+              <p class="font-bold text-indigo-700 dark:text-indigo-400 text-xs">🏢 ${s.dudi}</p>
+              <p class="text-slate-600 dark:text-slate-300" title="${alamatDudiAman}">📍 <b>Alamat PKL:</b> ${s.alamatDudi && s.alamatDudi !== '-' ? s.alamatDudi : 'Belum diatur'}</p>
+              <p class="text-slate-500">👨‍🏫 <b>Guru:</b> ${s.namaGuru}</p>
             </td>
-            <td class="p-3 border-r border-slate-100 text-[11px]">
-              <p>📱 Siswa: <b>${s.waSiswa || '-'}</b></p>
-              <p>👪 Ortu: <b>${s.waKeluarga || '-'}</b></p>
-              <p class="text-slate-500 truncate max-w-[200px]" title="${s.alamatSiswa || '-'}">🏠 ${s.alamatSiswa || '-'}</p>
+            <td class="p-3 border-r border-slate-100 text-[11px] space-y-0.5">
+              <p>📱 <b>WA Siswa:</b> ${s.waSiswa || '-'}</p>
+              <p>👪 <b>WA Ortu:</b> ${s.waKeluarga || '-'}</p>
+              <p class="text-slate-600 dark:text-slate-300" title="${alamatRumahAman}">🏠 <b>Alamat Rumah:</b> ${s.alamatSiswa || 'Belum diisi'}</p>
             </td>
             <td class="p-3 text-center">
               <button onclick="bukaModalKelolaSiswa('${s.nis}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 rounded-xl text-xs shadow flex items-center justify-center gap-1.5">
@@ -1303,6 +1324,20 @@
           </tr>
         `;
       }).join('');
+    }
+
+    function tambahCabangDudiKeInput() {
+      const selVal = document.getElementById('kelolaDudiSiswa').value;
+      if (!selVal) return;
+      const inputEl = document.getElementById('kelolaIdDudiManual');
+      const existing = inputEl.value
+        .split(/[,;|]+/)
+        .map(x => x.trim())
+        .filter(Boolean);
+      if (!existing.map(x => x.toUpperCase()).includes(selVal.toUpperCase())) {
+        existing.push(selVal);
+      }
+      inputEl.value = existing.join(', ');
     }
 
     function bukaModalKelolaSiswa(nis) {
@@ -1315,7 +1350,10 @@
 
       document.getElementById('kelolaKelasSiswa').value = s.kelas || '';
       document.getElementById('kelolaPinSiswa').value = s.pin || s.nis;
-      document.getElementById('kelolaDudiSiswa').value = s.idDudi || '';
+
+      const idDudiPertama = String(s.idDudi || '').split(',')[0].trim();
+      document.getElementById('kelolaDudiSiswa').value = idDudiPertama;
+      document.getElementById('kelolaIdDudiManual').value = s.idDudi || '';
       document.getElementById('kelolaGuruSiswa').value = s.idGuru || '';
 
       document.getElementById('kelolaWaSiswa').value = s.waSiswa || '';
@@ -1336,7 +1374,8 @@
       const nis = document.getElementById('kelolaNisSiswa').value;
       const kelas = document.getElementById('kelolaKelasSiswa').value.trim();
       const pin = document.getElementById('kelolaPinSiswa').value.trim();
-      const idDudi = document.getElementById('kelolaDudiSiswa').value;
+      const idDudiManual = document.getElementById('kelolaIdDudiManual').value.trim();
+      const idDudi = idDudiManual || document.getElementById('kelolaDudiSiswa').value;
       const idGuru = document.getElementById('kelolaGuruSiswa').value;
       const waSiswa = document.getElementById('kelolaWaSiswa').value.trim();
       const waKeluarga = document.getElementById('kelolaWaKeluarga').value.trim();
@@ -1494,7 +1533,7 @@
         <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 flex justify-between items-center">
           <div>
             <p class="font-bold text-slate-800">${d.nama} <span class="text-[10px] text-indigo-600">(${d.id})</span></p>
-            <p class="text-[10px] text-slate-500">${d.alamat || '-'} • Instruktur: ${d.instruktur || '-'}</p>
+            <p class="text-[10px] text-slate-500">📍 ${d.alamat || '-'} • Instruktur: ${d.instruktur || '-'}</p>
           </div>
         </div>
       `).join('');
