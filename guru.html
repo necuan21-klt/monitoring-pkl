@@ -991,7 +991,7 @@
 
         let badgeStatus = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-100 text-rose-800">BELUM PRESENSI</span>`;
         if (!isDalamPeriodePKL && !s.sudahAbsen) {
-          badgeStatus = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-200 text-slate-600">DI LUAR PERIODE PKL</span>`;
+          badgeStatus = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-600 text-white">DI LUAR PERIODE PKL</span>`;
         } else if (isAlpha) {
           badgeStatus = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-red-600 text-white">ALPHA</span>`;
         } else if (s.sudahAbsen) {
@@ -999,7 +999,7 @@
           else if (s.status === 'Dinas Luar') badgeStatus = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-purple-100 text-purple-800">DINAS LUAR</span>`;
           else if (s.status === 'Ijin') badgeStatus = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800">IJIN</span>`;
           else if (s.status === 'Sakit') badgeStatus = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-100 text-sky-800">SAKIT</span>`;
-          else if (s.status === 'Libur') badgeStatus = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-200 text-slate-700">LIBUR</span>`;
+          else if (s.status === 'Libur') badgeStatus = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-600 text-white">LIBUR</span>`;
         }
 
         let infoLokasiHtml = `<p class="text-[11px] text-slate-400 mt-0.5">📍 Lokasi: Belum ada rekaman titik GPS</p>`;
