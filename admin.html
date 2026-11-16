@@ -129,6 +129,11 @@
             <p class="text-[10px] text-slate-400 mt-0.5">*Kosongkan jika belum pulang</p>
           </div>
         </div>
+
+        <div id="boxKoordinatModalPresensi" class="hidden">
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">🛰️ Titik Koordinat Lokasi (Lat, Lng)</label>
+          <input type="text" id="editPresensiKoordinat" placeholder="Contoh: -7.70512, 110.60123" class="w-full p-2.5 rounded-xl border border-slate-300 bg-white font-mono text-xs">
+        </div>
       </div>
 
       <div class="flex gap-2.5 pt-2">
@@ -794,6 +799,17 @@
       return String(teks || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
     }
 
+    function salinKoordinatAdmin(teksKoordinat, btnEl) {
+      if (!teksKoordinat || teksKoordinat === '-') return;
+      navigator.clipboard.writeText(teksKoordinat).then(() => {
+        const asli = btnEl.innerHTML;
+        btnEl.innerHTML = '✔ Tersalin';
+        setTimeout(() => { btnEl.innerHTML = asli; }, 1500);
+      }).catch(() => {
+        prompt('Salin koordinat lokasi siswa berikut:', teksKoordinat);
+      });
+    }
+
     function bukaModalFoto(url, judul) {
       const valid = pastikanUrlGambarDriveValid(url);
       if (!valid) return alert('Foto tidak tersedia.');
@@ -1063,17 +1079,6 @@
       }
     }
 
-    function salinKoordinatAdmin(teksKoordinat, btnEl) {
-      if (!teksKoordinat || teksKoordinat === '-') return;
-      navigator.clipboard.writeText(teksKoordinat).then(() => {
-        const asli = btnEl.innerHTML;
-        btnEl.innerHTML = '✔ Tersalin';
-        setTimeout(() => { btnEl.innerHTML = asli; }, 1500);
-      }).catch(() => {
-        prompt('Salin koordinat lokasi siswa berikut:', teksKoordinat);
-      });
-    }
-
     function renderPantauanHarianAdmin() {
       const wadah = document.getElementById('wadahPantauanHarianAdmin');
       const filterKelas = document.getElementById('filterKelasPantauanAdmin').value || 'ALL';
@@ -1140,16 +1145,16 @@
         const warnaJamMasuk = tampilJamMasuk !== '-' ? 'text-emerald-700' : 'text-slate-400';
 
         // Tampilan Lokasi & Koordinat (Khusus DL tampilkan koordinat yang bisa di-copy paste + Buka Maps)
+        const koordClean = (s.koordinat && String(s.koordinat).trim() !== '-') ? String(s.koordinat).trim() : '';
         let infoLokasiAdminHtml = `<p class="text-[11px] text-slate-500">📍 Belum ada titik GPS</p>`;
         if (isAlpha) {
           infoLokasiAdminHtml = `<p class="text-[11px] text-rose-600 font-semibold">📍 Ket: Alpha (Tanpa Keterangan)</p>`;
         } else if (s.sudahAbsen) {
-          const koord = (s.koordinat && s.koordinat !== '-') ? String(s.koordinat).trim() : '';
-          const linkMaps = (koord && koord.includes(','))
-            ? `<a href="https://www.google.com/maps?q=${koord}" target="_blank" class="text-indigo-600 dark:text-indigo-400 underline font-bold ml-1">Buka Maps ↗</a>`
+          const linkMaps = (koordClean && koordClean.includes(','))
+            ? `<a href="https://www.google.com/maps?q=${encodeURIComponent(koordClean)}" target="_blank" class="text-indigo-600 dark:text-indigo-400 underline font-bold ml-1">Buka Maps ↗</a>`
             : '';
-          const btnCopyKoord = koord
-            ? `<button type="button" onclick="salinKoordinatAdmin('${amankanKutipan(koord)}', this)" class="px-1.5 py-0.5 rounded bg-purple-100 dark:bg-slate-700 text-purple-800 dark:text-purple-200 hover:bg-purple-200 font-bold text-[10px] ml-1 transition" title="Salin Koordinat">📋 Salin</button>`
+          const btnCopyKoord = koordClean
+            ? `<button type="button" onclick="salinKoordinatAdmin('${amankanKutipan(koordClean)}', this)" class="px-1.5 py-0.5 rounded bg-purple-100 dark:bg-slate-700 text-purple-800 dark:text-purple-200 hover:bg-purple-200 font-bold text-[10px] ml-1 transition" title="Salin Koordinat">📋 Salin</button>`
             : '';
 
           if (s.status === 'Hadir') {
@@ -1158,7 +1163,7 @@
             infoLokasiAdminHtml = `
               <div class="flex flex-wrap items-center gap-1 text-[11px] text-purple-700 dark:text-purple-300 pt-0.5">
                 <span>🛰️ Koordinat DL:</span>
-                <code class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 font-mono font-bold text-slate-800 dark:text-slate-100 select-all cursor-text">${koord || '-'}</code>
+                <code class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 font-mono font-bold text-slate-800 dark:text-slate-100 select-all cursor-text">${koordClean || 'Belum tercatat'}</code>
                 ${btnCopyKoord}
                 ${linkMaps}
               </div>`;
@@ -1196,7 +1201,7 @@
 
               <div class="flex items-center gap-1.5 justify-end">
                 ${s.fotoUrl ? `<button onclick="bukaModalFoto('${s.fotoUrl}', 'Foto Presensi - ${safeNama}')" class="px-2.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs" title="Lihat Foto">📸</button>` : ''}
-                <button onclick="bukaModalEditPresensi('${s.nis}', '${safeNama}', '${tglAktif}', '${statusUntukModal}', '${isTanpaJam ? '-' : s.jamMasuk}', '${isTanpaJam ? '-' : s.jamPulang}')" class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow flex items-center gap-1">
+                <button onclick="bukaModalEditPresensi('${s.nis}', '${safeNama}', '${tglAktif}', '${statusUntukModal}', '${isTanpaJam ? '-' : s.jamMasuk}', '${isTanpaJam ? '-' : s.jamPulang}', '${amankanKutipan(koordClean)}')" class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow flex items-center gap-1">
                   <span>✏️</span> <span>Edit</span>
                 </button>
                 ${s.sudahAbsen ? `
@@ -1211,7 +1216,7 @@
       }).join('');
     }
 
-    function bukaModalEditPresensi(nis, nama, tanggal, statusSekarang, jamMasuk, jamPulang) {
+    function bukaModalEditPresensi(nis, nama, tanggal, statusSekarang, jamMasuk, jamPulang, koordinatSekarang = '') {
       document.getElementById('editPresensiNis').value = nis;
       document.getElementById('editPresensiNama').value = nama;
       document.getElementById('editPresensiTanggal').value = tanggal;
@@ -1223,6 +1228,7 @@
       const tidakPerluJam = (st === 'Alpha' || st === 'Libur');
       document.getElementById('editPresensiJamMasuk').value = (!tidakPerluJam && jamMasuk && jamMasuk !== '-') ? jamMasuk : '';
       document.getElementById('editPresensiJamPulang').value = (!tidakPerluJam && jamPulang && jamPulang !== '-') ? jamPulang : '';
+      document.getElementById('editPresensiKoordinat').value = (koordinatSekarang && koordinatSekarang !== '-') ? koordinatSekarang : '';
 
       aturTampilanJamModalPresensi();
       document.getElementById('modalEditPresensi').classList.remove('hidden');
@@ -1232,17 +1238,26 @@
       const st = document.getElementById('editPresensiStatus').value;
       const boxJam = document.getElementById('boxJamModalPresensi');
       const colPulang = document.getElementById('colJamPulangModal');
+      const boxKoord = document.getElementById('boxKoordinatModalPresensi');
 
       if (st === 'Alpha' || st === 'Libur') {
         boxJam.classList.add('hidden');
+        boxKoord.classList.add('hidden');
         document.getElementById('editPresensiJamMasuk').value = '';
         document.getElementById('editPresensiJamPulang').value = '';
       } else if (st === 'Hadir') {
         boxJam.classList.remove('hidden');
         colPulang.classList.remove('hidden');
+        boxKoord.classList.add('hidden');
+      } else if (st === 'Dinas Luar') {
+        boxJam.classList.remove('hidden');
+        colPulang.classList.add('hidden');
+        boxKoord.classList.remove('hidden');
+        document.getElementById('editPresensiJamPulang').value = '';
       } else {
         boxJam.classList.remove('hidden');
         colPulang.classList.add('hidden');
+        boxKoord.classList.add('hidden');
         document.getElementById('editPresensiJamPulang').value = '';
       }
     }
@@ -1260,6 +1275,7 @@
 
       const jamMasuk = tidakPerluJam ? '-' : (document.getElementById('editPresensiJamMasuk').value || '-');
       const jamPulang = (statusKehadiran === 'Hadir') ? (document.getElementById('editPresensiJamPulang').value || '-') : '-';
+      const koordinat = (statusKehadiran === 'Dinas Luar') ? (document.getElementById('editPresensiKoordinat').value.trim() || '') : '';
 
       if (statusKehadiran === 'Hadir' && jamMasuk === '-') {
         return alert('Untuk status Hadir, silakan isi Jam Masuk terlebih dahulu!');
@@ -1271,7 +1287,7 @@
       try {
         const res = await callAPI({
           action: 'adminEditPresensiHarian',
-          nis, nama, tanggal, statusKehadiran, jamMasuk, jamPulang
+          nis, nama, tanggal, statusKehadiran, jamMasuk, jamPulang, koordinat
         });
         alert(res.message);
         if (res.status === 'success') {
