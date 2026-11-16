@@ -352,7 +352,7 @@
           <div>
             <span id="badgeKategoriHalamanAdmin" class="inline-block text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 mb-1">PANEL KENDALI ADMIN</span>
             <h2 id="txtJudulHalamanAdmin" class="font-extrabold text-base sm:text-lg tracking-wide">📍 Pantauan Presensi Harian & Koreksi Data</h2>
-            <p id="txtSubJudulHalamanAdmin" class="text-xs text-indigo-200 mt-0.5">Pantau kehadiran seluruh siswa PKL, bantu input/edit presensi, atau reset rekaman harian</p>
+            <p id="txtSubJudulHalamanAdmin" class="text-xs text-indigo-200 mt-0.5">Pantau kehadiran seluruh siswa PKL, hubungi WA siswa, bantu input/edit presensi, atau reset rekaman harian</p>
           </div>
           <button onclick="muatDataGlobalAdmin(true)" class="bg-white/15 hover:bg-white/25 px-3.5 py-2 rounded-2xl text-xs font-bold border border-white/20 flex items-center gap-1.5 self-start sm:self-auto shrink-0 active:scale-95 transition">
             <span id="iconRefreshAdmin">🔄</span> <span>Segarkan Data</span>
@@ -360,7 +360,7 @@
         </div>
 
         <!-- ========================================================================= -->
-        <!-- TAB 1: PANTAUAN PRESENSI HARIAN, EDIT MANUAL & RESET                      -->
+        <!-- TAB 1: PANTAUAN PRESENSI HARIAN, HUBUNGI WA, EDIT MANUAL & RESET          -->
         <!-- ========================================================================= -->
         <section id="tabPantauan" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
           
@@ -785,6 +785,22 @@
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     }
 
+    function formatTanggalIndoLengkapAdmin(isoDateStr) {
+      if (!isoDateStr || isoDateStr.length < 10) return isoDateStr || '-';
+      const [y, m, d] = isoDateStr.substring(0, 10).split('-').map(Number);
+      const dt = new Date(y, m - 1, d);
+      return dt.toLocaleDateString('id-ID', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+    }
+
+    function formatNomorWaKeLinkAdmin(no, pesanOtomatis = '') {
+      if (!no) return '';
+      let clean = String(no).replace(/\D/g, '');
+      if (clean.startsWith('0')) clean = '62' + clean.substring(1);
+      if (!clean) return '';
+      const queryPesan = pesanOtomatis ? `?text=${encodeURIComponent(pesanOtomatis)}` : '';
+      return `https://wa.me/${clean}${queryPesan}`;
+    }
+
     function pastikanUrlGambarDriveValid(url) {
       if (!url || url === '-') return '';
       if (url.startsWith('data:image')) return url;
@@ -940,7 +956,7 @@
       if (menu === 'Pantauan') {
         badgeEl.innerText = 'MONITORING & KOREKSI HARIAN';
         judulEl.innerText = '📍 Pantauan Presensi Harian & Koreksi Data';
-        subEl.innerText = 'Pantau kehadiran seluruh siswa PKL, bantu input/edit presensi, atau reset rekaman harian';
+        subEl.innerText = 'Pantau kehadiran seluruh siswa PKL, hubungi WA siswa, bantu input/edit presensi, atau reset rekaman harian';
       } else if (menu === 'KelolaSiswa') {
         badgeEl.innerText = 'MANAJEMEN PESERTA PKL';
         judulEl.innerText = '👥 Kelola Data Siswa & Buka Kunci Profil';
@@ -1044,7 +1060,7 @@
     }
 
     // =========================================================================
-    // TAB 1: PANTAUAN HARIAN + TOMBOL EDIT PRESENSI MANUAL & RESET
+    // TAB 1: PANTAUAN HARIAN + HUBUNGI WA SISWA + EDIT MANUAL & RESET
     // =========================================================================
     function geserTanggalAdmin(offset) {
       const el = document.getElementById('filterTanggalAdmin');
@@ -1085,6 +1101,7 @@
       const kw = (document.getElementById('searchPantauanSiswa').value || '').toLowerCase().trim();
       const tglAktif = document.getElementById('filterTanggalAdmin').value || getLocalTodayISO();
       const todayIso = getLocalTodayISO();
+      const tglIndo = formatTanggalIndoLengkapAdmin(tglAktif);
 
       const [yP, mP, dP] = tglAktif.split('-').map(Number);
       const isHariMinggu = new Date(yP, mP - 1, dP).getDay() === 0;
@@ -1172,6 +1189,26 @@
           }
         }
 
+        // Tombol Hubungi Siswa via WhatsApp (Muncul saat Belum Absen/Alpha ATAU Baru Absen Pagi / Belum Absen Pulang)
+        const belumAbsenSamaSekali = !s.sudahAbsen || isAlpha;
+        const baruAbsenPagi = s.sudahAbsen && s.status === 'Hadir' && (!s.jamPulang || s.jamPulang === '-');
+        let btnHubungiWaAdminHtml = '';
+
+        if (isDalamPeriodePKL && (belumAbsenSamaSekali || baruAbsenPagi)) {
+          const teksPesanWa = belumAbsenSamaSekali
+            ? `Halo ${s.nama}, mengingatkan dari Admin Pokja PKL untuk segera mengisi presensi kehadiran PKL pada hari ini (${tglIndo}). Terima kasih.`
+            : `Halo ${s.nama}, tercatat baru melakukan presensi masuk pagi (${s.jamMasuk} WIB) pada ${tglIndo}. Jangan lupa mengisi presensi pulang setelah selesai kegiatan PKL. Terima kasih.`;
+
+          const labelTombolWa = belumAbsenSamaSekali ? '💬 Hubungi Siswa' : '💬 Ingatkan Pulang';
+          const urlWa = formatNomorWaKeLinkAdmin(s.waSiswa, teksPesanWa);
+
+          if (urlWa) {
+            btnHubungiWaAdminHtml = `<a href="${urlWa}" target="_blank" class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 shadow-2xs shrink-0 transition" title="Hubungi WhatsApp Siswa (${s.waSiswa})">${labelTombolWa}</a>`;
+          } else {
+            btnHubungiWaAdminHtml = `<span class="px-2.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 text-[10px] font-semibold shrink-0" title="Siswa belum mengisi nomor WhatsApp di profil">📵 WA Kosong</span>`;
+          }
+        }
+
         return `
           <div class="p-3.5 rounded-2xl border ${isAlpha ? 'border-red-300 bg-red-50/20' : 'border-slate-200 bg-white'} dark:border-slate-700 dark:bg-slate-900 flex flex-col lg:flex-row lg:items-center justify-between gap-3 shadow-2xs">
             <div class="flex items-start gap-3">
@@ -1199,7 +1236,8 @@
                 </div>
               </div>
 
-              <div class="flex items-center gap-1.5 justify-end">
+              <div class="flex flex-wrap items-center gap-1.5 justify-end">
+                ${btnHubungiWaAdminHtml}
                 ${s.fotoUrl ? `<button onclick="bukaModalFoto('${s.fotoUrl}', 'Foto Presensi - ${safeNama}')" class="px-2.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs" title="Lihat Foto">📸</button>` : ''}
                 <button onclick="bukaModalEditPresensi('${s.nis}', '${safeNama}', '${tglAktif}', '${statusUntukModal}', '${isTanpaJam ? '-' : s.jamMasuk}', '${isTanpaJam ? '-' : s.jamPulang}', '${amankanKutipan(koordClean)}')" class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow flex items-center gap-1">
                   <span>✏️</span> <span>Edit</span>
