@@ -1063,6 +1063,17 @@
       }
     }
 
+    function salinKoordinatAdmin(teksKoordinat, btnEl) {
+      if (!teksKoordinat || teksKoordinat === '-') return;
+      navigator.clipboard.writeText(teksKoordinat).then(() => {
+        const asli = btnEl.innerHTML;
+        btnEl.innerHTML = '✔ Tersalin';
+        setTimeout(() => { btnEl.innerHTML = asli; }, 1500);
+      }).catch(() => {
+        prompt('Salin koordinat lokasi siswa berikut:', teksKoordinat);
+      });
+    }
+
     function renderPantauanHarianAdmin() {
       const wadah = document.getElementById('wadahPantauanHarianAdmin');
       const filterKelas = document.getElementById('filterKelasPantauanAdmin').value || 'ALL';
@@ -1111,13 +1122,13 @@
 
         let badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-100 text-rose-800">BELUM PRESENSI</span>`;
         if (!isDalamPeriodePKL && !s.sudahAbsen) {
-          badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-200 text-slate-600">DI LUAR PERIODE PKL</span>`;
+          badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-600 text-white dark:bg-slate-700 dark:text-slate-100">DI LUAR PERIODE PKL</span>`;
         } else if (isAlpha) {
           badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-red-600 text-white">ALPHA</span>`;
         } else if (s.sudahAbsen) {
           if (s.status === 'Hadir') badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800">HADIR</span>`;
           else if (s.status === 'Dinas Luar') badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-purple-100 text-purple-800">DINAS LUAR</span>`;
-          else if (s.status === 'Libur') badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-200 text-slate-700">LIBUR</span>`;
+          else if (s.status === 'Libur') badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-600 text-white dark:bg-slate-700 dark:text-slate-100">LIBUR</span>`;
           else badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800">${s.status.toUpperCase()}</span>`;
         }
 
@@ -1127,6 +1138,34 @@
         const tampilJamMasuk = (!isTanpaJam && s.jamMasuk && s.jamMasuk !== '-') ? (s.jamMasuk + ' WIB') : '-';
         const tampilJamPulang = (!isTanpaJam && s.jamPulang && s.jamPulang !== '-') ? (s.jamPulang + ' WIB') : '-';
         const warnaJamMasuk = tampilJamMasuk !== '-' ? 'text-emerald-700' : 'text-slate-400';
+
+        // Tampilan Lokasi & Koordinat (Khusus DL tampilkan koordinat yang bisa di-copy paste + Buka Maps)
+        let infoLokasiAdminHtml = `<p class="text-[11px] text-slate-500">📍 Belum ada titik GPS</p>`;
+        if (isAlpha) {
+          infoLokasiAdminHtml = `<p class="text-[11px] text-rose-600 font-semibold">📍 Ket: Alpha (Tanpa Keterangan)</p>`;
+        } else if (s.sudahAbsen) {
+          const koord = (s.koordinat && s.koordinat !== '-') ? String(s.koordinat).trim() : '';
+          const linkMaps = (koord && koord.includes(','))
+            ? `<a href="https://www.google.com/maps?q=${koord}" target="_blank" class="text-indigo-600 dark:text-indigo-400 underline font-bold ml-1">Buka Maps ↗</a>`
+            : '';
+          const btnCopyKoord = koord
+            ? `<button type="button" onclick="salinKoordinatAdmin('${amankanKutipan(koord)}', this)" class="px-1.5 py-0.5 rounded bg-purple-100 dark:bg-slate-700 text-purple-800 dark:text-purple-200 hover:bg-purple-200 font-bold text-[10px] ml-1 transition" title="Salin Koordinat">📋 Salin</button>`
+            : '';
+
+          if (s.status === 'Hadir') {
+            infoLokasiAdminHtml = `<p class="text-[11px] text-slate-600 dark:text-slate-300">📍 Jarak: <b>${s.jarak}m</b> dari DUDI ${linkMaps}</p>`;
+          } else if (s.status === 'Dinas Luar') {
+            infoLokasiAdminHtml = `
+              <div class="flex flex-wrap items-center gap-1 text-[11px] text-purple-700 dark:text-purple-300 pt-0.5">
+                <span>🛰️ Koordinat DL:</span>
+                <code class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 font-mono font-bold text-slate-800 dark:text-slate-100 select-all cursor-text">${koord || '-'}</code>
+                ${btnCopyKoord}
+                ${linkMaps}
+              </div>`;
+          } else {
+            infoLokasiAdminHtml = `<p class="text-[11px] text-slate-500">📍 Ket: <b>${s.status}</b> ${linkMaps}</p>`;
+          }
+        }
 
         return `
           <div class="p-3.5 rounded-2xl border ${isAlpha ? 'border-red-300 bg-red-50/20' : 'border-slate-200 bg-white'} dark:border-slate-700 dark:bg-slate-900 flex flex-col lg:flex-row lg:items-center justify-between gap-3 shadow-2xs">
@@ -1139,7 +1178,7 @@
                 </div>
                 <p class="text-[11px] text-slate-500 font-semibold">${s.kelas} • NIS: ${s.nis} • Pembimbing: <b>${s.namaGuru}</b></p>
                 <p class="text-xs font-bold text-indigo-700 dark:text-indigo-400">🏢 ${s.dudi}</p>
-                <p class="text-[11px] text-slate-500">📍 ${s.sudahAbsen ? (s.status === 'Hadir' ? `Jarak: ${s.jarak}m dari DUDI` : `Ket: ${s.status}`) : (isAlpha ? 'Ket: Alpha (Tanpa Keterangan)' : 'Belum ada titik GPS')}</p>
+                ${infoLokasiAdminHtml}
               </div>
             </div>
 
