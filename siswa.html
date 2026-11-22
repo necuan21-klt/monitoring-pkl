@@ -280,7 +280,6 @@
                 </div>
               </div>
 
-              <!-- PEMBERITAHUAN RINGKAS & ELEGAN -->
               <div id="boxInfoFotoTerkunci" class="hidden bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-3 rounded-xl text-[11px] text-slate-500 text-center font-medium">
                 ℹ️ Hubungi Admin Pokja PKL jika terdapat perubahan data profil.
               </div>
@@ -385,18 +384,30 @@
           </button>
         </section>
 
-        <!-- TAB 2: ISI JURNAL HARIAN -->
+        <!-- TAB 2: ISI JURNAL HARIAN (MENDUKUNG INPUT TANGGAL MUNDUR / SUSULAN) -->
         <section id="tabJurnal" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-          <div id="bannerStatusJurnalHarian" class="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 p-3 rounded-xl text-xs flex justify-between items-center">
-            <span id="txtInfoModeJurnal" class="text-indigo-900 dark:text-indigo-300 font-semibold">📝 Silakan isi jurnal kegiatan Anda hari ini (1x sehari).</span>
-            <span id="badgeModeJurnal" class="bg-indigo-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">BARU</span>
+          <!-- PEMILIH TANGGAL KEGIATAN JURNAL -->
+          <div class="bg-slate-50 dark:bg-slate-800/80 p-3.5 rounded-2xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
+            <div>
+              <label for="inputTanggalJurnal" class="font-extrabold text-slate-700 dark:text-slate-200 block">📅 Tanggal Kegiatan Jurnal</label>
+              <span class="text-[11px] text-slate-500">Pilih tanggal hari ini atau tanggal sebelumnya jika lupa mengisi.</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="date" id="inputTanggalJurnal" onchange="sinkronFormJurnalTunggalHariIni(false)" class="p-2 rounded-xl border border-indigo-300 bg-white font-bold text-xs">
+              <button type="button" onclick="setTanggalJurnalHariIni()" class="px-2.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[11px] shrink-0">Hari Ini</button>
+            </div>
+          </div>
+
+          <div id="bannerStatusJurnalHarian" class="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 p-3 rounded-xl text-xs flex justify-between items-center gap-2">
+            <span id="txtInfoModeJurnal" class="text-indigo-900 dark:text-indigo-300 font-semibold">📝 Silakan isi jurnal kegiatan Anda (1x sehari).</span>
+            <span id="badgeModeJurnal" class="bg-indigo-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shrink-0">BARU</span>
           </div>
 
           <!-- KARTU MODE BACA -->
           <div id="boxJurnalReadView" class="hidden bg-slate-50 dark:bg-slate-800/90 p-4 rounded-2xl border border-slate-200 space-y-3 text-xs">
             <div class="flex justify-between items-center border-b border-slate-200 pb-2.5">
               <div>
-                <span class="text-[10px] font-bold uppercase text-emerald-600">✔ Jurnal Hari Ini Terkirim</span>
+                <span class="text-[10px] font-bold uppercase text-emerald-600">✔ Jurnal Tanggal Ini Terkirim</span>
                 <p id="readWaktuJurnal" class="font-bold text-slate-700 text-xs mt-0.5">-</p>
               </div>
               <span id="readStatusValidasiJurnal" class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Menunggu Validasi</span>
@@ -417,7 +428,7 @@
                 <a id="linkBuktiTersimpan" href="#" target="_blank" class="inline-flex items-center gap-1.5 text-xs text-indigo-600 font-bold underline">📎 Lihat Bukti Foto/Karya Terunggah</a>
               </div>
               <button onclick="bukaModeEditJurnalHariIni()" class="ml-auto bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow flex items-center gap-1.5 transition">
-                <span>✏️</span> <span>Edit Jurnal Hari Ini</span>
+                <span>✏️</span> <span>Edit Jurnal Tanggal Ini</span>
               </button>
             </div>
           </div>
@@ -425,8 +436,8 @@
           <!-- FORMULIR INPUT / EDIT JURNAL -->
           <div id="boxJurnalFormView" class="space-y-4">
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1.5">Uraian Kegiatan Pekerjaan Hari Ini</label>
-              <textarea id="txtUraianJurnal" oninput="simpanDraftJurnal()" rows="5" placeholder="Tuliskan detail pekerjaan yang Anda lakukan hari ini di tempat PKL..." class="w-full p-3 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">Uraian Kegiatan Pekerjaan</label>
+              <textarea id="txtUraianJurnal" oninput="simpanDraftJurnal()" rows="5" placeholder="Tuliskan detail pekerjaan yang Anda lakukan di tempat PKL..." class="w-full p-3 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
             </div>
 
             <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
@@ -442,7 +453,7 @@
             <div class="flex gap-2.5">
               <button type="button" id="btnBatalEditJurnal" onclick="batalModeEditJurnalHariIni()" class="hidden w-1/3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3.5 rounded-xl text-xs">Batal Edit</button>
               <button onclick="kirimJurnal()" id="btnSubmitJurnal" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-md flex items-center justify-center gap-2 text-xs sm:text-sm">
-                <span id="txtBtnJurnal">Simpan Jurnal Hari Ini</span>
+                <span id="txtBtnJurnal">Simpan Jurnal Kegiatan</span>
                 <svg id="spinnerJurnal" class="hidden animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -647,6 +658,17 @@
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     }
 
+    function formatBulanTahunIndo(yyyyMm) {
+      if (!yyyyMm || !yyyyMm.includes('-')) return yyyyMm || '-';
+      const namaBulan = [
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+      ];
+      const [yStr, mStr] = yyyyMm.split('-');
+      const mIdx = Number(mStr) - 1;
+      return `${namaBulan[mIdx] || mStr} ${yStr}`;
+    }
+
     function pastikanUrlGambarDriveValid(url) {
       if (!url || url === '-') return '';
       if (url.startsWith('data:image')) return url;
@@ -657,9 +679,6 @@
       return url;
     }
 
-    /**
-     * Mengambil daftar lokasi DUDI yang terdaftar pada siswa (mendukung 1 atau banyak DUDI)
-     */
     function ambilDaftarDudiSiswa() {
       if (currentUser?.user?.dudiList && Array.isArray(currentUser.user.dudiList) && currentUser.user.dudiList.length > 0) {
         return currentUser.user.dudiList;
@@ -786,6 +805,12 @@
       document.getElementById('profGuru').innerText = currentUser.user.namaGuru || currentUser.user.idGuru || '-';
 
       perbaruiTampilanInfoDudiSiswa();
+
+      const todayIso = getLocalTodayISO();
+      const inputTglJurnal = document.getElementById('inputTanggalJurnal');
+      inputTglJurnal.min = TGL_MULAI_PKL;
+      inputTglJurnal.max = todayIso < TGL_SELESAI_PKL ? todayIso : TGL_SELESAI_PKL;
+      inputTglJurnal.value = todayIso;
 
       const cachedAvatar = localStorage.getItem('avatar_cache_' + currentUser.user.nis);
       terapkanUIProfilFoto(currentUser.user.fotoProfil || cachedAvatar, currentUser.user.waSiswa, currentUser.user.waKeluarga, currentUser.user.alamatSiswa);
@@ -951,7 +976,7 @@
           iconTab.innerText = '📍';
         } else if (menu === 'Jurnal') {
           txtJudulUtama.innerText = '📝 Jurnal Kegiatan Harian';
-          txtSubJudul.innerText = 'Catat aktivitas pekerjaan dan unggah bukti karya hari ini';
+          txtSubJudul.innerText = 'Catat aktivitas pekerjaan hari ini atau lengkapi tanggal yang terlewat';
           iconTab.innerText = '✍️';
         } else if (menu === 'Rekap') {
           txtJudulUtama.innerText = '📅 Rekapitulasi Presensi Bulanan';
@@ -1247,9 +1272,20 @@
       }
     }
 
+    function setTanggalJurnalHariIni() {
+      const todayIso = getLocalTodayISO();
+      document.getElementById('inputTanggalJurnal').value = todayIso;
+      sinkronFormJurnalTunggalHariIni(false);
+    }
+
     function sinkronFormJurnalTunggalHariIni(forceEditMode = false) {
       const todayStr = getLocalTodayISO();
-      const jurnalHariIni = riwayatJurnalGlobal.find(j => j.rawTanggal === todayStr);
+      const inputTgl = document.getElementById('inputTanggalJurnal');
+      const targetStr = inputTgl?.value || todayStr;
+      const isTerlambat = targetStr < todayStr;
+
+      const jurnalTanggalIni = riwayatJurnalGlobal.find(j => j.rawTanggal === targetStr);
+      const bannerBox = document.getElementById('bannerStatusJurnalHarian');
       const txtInfo = document.getElementById('txtInfoModeJurnal');
       const badge = document.getElementById('badgeModeJurnal');
       const txtBtn = document.getElementById('txtBtnJurnal');
@@ -1261,34 +1297,35 @@
       const boxCatatan = document.getElementById('boxCatatanGuruHarian');
       const txtCatatan = document.getElementById('txtCatatanGuruHarian');
 
-      if (jurnalHariIni) {
-        editingJurnalId = jurnalHariIni.idJurnal;
-        document.getElementById('txtUraianJurnal').value = jurnalHariIni.uraian;
-        document.getElementById('readWaktuJurnal').innerText = `${jurnalHariIni.hari}, ${jurnalHariIni.tanggal} • Pukul ${jurnalHariIni.jam} WIB`;
-        document.getElementById('readUraianJurnal').innerText = jurnalHariIni.uraian;
+      if (jurnalTanggalIni) {
+        editingJurnalId = jurnalTanggalIni.idJurnal;
+        document.getElementById('txtUraianJurnal').value = jurnalTanggalIni.uraian;
+        document.getElementById('readWaktuJurnal').innerText = `${jurnalTanggalIni.hari}, ${jurnalTanggalIni.tanggal} • Dikirim pukul ${jurnalTanggalIni.jam} WIB`;
+        document.getElementById('readUraianJurnal').innerText = jurnalTanggalIni.uraian;
 
-        const isApproved = jurnalHariIni.validasi && jurnalHariIni.validasi.includes('Disetujui');
+        const isApproved = jurnalTanggalIni.validasi && jurnalTanggalIni.validasi.includes('Disetujui');
         const elStatus = document.getElementById('readStatusValidasiJurnal');
-        elStatus.innerText = jurnalHariIni.validasi || 'Menunggu Validasi';
+        elStatus.innerText = jurnalTanggalIni.validasi || 'Menunggu Validasi';
         elStatus.className = isApproved
           ? 'px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800'
           : 'px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800';
 
-        if (jurnalHariIni.buktiUrl && jurnalHariIni.buktiUrl !== '-') {
+        if (jurnalTanggalIni.buktiUrl && jurnalTanggalIni.buktiUrl !== '-') {
           linkBox.classList.remove('hidden');
-          linkEl.href = jurnalHariIni.buktiUrl.split(' | ')[0];
+          linkEl.href = jurnalTanggalIni.buktiUrl.split(' | ')[0];
         } else { linkBox.classList.add('hidden'); }
 
-        if (jurnalHariIni.catatanGuru) {
+        if (jurnalTanggalIni.catatanGuru) {
           boxCatatan.classList.remove('hidden');
-          txtCatatan.innerText = `"${jurnalHariIni.catatanGuru}"`;
+          txtCatatan.innerText = `"${jurnalTanggalIni.catatanGuru}"`;
         } else { boxCatatan.classList.add('hidden'); }
 
         if (forceEditMode) {
           readBox.classList.add('hidden');
           formBox.classList.remove('hidden');
           btnBatalEdit.classList.remove('hidden');
-          txtInfo.innerText = `✏️ Mode Edit Jurnal Hari Ini (${jurnalHariIni.jam}).`;
+          bannerBox.className = 'bg-amber-50 dark:bg-slate-800 border border-amber-200 dark:border-slate-700 p-3 rounded-xl text-xs flex justify-between items-center gap-2';
+          txtInfo.innerText = `✏️ Mode Edit Jurnal tanggal ${jurnalTanggalIni.tanggal}.`;
           badge.innerText = 'MODE EDIT';
           badge.className = 'bg-amber-500 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shrink-0';
           txtBtn.innerText = '💾 Simpan Perubahan Jurnal';
@@ -1296,19 +1333,34 @@
           readBox.classList.remove('hidden');
           formBox.classList.add('hidden');
           btnBatalEdit.classList.add('hidden');
-          txtInfo.innerText = `✅ Jurnal kegiatan hari ini sudah tersimpan. Klik tombol "Edit Jurnal" jika ingin mengubah.`;
+          bannerBox.className = 'bg-emerald-50 dark:bg-slate-800 border border-emerald-200 dark:border-slate-700 p-3 rounded-xl text-xs flex justify-between items-center gap-2';
+          txtInfo.innerText = `✅ Jurnal tanggal ${jurnalTanggalIni.tanggal} sudah tersimpan. Klik "Edit Jurnal" jika ingin mengubah.`;
           badge.innerText = 'TERSIMPAN';
           badge.className = 'bg-emerald-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shrink-0';
         }
       } else {
         editingJurnalId = null;
+        if (!forceEditMode) {
+          const savedDraft = (targetStr === todayStr) ? (localStorage.getItem('draft_jurnal_' + currentUser.user.nis) || '') : '';
+          document.getElementById('txtUraianJurnal').value = savedDraft;
+        }
         readBox.classList.add('hidden');
         formBox.classList.remove('hidden');
         btnBatalEdit.classList.add('hidden');
-        txtInfo.innerText = '📝 Silakan isi jurnal kegiatan Anda hari ini (1x sehari).';
-        badge.innerText = 'BARU';
-        badge.className = 'bg-indigo-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shrink-0';
-        txtBtn.innerText = 'Simpan Jurnal Hari Ini';
+
+        if (isTerlambat) {
+          bannerBox.className = 'bg-amber-50 dark:bg-slate-800 border border-amber-300 dark:border-amber-700 p-3 rounded-xl text-xs flex justify-between items-center gap-2';
+          txtInfo.innerText = `⚠️ Input Jurnal Susulan (${targetStr}): Jurnal akan otomatis ditandai [Input Terlambat].`;
+          badge.innerText = 'TERLAMBAT INPUT';
+          badge.className = 'bg-amber-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shrink-0';
+          txtBtn.innerText = 'Simpan Jurnal Susulan';
+        } else {
+          bannerBox.className = 'bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 p-3 rounded-xl text-xs flex justify-between items-center gap-2';
+          txtInfo.innerText = '📝 Silakan isi jurnal kegiatan Anda hari ini (1x sehari).';
+          badge.innerText = 'BARU';
+          badge.className = 'bg-indigo-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shrink-0';
+          txtBtn.innerText = 'Simpan Jurnal Hari Ini';
+        }
       }
     }
 
@@ -1510,7 +1562,11 @@
     }
 
     function simpanDraftJurnal() {
-      localStorage.setItem('draft_jurnal_' + currentUser.user.nis, document.getElementById('txtUraianJurnal').value);
+      const todayIso = getLocalTodayISO();
+      const targetTgl = document.getElementById('inputTanggalJurnal')?.value || todayIso;
+      if (targetTgl === todayIso) {
+        localStorage.setItem('draft_jurnal_' + currentUser.user.nis, document.getElementById('txtUraianJurnal').value);
+      }
     }
 
     function prosesFileBuktiJurnal(event) {
@@ -1536,8 +1592,13 @@
 
     async function kirimJurnal() {
       const todayIso = getLocalTodayISO();
-      if (todayIso < TGL_MULAI_PKL || todayIso > TGL_SELESAI_PKL) {
+      const tanggalJurnal = document.getElementById('inputTanggalJurnal')?.value || todayIso;
+
+      if (tanggalJurnal < TGL_MULAI_PKL || tanggalJurnal > TGL_SELESAI_PKL) {
         return alert('Pengisian jurnal hanya dibuka pada masa aktif PKL (16 November 2026 s.d. 27 Maret 2027).');
+      }
+      if (tanggalJurnal > todayIso) {
+        return alert('Tanggal jurnal tidak boleh melebihi hari ini.');
       }
 
       const uraian = document.getElementById('txtUraianJurnal').value.trim();
@@ -1556,6 +1617,7 @@
         const res = await callAPI({
           action: 'submitJurnal',
           idJurnal: editingJurnalId,
+          tanggalJurnal,
           nis: currentUser.user.nis,
           nama: currentUser.user.nama,
           idDudi: targetDudi ? targetDudi.id : currentUser.user.dudi.id,
@@ -1564,11 +1626,13 @@
           imageBase64: buktiJurnalBase64
         });
         alert(res.message);
-        localStorage.removeItem('draft_jurnal_' + currentUser.user.nis);
+        if (tanggalJurnal === todayIso) {
+          localStorage.removeItem('draft_jurnal_' + currentUser.user.nis);
+        }
         document.getElementById('fileBuktiJurnal').value = '';
         buktiJurnalBase64 = '';
         document.getElementById('previewBuktiContainer').classList.add('hidden');
-        await sinkronDataSiswa();
+        await sinkronDataSiswa(tanggalJurnal.substring(0, 7));
         sinkronFormJurnalTunggalHariIni(false);
       } catch (e) {
         alert('Gagal menyimpan jurnal.');
@@ -1640,7 +1704,8 @@
       `;
     }
 
-    function buatIdentitasSiswaCetakHTML() {
+    function buatIdentitasSiswaCetakHTML(bulanStr) {
+      const teksPeriode = formatBulanTahunIndo(bulanStr);
       return `
         <table style="border:none; border-collapse:collapse; margin-bottom:12px; font-size:11.5px; line-height:1.5;">
           <tr style="border:none;">
@@ -1657,6 +1722,11 @@
             <td style="border:none; padding:1px 8px 1px 0; font-weight:bold;">Tempat PKL</td>
             <td style="border:none; padding:1px 6px;">:</td>
             <td style="border:none; padding:1px 0;">${currentUser.user.dudi.nama}</td>
+          </tr>
+          <tr style="border:none;">
+            <td style="border:none; padding:1px 8px 1px 0; font-weight:bold;">Periode</td>
+            <td style="border:none; padding:1px 6px;">:</td>
+            <td style="border:none; padding:1px 0; font-weight:bold;">${teksPeriode}</td>
           </tr>
         </table>
       `;
@@ -1760,7 +1830,6 @@
         let rec = mapTanggal[fullIso] ? { ...mapTanggal[fullIso] } : { masuk: '-', pulang: '-', ket: '-' };
 
         if (!dalamPeriodePKL) {
-          // Tanggal sebelum 16 Nov 2026 atau sesudah 27 Mar 2027 tidak dihitung dalam absen
           rec = { masuk: '-', pulang: '-', ket: '-' };
         } else {
           if (rec.ket === '-') {
@@ -1823,8 +1892,8 @@
           table.data th { background: #e2e8f0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         </style></head><body>
           ${buatKopSuratSiswaHTML()}
-          <div class="judul">LAPORAN REKAPITULASI PRESENSI BULANAN PKL (PERIODE: ${bulan})</div>
-          ${buatIdentitasSiswaCetakHTML()}
+          <div class="judul">LAPORAN REKAPITULASI PRESENSI BULANAN PKL</div>
+          ${buatIdentitasSiswaCetakHTML(bulan)}
           <table class="data">
             <thead><tr><th style="width:38px;">No</th><th>Hari</th><th>Tanggal</th><th>Jam Masuk</th><th>Jam Pulang</th><th>Keterangan</th></tr></thead>
             <tbody>
@@ -1846,7 +1915,10 @@
       tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400">Memuat laporan jurnal...</td></tr>';
 
       await sinkronDataSiswa(bulanFilter);
-      cacheJurnalBulanan = riwayatJurnalGlobal.filter(j => j.rawTanggal && j.rawTanggal.startsWith(bulanFilter)).slice().reverse();
+      cacheJurnalBulanan = riwayatJurnalGlobal
+        .filter(j => j.rawTanggal && j.rawTanggal.startsWith(bulanFilter))
+        .slice()
+        .sort((a, b) => a.rawTanggal.localeCompare(b.rawTanggal));
 
       if (cacheJurnalBulanan.length === 0) {
         tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400">Belum ada jurnal pada bulan ini.</td></tr>';
@@ -1861,7 +1933,7 @@
             <div>${j.uraian}</div>
             ${j.catatanGuru ? `<div class="mt-1.5 p-2 rounded-lg bg-indigo-50 dark:bg-slate-800 text-[11px] text-indigo-800 dark:text-indigo-300 font-medium">💬 <b>Catatan Guru:</b> ${j.catatanGuru}</div>` : ''}
           </td>
-          <td class="p-2 text-center font-semibold text-[10px]">${j.validasi.includes('Disetujui') ? '✔ Paraf' : '⏳ Proses'}</td>
+          <td class="p-2 text-center font-semibold text-[10px]">${j.validasi && j.validasi.includes('Disetujui') ? '✔ Paraf' : ''}</td>
         </tr>
       `).join('');
     }
@@ -1881,8 +1953,8 @@
           table.data th { background: #e2e8f0; text-align: center; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         </style></head><body>
           ${buatKopSuratSiswaHTML()}
-          <div class="judul">LAPORAN JURNAL KEGIATAN BULANAN PKL (PERIODE: ${bulan})</div>
-          ${buatIdentitasSiswaCetakHTML()}
+          <div class="judul">LAPORAN JURNAL KEGIATAN BULANAN PKL</div>
+          ${buatIdentitasSiswaCetakHTML(bulan)}
           <table class="data">
             <thead><tr><th style="width:35px;">No</th><th style="width:125px;">Hari & Tanggal</th><th>Uraian Kegiatan Siswa & Catatan Pembimbing</th><th style="width:95px;">Status Paraf</th></tr></thead>
             <tbody>
@@ -1891,7 +1963,7 @@
                   <td style="text-align:center;">${i + 1}</td>
                   <td style="text-align:center;">${j.hari}, ${j.tanggal}</td>
                   <td>${j.uraian}${j.catatanGuru ? `<br><small><i>Catatan Guru: ${j.catatanGuru}</i></small>` : ''}</td>
-                  <td style="text-align:center;">${j.validasi.includes('Disetujui') ? '✔ Disetujui' : 'Menunggu'}</td>
+                  <td style="text-align:center;">${j.validasi && j.validasi.includes('Disetujui') ? '✔ Disetujui' : ''}</td>
                 </tr>
               `).join('') : '<tr><td colspan="4" style="text-align:center;">Belum ada catatan kegiatan pada periode ini.</td></tr>'}
             </tbody>
