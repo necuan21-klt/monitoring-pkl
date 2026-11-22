@@ -2,7 +2,7 @@
 <html lang="id" class="">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login Monitoring PKL - SMK Negeri 1 Klaten</title>
 
   <!-- KONFIGURASI PWA -->
@@ -15,75 +15,150 @@
   <link rel="apple-touch-icon" href="logo.png">
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config = { darkMode: 'class' };</script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"Segoe UI"', 'Roboto', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
   <style>
     @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(24px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
+    @keyframes floatSlow {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(18px, -18px) scale(1.06); }
+    }
+    @keyframes floatSlowReverse {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-20px, 16px) scale(1.05); }
+    }
+
     .animate-login-card {
-      animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: fadeInUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
-    body, div, main, input, button {
-      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    .orb-1 { animation: floatSlow 12s ease-in-out infinite; }
+    .orb-2 { animation: floatSlowReverse 15s ease-in-out infinite; }
+
+    /* Efek Liquid Glass (Mode Terang) */
+    .glass-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.68), rgba(255, 255, 255, 0.42));
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      box-shadow:
+        0 24px 48px -12px rgba(31, 38, 135, 0.14),
+        inset 0 1.5px 1px rgba(255, 255, 255, 0.85),
+        inset 0 -1px 1px rgba(255, 255, 255, 0.25);
     }
-    html.dark body { background-color: #0f172a; color: #f1f5f9; }
-    html.dark .bg-white { background-color: #1e293b !important; color: #f1f5f9; }
-    html.dark .text-slate-800 { color: #f8fafc !important; }
-    html.dark .text-slate-600 { color: #cbd5e1 !important; }
-    html.dark .border-slate-200, html.dark .border-slate-300, html.dark .border-slate-100 { border-color: #334155 !important; }
-    html.dark input {
-      background-color: #0f172a !important;
-      color: #f8fafc !important;
-      border-color: #475569 !important;
+
+    /* Efek Liquid Glass (Mode Gelap) */
+    html.dark .glass-card {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.62), rgba(15, 23, 42, 0.45));
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow:
+        0 24px 48px -12px rgba(0, 0, 0, 0.55),
+        inset 0 1px 1px rgba(255, 255, 255, 0.22),
+        inset 0 -1px 1px rgba(255, 255, 255, 0.05);
+    }
+
+    /* Efek Kaca untuk Tombol Toggle & Input */
+    .glass-pill {
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(18px) saturate(160%);
+      -webkit-backdrop-filter: blur(18px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      box-shadow: 0 8px 20px -6px rgba(15, 23, 42, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+    html.dark .glass-pill {
+      background: rgba(30, 41, 59, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    .glass-input {
+      background: rgba(255, 255, 255, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      box-shadow: inset 0 1px 3px rgba(15, 23, 42, 0.05);
+    }
+    .glass-input:focus {
+      background: rgba(255, 255, 255, 0.85);
+    }
+    html.dark .glass-input {
+      background: rgba(15, 23, 42, 0.48);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.3);
+    }
+    html.dark .glass-input:focus {
+      background: rgba(15, 23, 42, 0.75);
     }
   </style>
 </head>
-<body class="bg-slate-100 font-sans text-slate-800 min-h-[100dvh] overflow-x-hidden overflow-y-auto">
+<body class="bg-[#e8eef9] dark:bg-[#070b14] font-sans text-slate-800 dark:text-slate-100 min-h-[100dvh] overflow-x-hidden overflow-y-auto transition-colors duration-300">
 
-  <main class="w-full min-h-[100dvh] flex flex-col items-center justify-center p-5 py-14 bg-gradient-to-br from-slate-100 via-indigo-50/50 to-blue-100/60 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950 select-none relative">
+  <main class="relative w-full min-h-[100dvh] flex flex-col items-center justify-center p-5 py-14 overflow-hidden">
     
+    <!-- LATAR BELAKANG CAHAYA (AMBIENT ORBS) UNTUK PEMBIASAN KACA -->
+    <div class="pointer-events-none fixed inset-0 overflow-hidden -z-10">
+      <div class="orb-1 absolute -top-24 -left-20 w-80 h-80 sm:w-96 sm:h-96 rounded-full bg-indigo-400/50 dark:bg-indigo-600/35 blur-[80px]"></div>
+      <div class="orb-2 absolute top-1/3 -right-24 w-80 h-80 sm:w-[26rem] sm:h-[26rem] rounded-full bg-sky-300/60 dark:bg-cyan-500/25 blur-[90px]"></div>
+      <div class="orb-1 absolute -bottom-28 left-1/4 w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-fuchsia-300/45 dark:bg-violet-600/30 blur-[90px]"></div>
+    </div>
+
     <!-- TOMBOL MODE GELAP / TERANG -->
-    <button type="button" onclick="toggleDarkMode()" class="fixed top-4 right-4 z-20 p-2.5 rounded-2xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-xs shadow-md border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-1.5 active:scale-95 transition">
-      <span id="iconDarkLogin">🌙</span> <span id="txtDarkLogin" class="text-slate-700 dark:text-slate-200">Mode Gelap</span>
+    <button type="button" onclick="toggleDarkMode()" class="glass-pill fixed top-4 right-4 z-20 px-3.5 py-2 rounded-full text-xs font-semibold flex items-center gap-1.5 active:scale-95 transition select-none">
+      <span id="iconDarkLogin">🌙</span>
+      <span id="txtDarkLogin" class="text-slate-700 dark:text-slate-200">Mode Gelap</span>
     </button>
 
-    <!-- KARTU LOGIN UTAMA -->
-    <div class="w-full max-w-sm bg-white p-6 rounded-3xl shadow-xl border border-slate-200/80 animate-login-card my-auto">
-      <div class="text-center mb-5">
-        <img src="logo.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135755.png'" alt="Logo Sekolah" class="w-20 h-20 mx-auto mb-2.5 object-contain drop-shadow-md">
-        <h1 class="text-lg font-extrabold text-slate-800 tracking-tight">SMK NEGERI 1 KLATEN</h1>
+    <!-- KARTU LOGIN UTAMA (LIQUID GLASS) -->
+    <div class="glass-card w-full max-w-sm p-7 rounded-[2rem] animate-login-card my-auto">
+      <div class="text-center mb-6 select-none">
+        <div class="w-20 h-20 mx-auto mb-3 rounded-2xl bg-white/60 dark:bg-white/10 border border-white/70 dark:border-white/15 flex items-center justify-center p-2 shadow-sm">
+          <img src="logo.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135755.png'" alt="Logo Sekolah" class="w-full h-full object-contain drop-shadow-sm">
+        </div>
+        <h1 class="text-lg font-extrabold text-slate-900 dark:text-white tracking-tight">SMK NEGERI 1 KLATEN</h1>
         <p class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 mt-0.5">Program Keahlian Desain Komunikasi Visual (DKV)</p>
-        <p class="text-[11px] text-slate-400 mt-1">Portal Presensi, Jurnal & Monitoring PKL</p>
+        <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Portal Presensi, Jurnal & Monitoring PKL</p>
       </div>
 
       <!-- BANNER NOTIFIKASI ERROR / STATUS INLINE -->
-      <div id="boxAlertLogin" class="hidden mb-3.5 p-3 rounded-xl text-xs font-semibold border flex items-start gap-2 leading-relaxed">
+      <div id="boxAlertLogin" class="hidden mb-4 p-3 rounded-2xl text-xs font-semibold border backdrop-blur-md flex items-start gap-2 leading-relaxed">
         <span id="iconAlertLogin" class="shrink-0">⚠️</span>
         <span id="txtAlertLogin" class="flex-1">-</span>
       </div>
 
-      <form onsubmit="event.preventDefault(); prosesLogin();" class="space-y-3.5">
+      <form onsubmit="event.preventDefault(); prosesLogin();" class="space-y-4">
         <div>
-          <label for="inputNis" class="block text-[11px] font-bold uppercase text-slate-600 mb-1">ID Pengguna (NIS / ID Guru)</label>
-          <input type="text" id="inputNis" autocomplete="username" oninput="sembunyikanAlert()" placeholder="Masukkan NIS atau ID Guru" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition">
+          <label for="inputNis" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5 ml-1 select-none">ID Pengguna (NIS / ID Guru)</label>
+          <input type="text" id="inputNis" autocomplete="username" oninput="sembunyikanAlert()" placeholder="Masukkan NIS atau ID Guru" class="glass-input w-full px-4 py-3 rounded-2xl text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 text-sm transition">
         </div>
+
         <div>
-          <label for="inputPin" class="block text-[11px] font-bold uppercase text-slate-600 mb-1">PIN Keamanan</label>
+          <label for="inputPin" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5 ml-1 select-none">PIN Keamanan</label>
           <div class="relative">
-            <input type="password" id="inputPin" autocomplete="current-password" oninput="sembunyikanAlert()" placeholder="Masukkan PIN Anda" class="w-full px-4 py-2.5 pr-11 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition">
-            <button type="button" onclick="toggleShowPin('inputPin', 'btnEyeLogin')" id="btnEyeLogin" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-indigo-600 text-sm px-1" title="Lihat / Sembunyikan PIN">👁️</button>
+            <input type="password" id="inputPin" autocomplete="current-password" oninput="sembunyikanAlert()" placeholder="Masukkan PIN Anda" class="glass-input w-full px-4 py-3 pr-11 rounded-2xl text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/60 text-sm transition">
+            <button type="button" onclick="toggleShowPin('inputPin', 'btnEyeLogin')" id="btnEyeLogin" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 text-sm px-1.5 py-1 rounded-lg transition select-none" title="Lihat / Sembunyikan PIN">👁️</button>
           </div>
         </div>
-        <button type="submit" id="btnLogin" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-200/50 dark:shadow-none transition flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+
+        <button type="submit" id="btnLogin" class="w-full bg-gradient-to-b from-indigo-500 to-indigo-600 hover:from-indigo-500 hover:to-indigo-700 active:scale-[0.98] text-white font-semibold py-3.5 rounded-2xl shadow-[0_10px_24px_-6px_rgba(79,70,229,0.55),inset_0_1px_1px_rgba(255,255,255,0.4)] transition flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed select-none mt-2">
           <span id="txtBtnLogin">Masuk Aplikasi</span>
           <svg id="spinnerLogin" class="hidden animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
         </button>
-        <div class="text-center pt-2 border-t border-slate-100">
-          <p class="text-[11px] text-slate-400 font-medium">© copyright_DKV_SMKN 1 Klaten</p>
+
+        <div class="text-center pt-3 border-t border-slate-300/50 dark:border-white/10 select-none">
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">© copyright_DKV_SMKN 1 Klaten</p>
         </div>
       </form>
     </div>
@@ -136,10 +211,10 @@
 
       if (tipe === 'success') {
         icon.innerText = '✅';
-        box.className = 'mb-3.5 p-3 rounded-xl text-xs font-semibold border flex items-start gap-2 leading-relaxed bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800';
+        box.className = 'mb-4 p-3 rounded-2xl text-xs font-semibold border backdrop-blur-md flex items-start gap-2 leading-relaxed bg-emerald-500/15 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-200 border-emerald-500/30';
       } else {
         icon.innerText = '⚠️';
-        box.className = 'mb-3.5 p-3 rounded-xl text-xs font-semibold border flex items-start gap-2 leading-relaxed bg-rose-50 dark:bg-rose-950/50 text-rose-800 dark:text-rose-300 border-rose-200 dark:border-rose-800';
+        box.className = 'mb-4 p-3 rounded-2xl text-xs font-semibold border backdrop-blur-md flex items-start gap-2 leading-relaxed bg-rose-500/15 dark:bg-rose-500/20 text-rose-800 dark:text-rose-200 border-rose-500/30';
       }
     }
 
